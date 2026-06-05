@@ -13,7 +13,7 @@ export const DEVELOPER_INFO = {
   email: "abdulbha77@gmail.com",
   github: "https://github.com/abdulbhati07-a11y",
   linkedin: "https://www.linkedin.com/in/muhammad-abdullah-bhatti-5bab33396/",
-  resume: "/Muhammad-Abdullah-Bhatti-CV.pdf",
+  resume: "/Muhammad_Abdullah_Bhatti_Professional_Resume.docx",
   certificates: "/certificate.pdf"
 };
 
