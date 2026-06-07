@@ -88,14 +88,14 @@ const ProjectCard = ({ project, index }) => {
     >
       {/* Top area: project image (unchanged) */}
       <div className={`w-full h-48 relative overflow-hidden bg-gradient-to-br ${project.gradient} shrink-0`}>
-        <div className="absolute inset-0 flex items-center justify-center w-full h-full object-cover">
+        <div className="absolute inset-0 flex items-center justify-center w-full h-full object-cover z-10">
           {project.logo ? (
             <img src={project.logo} alt={`${project.title} logo`} className="w-20 h-20 object-contain" />
           ) : (
             <img src={getPlaceholder(project.title)} alt={`${project.title} logo`} className="w-20 h-20 object-contain" />
           )}
         </div>
-        <div className="absolute inset-0 bg-primary/10" />
+        <div className="absolute inset-0 bg-primary/10 z-0" />
       </div>
 
       {/* Middle & Bottom areas (Resting State) */}

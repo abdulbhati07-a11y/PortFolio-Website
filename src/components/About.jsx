@@ -355,9 +355,9 @@ const TimelineItem = ({ item, isEven, shouldReduceMotion }) => {
           <div className="flex items-start justify-between mb-3 gap-4 flex-wrap">
             <div className="flex items-center gap-3">
               {item.logo ? (
-                <img src={item.logo} alt={`${item.title} logo`} className="w-10 h-10 rounded-md object-cover" />
+                <img src={item.logo} alt={`${item.title} logo`} className="w-10 h-10 rounded-md object-cover z-10" />
               ) : (
-                <img src={getPlaceholder(item.title)} alt={`${item.title} logo`} className="w-10 h-10 rounded-md object-cover" />
+                <img src={getPlaceholder(item.title)} alt={`${item.title} logo`} className="w-10 h-10 rounded-md object-cover z-10" />
               )}
               <h3 className="font-sans text-xl font-bold text-white tracking-tight group-hover:text-accent-cyan transition-colors">{item.title}</h3>
             </div>
