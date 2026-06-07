@@ -1,4 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
   <rect width="120" height="120" rx="20" fill="#60a5fa"/>
-  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Inter, Arial" font-size="44" fill="#fff">LW</text>
+  <g transform="translate(30,28)" fill="#fff">
+    <path d="M30 10 L50 10 L54 40 L6 40 L10 10 Z M22 10 L38 10" stroke="#fff" stroke-width="2" fill="none"/>
+    <circle cx="28" cy="60" r="6" />
+    <circle cx="40" cy="60" r="6" />
+    <circle cx="16" cy="60" r="6" />
+  </g>
 </svg>

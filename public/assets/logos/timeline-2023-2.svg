@@ -1,1 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="12" fill="#fb7185"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Inter, Arial" font-size="20" fill="#fff">FP</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="12" fill="#fb7185"/><g transform="translate(40,42)" fill="#fff"><path d="M-18 -2 L18 -2 L18 6 L-18 6 Z"/><path d="M-2 -12 L2 -12 L2 -2 L-2 -2 Z"/></g></svg>

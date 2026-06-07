@@ -1,4 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
-  <rect width="120" height="120" rx="20" fill="#14b8a6"/>
-  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Inter, Arial" font-size="38" fill="#fff">DW</text>
+  <rect width="120" height="120" rx="20" fill="#06b6d4"/>
+  <g transform="translate(60,48)">
+    <path d="M0,-30 C12,-30 24,-18 24,0 C24,18 0,30 0,30 C0,30 -24,18 -24,0 C-24,-18 -12,-30 0,-30 Z" fill="#fff"/>
+    <circle cx="-6" cy="-6" r="3" fill="#06b6d4"/>
+    <circle cx="6" cy="-6" r="2" fill="#06b6d4"/>
+  </g>
 </svg>

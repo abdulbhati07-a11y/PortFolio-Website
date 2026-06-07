@@ -1,4 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
   <rect width="120" height="120" rx="20" fill="#8b5cf6"/>
-  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Inter, Arial" font-size="36" fill="#fff">QR</text>
+  <g transform="translate(24,24)" fill="#fff">
+    <rect x="0" y="0" width="20" height="20"/>
+    <rect x="30" y="0" width="20" height="20"/>
+    <rect x="0" y="30" width="20" height="20"/>
+    <rect x="30" y="30" width="10" height="10"/>
+    <rect x="60" y="60" width="16" height="16"/>
+  </g>
 </svg>
