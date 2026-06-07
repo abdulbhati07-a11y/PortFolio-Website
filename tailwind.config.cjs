@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -7,9 +8,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#0F172A",
-        secondary: "#1E293B",
-        tertiary: "#0A0E27",
+        primary: "rgba(var(--bg-primary), <alpha-value>)",
+        secondary: "rgba(var(--bg-secondary), <alpha-value>)",
+        tertiary: "rgba(var(--bg-tertiary), <alpha-value>)",
+        glass: "rgba(var(--glass-color), <alpha-value>)",
         accent: {
           cyan: "#00D9FF",
           purple: "#A855F7",
@@ -17,9 +19,9 @@ module.exports = {
           orange: "#F97316"
         },
         text: {
-          primary: "#F1F5F9",
-          secondary: "#94A3B8",
-          tertiary: "#64748B"
+          primary: "rgba(var(--text-primary), <alpha-value>)",
+          secondary: "rgba(var(--text-secondary), <alpha-value>)",
+          tertiary: "rgba(var(--text-tertiary), <alpha-value>)"
         }
       },
       fontFamily: {

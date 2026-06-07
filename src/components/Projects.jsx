@@ -1,132 +1,199 @@
-import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { m, AnimatePresence, useInView } from 'framer-motion';
 import { FaGithub, FaExternalLinkAlt, FaStar } from 'react-icons/fa';
 import { PROJECTS, COMPETENCY_DETAILS, PROJECT_CATEGORIES } from '../utils/constants';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
-};
+import Skeleton from './Skeleton';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
+  visible: (i) => ({ 
+    opacity: 1, 
+    y: 0, 
+    transition: { delay: i * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] } 
+  }),
 };
 
+const REVIEWS = [
+  { id: 1, name: 'Alice Smith', role: 'Product Manager', text: 'An absolute pleasure to work with. Delivered on time and exceeded expectations.', rating: 5, avatar: 'AS' },
+  { id: 2, name: 'Bob Johnson', role: 'Senior Developer', text: 'Clean code, great communication, and highly skilled in modern tech stacks.', rating: 5, avatar: 'BJ' },
+  { id: 3, name: 'Charlie Lee', role: 'Startup Founder', text: 'Transformed our rough ideas into a polished, high-performing application.', rating: 5, avatar: 'CL' },
+  { id: 4, name: 'Diana Prince', role: 'UX Designer', text: 'Exceptional attention to detail. The UI implementations were pixel perfect.', rating: 5, avatar: 'DP' },
+  { id: 5, name: 'Evan Wright', role: 'Engineering Lead', text: 'Quick learner and very adaptable. A valuable addition to any engineering team.', rating: 5, avatar: 'EW' },
+  { id: 6, name: 'Fiona Gallagher', role: 'Marketing Director', text: 'The new site increased our conversions by 40%. Fantastic work all around!', rating: 5, avatar: 'FG' },
+];
+
+const ReviewCard = ({ review }) => (
+  <div className="glass-card w-[280px] p-6 flex flex-col gap-4 mx-3 flex-shrink-0 snap-center">
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-cyan/20 to-accent-purple/20 border border-white/10 flex items-center justify-center text-white font-mono font-bold text-sm">
+        {review.avatar}
+      </div>
+      <div>
+        <h4 className="font-sans font-bold text-white text-sm">{review.name}</h4>
+        <p className="font-mono text-accent-cyan text-[10px] tracking-wider uppercase">{review.role}</p>
+      </div>
+    </div>
+    <div className="flex gap-1 text-accent-cyan">
+      {[...Array(review.rating)].map((_, i) => (
+        <FaStar key={i} size={12} />
+      ))}
+    </div>
+    <p className="font-sans text-text-secondary text-sm leading-relaxed font-light">
+      "{review.text}"
+    </p>
+  </div>
+);
+
 /* ─── Project Card ────────────────────────────────────────────────────── */
-const ProjectCard = ({ project, activeFilter }) => {
+const ProjectCard = ({ project, index }) => {
   const [hovered, setHovered] = useState(false);
+  const cardRef = useRef(null);
+  const isInView = useInView(cardRef, { once: true, margin: "-50px" });
+
+  const overlayVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } }
+  };
 
   return (
-    <motion.article
+    <m.article
+      ref={cardRef}
+      custom={index}
       variants={cardVariants}
-      layout
-      className="glass-card rounded-3xl overflow-hidden group flex flex-col relative card-hover"
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      className="glass-card rounded-3xl relative flex flex-col h-full bg-secondary/30"
+      style={{
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        overflow: 'hidden'
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
+      tabIndex={0}
+      aria-label={`${project.title} project — press Enter to view details`}
     >
-      {/* Featured badge */}
-      {project.featured && (
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent-cyan/20 border border-accent-cyan/40 text-accent-cyan text-xs font-mono font-bold">
-          <FaStar size={9} />
-          Featured
-        </div>
-      )}
-
-      {/* Thumbnail */}
-      <div className={`w-full h-48 relative overflow-hidden bg-gradient-to-br ${project.gradient} border-b border-white/[0.05]`}>
-        <div className="absolute inset-0 flex items-center justify-center">
+      {/* Top area: project image (unchanged) */}
+      <div className={`w-full h-48 relative overflow-hidden bg-gradient-to-br ${project.gradient} shrink-0`}>
+        <div className="absolute inset-0 flex items-center justify-center w-full h-full object-cover">
           <span className="text-6xl select-none">{project.icon}</span>
         </div>
-        {/* Animated overlay on hover */}
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"
-          animate={{ opacity: hovered ? 1 : 0.5 }}
-          transition={{ duration: 0.3 }}
-        />
-        {/* Tech peek on hover */}
-        <AnimatePresence>
-          {hovered && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute bottom-3 left-0 right-0 flex justify-center flex-wrap gap-1.5 px-3"
-            >
-              {project.tech.slice(0, 3).map((t) => (
-                <span key={t} className="text-xs font-mono bg-primary/80 text-accent-cyan px-2 py-0.5 rounded-full border border-accent-cyan/30">
-                  {t}
-                </span>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <div className="absolute inset-0 bg-primary/10" />
       </div>
 
-      {/* Content */}
-      <div className="p-7 flex flex-col flex-grow">
-        <h3 className="font-sans text-xl font-bold text-white mb-2 tracking-tight group-hover:text-accent-cyan transition-colors duration-300">
-          {project.title}
-        </h3>
-        <p className="font-sans text-text-secondary text-sm leading-relaxed mb-5 flex-grow font-light">
+      {/* Middle & Bottom areas (Resting State) */}
+      <div className="p-7 flex flex-col flex-1 relative z-0">
+        
+        {/* Middle: type badge + project title — nothing else */}
+        <div className="flex-1">
+          <div className="mb-3 flex items-center gap-2">
+             {project.featured && (
+               <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full bg-accent-cyan/20 border border-accent-cyan/40 text-accent-cyan text-[10px] font-mono font-bold uppercase tracking-wider">
+                 <FaStar size={8} className="mr-1" /> Featured
+               </span>
+             )}
+             <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-sans font-medium text-accent-cyan uppercase tracking-wider">
+               {project.category || project.tech[0]}
+             </span>
+          </div>
+          <h3 className="font-sans text-xl font-bold text-white mb-2 tracking-tight line-clamp-2">
+            {project.title}
+          </h3>
+        </div>
+
+        {/* Bottom: tech stack and buttons */}
+        <div className="mt-auto pt-4 relative z-20 flex flex-col gap-3">
+          <div className="flex flex-wrap gap-2 items-center">
+            {project.tech.map((t, idx) => (
+              <span key={idx} className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] text-white">
+                {t}
+              </span>
+            ))}
+          </div>
+          
+          <div className="flex gap-2 items-center min-h-[28px] border-t border-white/[0.04] pt-3 mt-1">
+            {/* GitHub pill button */}
+            {(!project.links?.github || project.links.github === '#') ? (
+              <span
+                className="px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-[11px] text-white/30 cursor-not-allowed flex items-center gap-1.5"
+                aria-label={`${project.title} GitHub repository not available`}
+              >
+                <FaGithub size={12} /> GitHub
+              </span>
+            ) : (
+              <a
+                href={project.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-[11px] text-white hover:bg-white hover:text-black transition-colors flex items-center gap-1.5"
+                aria-label={`View ${project.title} on GitHub`}
+              >
+                <FaGithub size={12} /> GitHub
+              </a>
+            )}
+
+            {/* Demo pill button */}
+            {(!project.links?.demo || project.links.demo === '#') ? (
+              <span
+                className="px-3 py-1.5 rounded-full bg-accent-cyan/5 border border-accent-cyan/10 text-[11px] text-accent-cyan/30 cursor-not-allowed flex items-center gap-1.5"
+                aria-label={`${project.title} live demo not available`}
+              >
+                <FaExternalLinkAlt size={10} /> Demo
+              </span>
+            ) : (
+              <a
+                href={project.links.demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-full bg-accent-cyan/20 border border-accent-cyan/40 text-[11px] text-accent-cyan hover:bg-accent-cyan hover:text-black transition-colors flex items-center gap-1.5"
+                aria-label={`View ${project.title} live demo`}
+              >
+                <FaExternalLinkAlt size={10} /> Demo
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* HOVER OVERLAY */}
+      <m.div
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center"
+        style={{ 
+          background: 'rgba(0, 0, 0, 0.85)',
+          padding: '1.5rem',
+          pointerEvents: hovered ? "auto" : "none"
+        }}
+        variants={overlayVariants}
+        initial="hidden"
+        animate={hovered ? "visible" : "hidden"}
+      >
+        <p className="font-sans text-white text-sm leading-relaxed font-light">
           {project.description}
         </p>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {project.tech.map((t, idx) => (
-            <span
-              key={idx}
-              className={`tag text-xs ${
-                activeFilter &&
-                (t.toLowerCase().includes(activeFilter.toLowerCase()) ||
-                  activeFilter.toLowerCase().includes(t.toLowerCase()))
-                  ? 'tag-active'
-                  : ''
-              }`}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-
-        {/* Links */}
-        <div className="flex gap-3 mt-auto">
-          {project.links.github && project.links.github !== '#' && (
-            <a
-              href={project.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs font-sans font-medium text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white hover:text-primary transition-all duration-300"
-              aria-label={`View ${project.title} on GitHub`}
-            >
-              <FaGithub size={13} /> GitHub
-            </a>
-          )}
-          {project.links.demo && project.links.demo !== '#' && (
-            <a
-              href={project.links.demo}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs font-sans font-medium text-primary bg-white px-4 py-2 rounded-full hover:bg-white/90 transition-all duration-300"
-              aria-label={`View ${project.title} live demo`}
-            >
-              <FaExternalLinkAlt size={11} /> Live Demo
-            </a>
-          )}
-        </div>
-      </div>
-    </motion.article>
+      </m.div>
+    </m.article>
   );
 };
 
 /* ─── Projects Section ────────────────────────────────────────────────── */
 const Projects = ({ activeFilter, clearFilter }) => {
   const [categoryFilter, setCategoryFilter] = useState('All');
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredProjects = useMemo(() => {
     let list = PROJECTS;
-    // Skill filter from About section
     if (activeFilter) {
       list = list.filter((p) =>
         p.tech.some(
@@ -136,7 +203,6 @@ const Projects = ({ activeFilter, clearFilter }) => {
         )
       );
     }
-    // Category tab filter
     if (categoryFilter !== 'All') {
       list = list.filter(
         (p) =>
@@ -147,171 +213,190 @@ const Projects = ({ activeFilter, clearFilter }) => {
     return list;
   }, [activeFilter, categoryFilter]);
 
-  const featuredProjects = PROJECTS.filter((p) => p.featured);
-
   return (
-    <motion.section
-      className="w-full max-w-7xl mx-auto px-6 py-20 md:py-32"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
+    <m.section
+      ref={sectionRef}
+      className="w-full max-w-screen-2xl mx-auto py-20 md:py-32"
     >
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
-        <motion.div variants={cardVariants}>
-          <div className="flex items-center gap-3 mb-3">
-            <span className="font-mono text-accent-cyan text-sm tracking-widest">Projects</span>
-            <div className="w-12 h-px bg-white/[0.06]" />
+      <div className="px-4 md:px-8 lg:px-16 2xl:px-0">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 overflow-hidden">
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="font-mono text-accent-cyan text-sm tracking-widest">Projects</span>
+              <div className="w-12 h-px bg-white/[0.06]" />
+            </div>
+            <AnimatePresence mode="wait">
+              {!isLoaded ? (
+                <m.div key="skeleton-header" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="my-2">
+                  <Skeleton width="300px" height="48px" borderRadius="8px" />
+                </m.div>
+              ) : (
+                <m.h2 
+                  key="real-header"
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter"
+                >
+                  {activeFilter ? (
+                    <>{activeFilter} <span className="text-gradient">Work</span></>
+                  ) : (
+                    <>Selected <span className="text-gradient">Projects</span></>
+                  )}
+                </m.h2>
+              )}
+            </AnimatePresence>
           </div>
-          <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
-            {activeFilter ? (
-              <>{activeFilter} <span className="text-gradient">Work</span></>
-            ) : (
-              <>Selected <span className="text-gradient">Projects</span></>
-            )}
-          </h2>
-        </motion.div>
 
-        {activeFilter && (
-          <motion.button
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            onClick={() => { clearFilter(); setCategoryFilter('All'); }}
-            className="text-sm font-sans font-medium text-text-secondary hover:text-white border border-white/10 hover:border-white/30 px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-2"
-          >
-            Clear Filter <span className="text-accent-cyan">✕</span>
-          </motion.button>
+          {activeFilter && isLoaded && (
+            <m.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => { clearFilter(); setCategoryFilter('All'); }}
+              className="text-sm font-sans font-medium text-text-secondary hover:text-white border border-white/10 hover:border-white/30 px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-2"
+            >
+              Clear Filter <span className="text-accent-cyan">✕</span>
+            </m.button>
+          )}
+        </div>
+
+        {/* Competency detail box */}
+        <AnimatePresence mode="wait">
+          {activeFilter && COMPETENCY_DETAILS[activeFilter] && isLoaded && (
+            <m.div
+              key="filter-details"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="glass-card rounded-2xl p-6 md:p-8 mb-8 border-l-4 border-l-accent-cyan overflow-hidden"
+            >
+              <h3 className="text-white font-sans text-lg font-semibold mb-2 tracking-tight">
+                My Expertise in {activeFilter}
+              </h3>
+              <p className="text-text-secondary font-sans text-sm leading-relaxed font-light max-w-4xl">
+                {COMPETENCY_DETAILS[activeFilter]}
+              </p>
+            </m.div>
+          )}
+        </AnimatePresence>
+
+        {/* Category filter tabs */}
+        {!activeFilter && (
+          <div className="flex flex-wrap gap-2 mb-12">
+            <AnimatePresence mode="wait">
+              {!isLoaded ? (
+                <m.div key="skeleton-tabs" className="flex gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <Skeleton width="80px" height="36px" borderRadius="999px" />
+                  <Skeleton width="100px" height="36px" borderRadius="999px" />
+                  <Skeleton width="120px" height="36px" borderRadius="999px" />
+                </m.div>
+              ) : (
+                <m.div key="real-tabs" className="flex flex-wrap gap-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                  {PROJECT_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setCategoryFilter(cat)}
+                      className={`px-5 py-2 rounded-full text-sm font-sans font-medium transition-all duration-300 ${
+                        categoryFilter === cat
+                          ? 'bg-accent-cyan text-primary shadow-[0_0_20px_rgba(0,217,255,0.4)]'
+                          : 'border border-white/10 text-text-secondary hover:border-white/30 hover:text-white'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </m.div>
+              )}
+            </AnimatePresence>
+          </div>
         )}
+
+        {/* Projects Grid */}
+        <AnimatePresence mode="wait">
+          {!isLoaded ? (
+            <m.div 
+              key="skeleton-grid" 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 items-stretch"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Skeleton width="100%" height="380px" borderRadius="24px" />
+              <Skeleton width="100%" height="380px" borderRadius="24px" />
+              <Skeleton width="100%" height="380px" borderRadius="24px" />
+              <Skeleton width="100%" height="380px" borderRadius="24px" />
+              <Skeleton width="100%" height="380px" borderRadius="24px" />
+              <Skeleton width="100%" height="380px" borderRadius="24px" />
+            </m.div>
+          ) : filteredProjects.length === 0 ? (
+            <m.div
+              key="no-projects"
+              className="w-full py-24 flex flex-col items-center justify-center text-center glass-card rounded-3xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="text-5xl mb-5">🔍</div>
+              <h3 className="text-white font-sans text-2xl font-bold mb-2">No projects found</h3>
+              <p className="text-text-secondary text-sm mb-6">
+                I have experience in {activeFilter || categoryFilter}, but no specific projects are listed yet.
+              </p>
+              <button
+                onClick={() => { clearFilter(); setCategoryFilter('All'); }}
+                className="px-6 py-3 bg-white/5 border border-white/10 rounded-full text-white hover:bg-white/10 transition-all duration-300"
+              >
+                View All Projects
+              </button>
+            </m.div>
+          ) : (
+            <m.div 
+              key="real-grid" 
+              layout 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 items-stretch"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Show Featured Projects First if in 'All' view */}
+              {!activeFilter && categoryFilter === 'All' && PROJECTS.filter(p => p.featured).map((project, index) => (
+                <ProjectCard key={project.id} project={project} index={index} />
+              ))}
+              
+              {/* Show the rest of the filtered projects */}
+              {(!activeFilter && categoryFilter === 'All' ? filteredProjects.filter(p => !p.featured) : filteredProjects).map((project, index) => (
+                <ProjectCard key={project.id} project={project} index={index + (categoryFilter === 'All' ? PROJECTS.filter(p => p.featured).length : 0)} />
+              ))}
+            </m.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Competency detail box */}
-      <AnimatePresence mode="wait">
-        {activeFilter && COMPETENCY_DETAILS[activeFilter] && (
-          <motion.div
-            key="filter-details"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="glass-card rounded-2xl p-6 md:p-8 mb-8 border-l-4 border-l-accent-cyan overflow-hidden"
-          >
-            <h3 className="text-white font-sans text-lg font-semibold mb-2 tracking-tight">
-              My Expertise in {activeFilter}
-            </h3>
-            <p className="text-text-secondary font-sans text-sm leading-relaxed font-light max-w-4xl">
-              {COMPETENCY_DETAILS[activeFilter]}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Infinite Carousel of Reviews at the end of the Projects Page */}
+      {isLoaded && (
+        <div className="mt-32 w-full max-w-screen-2xl overflow-hidden relative" aria-label="Client reviews carousel">
+          {/* Subtle separator */}
+          <div className="flex items-center justify-center gap-3 mb-10 opacity-70">
+            <div className="w-12 h-px bg-white/[0.06]" />
+            <span className="font-mono text-accent-cyan text-xs tracking-widest uppercase">Client Feedback</span>
+            <div className="w-12 h-px bg-white/[0.06]" />
+          </div>
 
-      {/* Category filter tabs */}
-      {!activeFilter && (
-        <motion.div variants={cardVariants} className="flex flex-wrap gap-2 mb-12">
-          {PROJECT_CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategoryFilter(cat)}
-              className={`px-5 py-2 rounded-full text-sm font-sans font-medium transition-all duration-300 ${
-                categoryFilter === cat
-                  ? 'bg-accent-cyan text-primary shadow-[0_0_20px_rgba(0,217,255,0.4)]'
-                  : 'border border-white/10 text-text-secondary hover:border-white/30 hover:text-white'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </motion.div>
-      )}
-
-      {/* Featured spotlight (only on "All" with no skill filter) */}
-      <AnimatePresence>
-        {!activeFilter && categoryFilter === 'All' && (
-          <motion.div
-            variants={cardVariants}
-            className="mb-14"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <h3 className="font-mono text-sm text-text-secondary tracking-widest uppercase mb-5 flex items-center gap-3">
-              <FaStar className="text-accent-cyan" size={12} />
-              Featured Work
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {featuredProjects.map((project) => (
-                <motion.article
-                  key={project.id}
-                  layout
-                  className="glass-card rounded-3xl overflow-hidden group flex flex-col md:flex-row card-hover relative"
-                >
-                  <div className={`w-full md:w-40 h-36 md:h-auto bg-gradient-to-br ${project.gradient} flex-shrink-0 flex items-center justify-center relative`}>
-                    <span className="text-5xl">{project.icon}</span>
-                    <div className="absolute inset-0 bg-primary/30" />
-                  </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-sans text-lg font-bold text-white tracking-tight group-hover:text-accent-cyan transition-colors duration-300">
-                        {project.title}
-                      </h3>
-                      <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan text-[10px] font-mono ml-2 flex-shrink-0">
-                        <FaStar size={8} /> Featured
-                      </div>
-                    </div>
-                    <p className="text-text-secondary text-xs leading-relaxed mb-4 font-light flex-grow">{project.description}</p>
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {project.tech.slice(0, 3).map((t) => (
-                        <span key={t} className="tag text-[11px]">{t}</span>
-                      ))}
-                    </div>
-                    <div className="flex gap-3">
-                      {project.links.github && project.links.github !== '#' && (
-                        <a href={project.links.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-white border border-white/20 px-3 py-1.5 rounded-full hover:bg-white hover:text-primary transition-all duration-300">
-                          <FaGithub size={11} /> GitHub
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </motion.article>
+          <div className="flex overflow-hidden relative group">
+            <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
+              {[...REVIEWS, ...REVIEWS, ...REVIEWS].map((review, i) => (
+                <ReviewCard key={`rev-${i}`} review={review} />
               ))}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Divider before all projects */}
-      {!activeFilter && categoryFilter === 'All' && (
-        <div className="section-divider mb-12" />
+          </div>
+          {/* Edge fade gradients to make the infinite scroll smooth visually */}
+          <div className="absolute inset-y-0 left-0 w-12 md:w-32 bg-gradient-to-r from-primary to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-12 md:w-32 bg-gradient-to-l from-primary to-transparent z-10 pointer-events-none" />
+        </div>
       )}
-
-      {/* All / filtered projects grid */}
-      {filteredProjects.length === 0 ? (
-        <motion.div
-          variants={cardVariants}
-          className="w-full py-24 flex flex-col items-center justify-center text-center glass-card rounded-3xl"
-        >
-          <div className="text-5xl mb-5">🔍</div>
-          <h3 className="text-white font-sans text-2xl font-bold mb-2">No projects found</h3>
-          <p className="text-text-secondary text-sm mb-6">
-            I have experience in {activeFilter || categoryFilter}, but no specific projects are listed yet.
-          </p>
-          <button
-            onClick={() => { clearFilter(); setCategoryFilter('All'); }}
-            className="px-6 py-3 bg-white/5 border border-white/10 rounded-full text-white hover:bg-white/10 transition-all duration-300"
-          >
-            View All Projects
-          </button>
-        </motion.div>
-      ) : (
-        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-          <AnimatePresence>
-            {filteredProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} activeFilter={activeFilter || categoryFilter !== 'All' ? categoryFilter : null} />
-            ))}
-          </AnimatePresence>
-        </motion.div>
-      )}
-    </motion.section>
+    </m.section>
   );
 };
 

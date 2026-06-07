@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope, FaDownload, FaCertificate, FaExternalLinkAlt, FaPaperPlane, FaCheck } from 'react-icons/fa';
 import { DEVELOPER_INFO } from '../utils/constants';
 
@@ -15,7 +15,7 @@ const itemVariants = {
 
 /* ─── Social Link Card ────────────────────────────────────────────────── */
 const LinkCard = ({ icon: Icon, title, handle, link, color, download }) => (
-  <motion.a
+  <m.a
     href={link}
     download={download}
     target={download ? undefined : '_blank'}
@@ -36,7 +36,7 @@ const LinkCard = ({ icon: Icon, title, handle, link, color, download }) => (
     </div>
     <h3 className="font-sans text-sm font-semibold text-white mb-0.5 tracking-tight">{title}</h3>
     <p className="font-mono text-[10px] text-text-secondary tracking-widest uppercase">{handle}</p>
-  </motion.a>
+  </m.a>
 );
 
 /* ─── Contact Form ────────────────────────────────────────────────────── */
@@ -136,7 +136,7 @@ const ContactForm = () => {
         {errors.message && <p className="text-red-400 text-xs mt-1 ml-1">{errors.message}</p>}
       </div>
 
-      <motion.button
+      <m.button
         type="submit"
         disabled={sending || sent}
         whileHover={!sent ? { scale: 1.02 } : {}}
@@ -161,7 +161,7 @@ const ContactForm = () => {
             <FaPaperPlane size={13} /> Send Message
           </>
         )}
-      </motion.button>
+      </m.button>
     </form>
   );
 };
@@ -169,15 +169,15 @@ const ContactForm = () => {
 /* ─── Contact Section ─────────────────────────────────────────────────── */
 const Contact = () => {
   return (
-    <motion.section
-      className="w-full max-w-5xl mx-auto px-6 py-20 md:py-32"
+    <m.section
+      className="w-full max-w-screen-2xl mx-auto px-4 md:px-8 lg:px-16 2xl:px-0 py-20 md:py-32"
       variants={containerVariants}
       initial="hidden"
-      animate="visible"
-      exit="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
     >
       {/* Header */}
-      <motion.div variants={itemVariants} className="text-center mb-16">
+      <m.div variants={itemVariants} className="text-center mb-16">
         <div className="flex items-center justify-center gap-3 mb-4">
           <div className="w-12 h-px bg-white/[0.06]" />
           <span className="font-mono text-accent-cyan text-sm tracking-widest">Get in touch</span>
@@ -189,10 +189,10 @@ const Contact = () => {
         <p className="font-sans text-text-secondary text-base font-light max-w-lg mx-auto leading-relaxed">
           Have a project in mind or want to collaborate? I'd love to hear from you. Drop me a message and I'll get back to you soon.
         </p>
-      </motion.div>
+      </m.div>
 
       {/* Resume + Certificate CTAs */}
-      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+      <m.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 max-w-5xl mx-auto">
         <a
           href={DEVELOPER_INFO.resume}
           target="_blank"
@@ -210,19 +210,19 @@ const Contact = () => {
           <FaCertificate size={15} />
           Download Certificate
         </a>
-      </motion.div>
+      </m.div>
 
       {/* Two-column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12 max-w-5xl mx-auto">
         {/* Contact form */}
-        <motion.div variants={itemVariants} className="lg:col-span-3 glass-card rounded-3xl p-8">
+        <m.div variants={itemVariants} className="lg:col-span-3 glass-card rounded-3xl p-8">
           <h3 className="font-sans text-xl font-bold text-white mb-6 tracking-tight">Send a Message</h3>
           <ContactForm />
-        </motion.div>
+        </m.div>
 
         {/* Info panel */}
-        <motion.div variants={itemVariants} className="lg:col-span-2 flex flex-col gap-6">
-          <div className="glass-card rounded-3xl p-7 flex flex-col gap-5">
+        <m.div variants={itemVariants} className="lg:col-span-2 flex flex-col gap-6 h-full">
+          <div className="glass-card rounded-3xl p-8 flex flex-col gap-5 h-full flex-1">
             <h3 className="font-sans text-lg font-bold text-white tracking-tight">Contact Info</h3>
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3">
@@ -269,11 +269,11 @@ const Contact = () => {
               <span className="text-text-secondary text-xs font-sans">Available for freelance &amp; full-time roles</span>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Social links grid */}
-      <motion.div variants={itemVariants}>
+      <m.div variants={itemVariants} className="max-w-5xl mx-auto">
         <h3 className="font-mono text-xs text-text-secondary tracking-widest uppercase mb-5 text-center">Or find me on</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <LinkCard icon={FaGithub} title="GitHub" handle="Code & Repos" link={DEVELOPER_INFO.github} color="#ffffff" />
@@ -281,8 +281,8 @@ const Contact = () => {
           <LinkCard icon={FaEnvelope} title="Email" handle="Direct Message" link={`mailto:${DEVELOPER_INFO.email}`} color="#00D9FF" />
           <LinkCard icon={FaCertificate} title="Certificates" handle="Achievements" link={DEVELOPER_INFO.certificates} color="#A855F7" download />
         </div>
-      </motion.div>
-    </motion.section>
+      </m.div>
+    </m.section>
   );
 };
 

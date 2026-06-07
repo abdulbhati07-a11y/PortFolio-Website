@@ -1,17 +1,8 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef, useEffect } from 'react';
+import { m, useScroll, useTransform, useReducedMotion, useInView, AnimatePresence } from 'framer-motion';
 import { FaCode, FaBrain, FaRocket, FaDatabase } from 'react-icons/fa';
 import { DEVELOPER_INFO, TIMELINE } from '../utils/constants';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
-};
+import Skeleton from './Skeleton';
 
 const highlights = [
   { icon: FaCode, label: '1.5+ Years Experience', color: 'text-accent-cyan', bg: 'bg-accent-cyan/10' },
@@ -23,36 +14,101 @@ const highlights = [
 const skills = ['Python', 'C++', 'Data Science', 'AI/ML', 'Full Stack', 'Web Dev', 'SQL', 'React', 'Flask'];
 
 const About = ({ onSkillClick }) => {
+  const [avatarLoaded, setAvatarLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const timelineRef = useRef(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  const section1Ref = useRef(null);
+  const isInView1 = useInView(section1Ref, { once: true, margin: "-100px" });
+
+  const section2Ref = useRef(null);
+  const isInView2 = useInView(section2Ref, { once: true, margin: "-100px" });
+
+  const section3Ref = useRef(null);
+  const isInView3 = useInView(section3Ref, { once: true, margin: "-100px" });
+
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Scroll-driven animation for timeline line
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ["start center", "end center"]
+  });
+
+  const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
   return (
-    <motion.section
-      className="w-full max-w-5xl mx-auto px-6 py-20 md:py-32"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
+    <m.section
+      className="w-full max-w-screen-2xl mx-auto px-4 md:px-8 lg:px-16 2xl:px-0 py-20 md:py-32"
     >
       {/* ── About Me ───────────────────────────────────────────────────── */}
-      <motion.div variants={itemVariants} className="mb-28">
-        <div className="flex items-center gap-3 mb-6">
-          <span className="font-mono text-accent-cyan text-sm tracking-widest">01.</span>
-          <div className="flex-1 h-px bg-white/[0.06]" />
-        </div>
-
-        <h2 className="font-sans text-4xl md:text-5xl font-bold text-white mb-10 tracking-tighter">
-          About <span className="text-gradient">Me</span>
-        </h2>
+      <m.div 
+        ref={section1Ref}
+        className="mb-28 max-w-5xl mx-auto"
+      >
+        <AnimatePresence mode="wait">
+          {!isLoaded ? (
+            <m.div
+              key="about-header-skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="mb-10"
+            >
+              <Skeleton width="100px" height="24px" className="mb-4" />
+              <Skeleton width="250px" height="48px" />
+            </m.div>
+          ) : (
+            <m.div
+              key="about-header-real"
+              initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+              animate={shouldReduceMotion || isInView1 ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+              transition={{ duration: 0.6 }}
+              className="mb-10"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <span className="font-mono text-accent-cyan text-sm tracking-widest">01.</span>
+                <div className="flex-1 h-px bg-white/[0.06]" />
+              </div>
+              <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
+                About <span className="text-gradient">Me</span>
+              </h2>
+            </m.div>
+          )}
+        </AnimatePresence>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile card */}
-          <div className="lg:col-span-1">
+          <m.div 
+            className="lg:col-span-1"
+            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            animate={shouldReduceMotion || isInView1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+          >
             <div className="glass-card rounded-3xl p-6 flex flex-col items-center text-center gap-4 h-full">
-              {/* Avatar placeholder */}
-              <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-accent-cyan/30 to-accent-purple/30 border-2 border-white/10 flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-accent-cyan/20 to-accent-purple/20 animate-gradient" />
-                <span className="font-mono font-bold text-4xl text-white/80 relative z-10">AB</span>
-                <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-green-400 rounded-full border-2 border-primary flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              {/* Avatar */}
+              <div className="relative w-32 h-32 rounded-full flex items-center justify-center overflow-hidden border-2 border-white/10 bg-secondary">
+                {!avatarLoaded && (
+                  <Skeleton className="absolute inset-0 z-10" width="100%" height="100%" borderRadius="999px" />
+                )}
+                {/* Fallback initials */}
+                <div className={`absolute inset-0 bg-gradient-to-br from-accent-cyan/20 to-accent-purple/20 flex items-center justify-center font-mono font-bold text-4xl text-white/80 transition-opacity duration-300 ${avatarLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                  AB
+                  <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="dummy" className="hidden" onLoad={() => setAvatarLoaded(true)} />
                 </div>
+                
+                {avatarLoaded && (
+                  <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-green-400 rounded-full border-2 border-primary flex items-center justify-center z-20">
+                    <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  </div>
+                )}
               </div>
 
               <div>
@@ -80,10 +136,15 @@ const About = ({ onSkillClick }) => {
                 </div>
               </div>
             </div>
-          </div>
+          </m.div>
 
           {/* Bio + highlights */}
-          <div className="lg:col-span-2 glass-card rounded-3xl p-8 flex flex-col gap-6">
+          <m.div 
+            className="lg:col-span-2 glass-card rounded-3xl p-8 flex flex-col gap-6"
+            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            animate={shouldReduceMotion || isInView1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
             <p className="font-sans text-text-secondary text-base md:text-lg leading-relaxed font-light">
               {DEVELOPER_INFO.bio}
             </p>
@@ -98,100 +159,207 @@ const About = ({ onSkillClick }) => {
                 </div>
               ))}
             </div>
-          </div>
+          </m.div>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* ── Timeline ────────────────────────────────────────────────────── */}
-      <motion.div variants={itemVariants} className="mb-28">
-        <div className="flex items-center gap-3 mb-6">
-          <span className="font-mono text-accent-cyan text-sm tracking-widest">02.</span>
-          <div className="flex-1 h-px bg-white/[0.06]" />
+      <m.div ref={section2Ref} className="mb-28 w-full">
+        <div className="max-w-5xl mx-auto mb-16">
+          <AnimatePresence mode="wait">
+            {!isLoaded ? (
+              <m.div
+                key="timeline-header-skeleton"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <Skeleton width="100px" height="24px" className="mb-4" />
+                <Skeleton width="250px" height="48px" />
+              </m.div>
+            ) : (
+              <m.div
+                key="timeline-header-real"
+                initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+                animate={shouldReduceMotion || isInView2 ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="font-mono text-accent-cyan text-sm tracking-widest">02.</span>
+                  <div className="flex-1 h-px bg-white/[0.06]" />
+                </div>
+                <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
+                  My <span className="text-gradient">Journey</span>
+                </h2>
+              </m.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <h2 className="font-sans text-4xl md:text-5xl font-bold text-white mb-12 tracking-tighter">
-          My <span className="text-gradient">Journey</span>
-        </h2>
+        <div className="relative max-w-6xl mx-auto" ref={timelineRef}>
+          {/* Vertical line background */}
+          <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-px bg-white/[0.05]" />
+          
+          {/* Animated vertical progress line */}
+          <m.div 
+            className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 w-px bg-gradient-to-b from-accent-cyan via-accent-purple to-accent-cyan origin-top shadow-[0_0_15px_rgba(0,217,255,0.5)]" 
+            style={{ height: shouldReduceMotion ? '100%' : lineHeight }}
+          />
 
-        <div className="relative">
-          {/* Vertical line */}
-          <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-accent-cyan via-accent-purple to-accent-cyan opacity-30" />
-
-          <div className="space-y-10 ml-8">
-            {TIMELINE.map((item, idx) => (
-              <motion.div
-                key={idx}
-                className="relative group"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.1 + 0.3, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {/* Dot */}
-                <div
-                  className={`absolute -left-[37px] top-2 w-3 h-3 rounded-full ring-4 ring-primary transition-all duration-300 group-hover:scale-125 ${
-                    item.color === 'accent-cyan'
-                      ? 'bg-accent-cyan shadow-[0_0_12px_rgba(0,217,255,0.8)]'
-                      : item.color === 'accent-purple'
-                      ? 'bg-accent-purple shadow-[0_0_12px_rgba(168,85,247,0.8)]'
-                      : 'bg-green-400 shadow-[0_0_12px_rgba(74,222,128,0.8)]'
-                  }`}
-                />
-
-                <div className="glass-card rounded-2xl p-6 group-hover:border-white/[0.1] transition-all duration-300">
-                  <div className="flex items-start justify-between mb-2 gap-4 flex-wrap">
-                    <h3 className="font-sans text-lg font-semibold text-white tracking-tight">{item.title}</h3>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="font-mono text-xs text-text-secondary border border-white/10 px-2.5 py-1 rounded-full">
-                        {item.year}
-                      </span>
-                      <span
-                        className={`font-mono text-xs px-2.5 py-1 rounded-full border ${
-                          item.color === 'accent-green' || item.subtitle === 'Current'
-                            ? 'border-green-400/30 text-green-400 bg-green-400/10'
-                            : 'border-white/10 text-text-secondary'
-                        }`}
-                      >
-                        {item.subtitle}
-                      </span>
+          <AnimatePresence mode="wait">
+            {!isLoaded ? (
+              <m.div key="timeline-skeletons" className="space-y-16" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                {[1, 2, 3].map((_, idx) => (
+                  <div key={idx} className={`relative flex flex-col md:flex-row items-center justify-between ${idx % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
+                    <div className="hidden md:block md:w-5/12" />
+                    <div className="w-full pl-16 md:pl-0 md:w-5/12">
+                      <Skeleton width="100%" height="150px" borderRadius="16px" />
                     </div>
                   </div>
-                  <p className="font-sans text-text-secondary/80 text-sm leading-relaxed">{item.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                ))}
+              </m.div>
+            ) : (
+              <m.div key="timeline-real" className="space-y-16" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                {TIMELINE.map((item, idx) => {
+                  const isEven = idx % 2 === 0;
+                  return (
+                    <TimelineItem key={idx} item={item} isEven={isEven} shouldReduceMotion={shouldReduceMotion} />
+                  );
+                })}
+              </m.div>
+            )}
+          </AnimatePresence>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* ── Core Competencies ───────────────────────────────────────────── */}
-      <motion.div variants={itemVariants}>
-        <div className="flex items-center gap-3 mb-6">
-          <span className="font-mono text-accent-cyan text-sm tracking-widest">03.</span>
-          <div className="flex-1 h-px bg-white/[0.06]" />
-        </div>
-
-        <h2 className="font-sans text-4xl md:text-5xl font-bold text-white mb-10 tracking-tighter">
-          Core <span className="text-gradient">Competencies</span>
-        </h2>
-
-        <div className="flex flex-wrap gap-3">
-          {skills.map((skill, idx) => (
-            <motion.button
-              key={idx}
-              onClick={() => onSkillClick && onSkillClick(skill)}
-              className="px-6 py-3 rounded-full border border-white/10 text-text-primary font-sans font-medium hover:border-accent-cyan hover:text-accent-cyan hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] hover:bg-accent-cyan/5 transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: idx * 0.06 + 0.5 }}
+      <m.div ref={section3Ref} className="max-w-5xl mx-auto">
+        <AnimatePresence mode="wait">
+          {!isLoaded ? (
+            <m.div
+              key="comp-header-skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="mb-10"
             >
-              {skill}
-            </motion.button>
-          ))}
+              <Skeleton width="100px" height="24px" className="mb-4" />
+              <Skeleton width="300px" height="48px" />
+            </m.div>
+          ) : (
+            <m.div
+              key="comp-header-real"
+              initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+              animate={shouldReduceMotion || isInView3 ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+              transition={{ duration: 0.6 }}
+              className="mb-10"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <span className="font-mono text-accent-cyan text-sm tracking-widest">03.</span>
+                <div className="flex-1 h-px bg-white/[0.06]" />
+              </div>
+              <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
+                Core <span className="text-gradient">Competencies</span>
+              </h2>
+            </m.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence mode="wait">
+          {!isLoaded ? (
+            <m.div key="comp-skeletons" className="flex flex-wrap gap-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              {[1, 2, 3, 4, 5, 6, 7].map(i => <Skeleton key={i} width="120px" height="48px" borderRadius="999px" />)}
+            </m.div>
+          ) : (
+            <m.div key="comp-real" className="flex flex-wrap gap-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              {skills.map((skill, idx) => (
+                <m.button
+                  key={idx}
+                  onClick={() => onSkillClick && onSkillClick(skill)}
+                  className="px-6 py-3 rounded-full border border-white/10 text-text-primary font-sans font-medium hover:border-accent-cyan hover:text-accent-cyan hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] hover:bg-accent-cyan/5 transition-all duration-300"
+                  whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
+                  whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
+                  initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.8 }}
+                  animate={shouldReduceMotion || isInView3 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                  transition={{ delay: shouldReduceMotion ? 0 : idx * 0.06 }}
+                >
+                  {skill}
+                </m.button>
+              ))}
+            </m.div>
+          )}
+        </AnimatePresence>
+      </m.div>
+    </m.section>
+  );
+};
+
+const TimelineItem = ({ item, isEven, shouldReduceMotion }) => {
+  const itemRef = useRef(null);
+  const isInView = useInView(itemRef, { once: true, margin: "-100px" });
+
+  return (
+    <m.div
+      ref={itemRef}
+      className={`relative flex flex-col md:flex-row items-center justify-between ${
+        isEven ? 'md:flex-row-reverse' : ''
+      }`}
+      initial={{ opacity: 0, x: shouldReduceMotion ? 0 : (isEven ? 50 : -50) }}
+      animate={shouldReduceMotion || isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: isEven ? 50 : -50 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {/* Empty space for desktop alternating layout */}
+      <div className="hidden md:block md:w-5/12" />
+
+      {/* Center Dot and Year Badge */}
+      <div className="absolute left-6 md:left-1/2 -translate-x-[5px] md:-translate-x-1/2 flex items-center justify-center z-10">
+        <div
+          className={`w-3 h-3 rounded-full ring-4 ring-primary transition-all duration-300 ${
+            item.color === 'accent-cyan'
+              ? 'bg-accent-cyan shadow-[0_0_12px_rgba(0,217,255,0.8)]'
+              : item.color === 'accent-purple'
+              ? 'bg-accent-purple shadow-[0_0_12px_rgba(168,85,247,0.8)]'
+              : 'bg-green-400 shadow-[0_0_12px_rgba(74,222,128,0.8)]'
+          }`}
+        />
+        
+        {/* Sticky Chapter Label */}
+        <m.div 
+          className="absolute left-8 md:left-auto md:-right-24 sticky top-[80px]"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <span className="font-mono text-xs text-text-secondary border border-white/10 px-3 py-1.5 rounded-full bg-primary/80 backdrop-blur-sm whitespace-nowrap">
+            {item.year}
+          </span>
+        </m.div>
+      </div>
+
+      {/* Content Card */}
+      <div className="w-full pl-16 md:pl-0 md:w-5/12">
+        <div className="glass-card rounded-2xl p-6 md:p-8 hover:border-white/[0.15] transition-all duration-300 group">
+          <div className="flex items-start justify-between mb-3 gap-4 flex-wrap">
+            <h3 className="font-sans text-xl font-bold text-white tracking-tight group-hover:text-accent-cyan transition-colors">{item.title}</h3>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="md:hidden font-mono text-[10px] text-text-secondary border border-white/10 px-2 py-1 rounded-full">
+                {item.year}
+              </span>
+              <span
+                className={`font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full border ${
+                  item.color === 'accent-green' || item.subtitle === 'Current'
+                    ? 'border-green-400/30 text-green-400 bg-green-400/10'
+                    : 'border-white/10 text-text-secondary'
+                }`}
+              >
+                {item.subtitle}
+              </span>
+            </div>
+          </div>
+          <p className="font-sans text-text-secondary/80 text-sm leading-relaxed">{item.description}</p>
         </div>
-      </motion.div>
-    </motion.section>
+      </div>
+    </m.div>
   );
 };
 

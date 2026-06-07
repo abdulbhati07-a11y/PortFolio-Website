@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 const CustomCursor = () => {
   const [mousePos, setMousePos] = useState({ x: -200, y: -200 });
@@ -66,7 +66,7 @@ const CustomCursor = () => {
   return (
     <div className="hidden md:block pointer-events-none">
       {/* Dot — snaps to cursor */}
-      <motion.div
+      <m.div
         className="fixed top-0 left-0 z-[9999] pointer-events-none"
         animate={{
           x: mousePos.x - 4,
@@ -77,7 +77,7 @@ const CustomCursor = () => {
         transition={{ type: 'tween', duration: 0, ease: 'linear' }}
       >
         <div className="w-2 h-2 bg-accent-cyan rounded-full shadow-[0_0_8px_rgba(0,217,255,0.9)]" />
-      </motion.div>
+      </m.div>
 
       {/* Ring — smooth follow */}
       <div
