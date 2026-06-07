@@ -4,6 +4,19 @@ import { FaCode, FaBrain, FaRocket, FaDatabase } from 'react-icons/fa';
 import { DEVELOPER_INFO, TIMELINE } from '../utils/constants';
 import Skeleton from './Skeleton';
 
+// Generate a tiny SVG placeholder for timeline entries
+const getPlaceholder = (text, size = 48, bg = '#2563eb', fg = '#ffffff') => {
+  const initials = (text || '')
+    .split(' ')
+    .map((w) => w[0] || '')
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+  const fontSize = Math.floor(size / 2.6);
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'><rect width='100%' height='100%' fill='${bg}' rx='12'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Inter,Arial,Helvetica,sans-serif' font-size='${fontSize}' fill='${fg}'>${initials}</text></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
+
 const highlights = [
   { icon: FaCode, label: '1.5+ Years Experience', color: 'text-accent-cyan', bg: 'bg-accent-cyan/10' },
   { icon: FaBrain, label: 'AI/ML Specialization', color: 'text-accent-purple', bg: 'bg-accent-purple/10' },
@@ -340,7 +353,14 @@ const TimelineItem = ({ item, isEven, shouldReduceMotion }) => {
       <div className="w-full pl-16 md:pl-0 md:w-5/12">
         <div className="glass-card rounded-2xl p-6 md:p-8 hover:border-white/[0.15] transition-all duration-300 group">
           <div className="flex items-start justify-between mb-3 gap-4 flex-wrap">
-            <h3 className="font-sans text-xl font-bold text-white tracking-tight group-hover:text-accent-cyan transition-colors">{item.title}</h3>
+            <div className="flex items-center gap-3">
+              {item.logo ? (
+                <img src={item.logo} alt={`${item.title} logo`} className="w-10 h-10 rounded-md object-cover" />
+              ) : (
+                <img src={getPlaceholder(item.title)} alt={`${item.title} logo`} className="w-10 h-10 rounded-md object-cover" />
+              )}
+              <h3 className="font-sans text-xl font-bold text-white tracking-tight group-hover:text-accent-cyan transition-colors">{item.title}</h3>
+            </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <span className="md:hidden font-mono text-[10px] text-text-secondary border border-white/10 px-2 py-1 rounded-full">
                 {item.year}

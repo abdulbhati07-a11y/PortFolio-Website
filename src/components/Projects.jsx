@@ -4,6 +4,18 @@ import { FaGithub, FaExternalLinkAlt, FaStar } from 'react-icons/fa';
 import { PROJECTS, COMPETENCY_DETAILS, PROJECT_CATEGORIES } from '../utils/constants';
 import Skeleton from './Skeleton';
 
+// Generate a small SVG placeholder data URL using project title initials
+const getPlaceholder = (text, size = 96, bg = '#0ea5a6', fg = '#ffffff') => {
+  const initials = (text || '')
+    .split(' ')
+    .map((w) => w[0] || '')
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+  const fontSize = Math.floor(size / 2.8);
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'><rect width='100%' height='100%' fill='${bg}' rx='18'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Inter,Arial,Helvetica,sans-serif' font-size='${fontSize}' fill='${fg}'>${initials}</text></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i) => ({ 
@@ -77,7 +89,11 @@ const ProjectCard = ({ project, index }) => {
       {/* Top area: project image (unchanged) */}
       <div className={`w-full h-48 relative overflow-hidden bg-gradient-to-br ${project.gradient} shrink-0`}>
         <div className="absolute inset-0 flex items-center justify-center w-full h-full object-cover">
-          <span className="text-6xl select-none">{project.icon}</span>
+          {project.logo ? (
+            <img src={project.logo} alt={`${project.title} logo`} className="w-20 h-20 object-contain" />
+          ) : (
+            <img src={getPlaceholder(project.title)} alt={`${project.title} logo`} className="w-20 h-20 object-contain" />
+          )}
         </div>
         <div className="absolute inset-0 bg-primary/10" />
       </div>
