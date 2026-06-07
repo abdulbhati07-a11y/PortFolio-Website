@@ -47,7 +47,8 @@ export const PROJECTS = [
     featured: false,
     links: { github: "#", demo: "#" },
     gradient: "from-pink-500/20 to-purple-500/20",
-    icon: "🐾"
+    icon: "🐾",
+    logo: "/assets/logos/pet-sitting.svg"
   },
   {
     id: 2,
@@ -59,7 +60,8 @@ export const PROJECTS = [
     featured: false,
     links: { github: "#", demo: "#" },
     gradient: "from-blue-500/20 to-cyan-500/20",
-    icon: "👕"
+    icon: "👕",
+    logo: "/assets/logos/laundry.svg"
   },
   {
     id: 3,
@@ -71,7 +73,8 @@ export const PROJECTS = [
     featured: true,
     links: { github: "https://github.com/abdulbhati07-a11y/AI-Text-Summarizer.git", demo: "#" },
     gradient: "from-cyan-500/20 to-blue-500/20",
-    icon: "🤖"
+    icon: "🤖",
+    logo: "/assets/logos/ai-summarizer.svg"
   },
   {
     id: 4,
@@ -83,7 +86,8 @@ export const PROJECTS = [
     featured: true,
     links: { github: "https://github.com/abdulbhati07-a11y/Algorithm-Visualizer.git", demo: "#" },
     gradient: "from-orange-500/20 to-red-500/20",
-    icon: "📊"
+    icon: "📊",
+    logo: "/assets/logos/algorithm.svg"
   },
   {
     id: 5,
@@ -95,7 +99,8 @@ export const PROJECTS = [
     featured: false,
     links: { github: "https://github.com/abdulbhati07-a11y/Happy-Birthday-Interactive-web.git", demo: "#" },
     gradient: "from-yellow-500/20 to-orange-500/20",
-    icon: "🎂"
+    icon: "🎂",
+    logo: "/assets/logos/birthday.svg"
   },
   {
     id: 6,
@@ -107,7 +112,8 @@ export const PROJECTS = [
     featured: false,
     links: { github: "https://github.com/abdulbhati07-a11y/Drink-water-Reminder.git" },
     gradient: "from-teal-500/20 to-green-500/20",
-    icon: "💧"
+    icon: "💧",
+    logo: "/assets/logos/drink-water.svg"
   },
   {
     id: 7,
@@ -119,7 +125,8 @@ export const PROJECTS = [
     featured: false,
     links: { github: "https://github.com/abdulbhati07-a11y/QR-Code-Generator.git" },
     gradient: "from-indigo-500/20 to-purple-500/20",
-    icon: "📱"
+    icon: "📱",
+    logo: "/assets/logos/qr-generator.svg"
   }
 ];
 
@@ -150,34 +157,39 @@ export const TIMELINE = [
     title: "Started Computer Science Degree",
     subtitle: "University",
     description: "Began my formal CS education with a focus on programming fundamentals, data structures, and algorithms.",
-    color: "accent-cyan"
+    color: "accent-cyan",
+    logo: "/assets/logos/timeline-2023-1.svg"
   },
   {
     year: "2023",
     title: "First Development Projects",
     subtitle: "Self-Taught",
     description: "Built my first web projects — Pet Sitting and Laundry Service platforms — diving deep into HTML, CSS, and JavaScript.",
-    color: "accent-purple"
+    color: "accent-purple",
+    logo: "/assets/logos/timeline-2023-2.svg"
   },
   {
     year: "2024",
     title: "AI/ML Specialization",
     subtitle: "Data Science Track",
     description: "Began pursuing a Data Science and AI/ML specialization, building the YouTube Summarizer and exploring ML frameworks.",
-    color: "accent-cyan"
+    color: "accent-cyan",
+    logo: "/assets/logos/timeline-2024-1.svg"
   },
   {
     year: "2024",
     title: "C++ & Algorithm Mastery",
     subtitle: "Advanced Programming",
     description: "Developed the Algorithm Visualizer using C++ and OpenGL, demonstrating deep understanding of data structures and rendering.",
-    color: "accent-purple"
+    color: "accent-purple",
+    logo: "/assets/logos/timeline-2024-2.svg"
   },
   {
     year: "2025",
     title: "Full Stack & Automation",
     subtitle: "Current",
     description: "Expanding into full-stack development, Python automation tools, and AI-integrated applications.",
-    color: "accent-green"
+    color: "accent-green",
+    logo: "/assets/logos/timeline-2025.svg"
   }
 ];
