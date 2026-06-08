@@ -3119,11 +3119,79 @@ document.getElementById('cert-lightbox').addEventListener('click', e => {
   }
 });
 
+// Magnetic Button Effect
+class MagneticButton {
+  constructor(button) {
+    this.button = button;
+    this.x = 0;
+    this.y = 0;
+    this.width = button.offsetWidth;
+    this.height = button.offsetHeight;
+    this.magneticRange = 80;
+    
+    // Create a wrapper for the magnetic effect
+    this.inner = document.createElement('div');
+    this.inner.style.position = 'relative';
+    this.inner.style.width = '100%';
+    this.inner.style.height = '100%';
+    
+    // Move button content to inner wrapper
+    while (this.button.firstChild) {
+      this.inner.appendChild(this.button.firstChild);
+    }
+    this.button.appendChild(this.inner);
+    
+    this.button.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+    this.button.addEventListener('mouseleave', (e) => this.handleMouseLeave(e));
+  }
+  
+  handleMouseMove(e) {
+    const rect = this.button.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    
+    const distX = mouseX - centerX;
+    const distY = mouseY - centerY;
+    const distance = Math.sqrt(distX * distX + distY * distY);
+    
+    if (distance < this.magneticRange) {
+      const pull = (this.magneticRange - distance) / this.magneticRange;
+      this.x = (distX * pull) * 0.3;
+      this.y = (distY * pull) * 0.3;
+    } else {
+      this.x *= 0.9;
+      this.y *= 0.9;
+    }
+    
+    this.inner.style.transform = `translate(${this.x}px, ${this.y}px)`;
+  }
+  
+  handleMouseLeave() {
+    this.x = 0;
+    this.y = 0;
+    this.inner.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    this.inner.style.transform = 'translate(0, 0)';
+    setTimeout(() => {
+      this.inner.style.transition = '';
+    }, 400);
+  }
+}
+
+// Apply magnetic effect to all interactive buttons
+document.addEventListener('DOMContentLoaded', () => {
+  const magneticButtons = document.querySelectorAll('.btn-primary, .btn-outline, .btn-hire, .filter-btn, .overlay-btn');
+  magneticButtons.forEach(btn => {
+    new MagneticButton(btn);
+  });
+});
+
 // CV download is handled directly by the anchor href attribute
 
 </script>
 </body>
 </html>
-
 
 
