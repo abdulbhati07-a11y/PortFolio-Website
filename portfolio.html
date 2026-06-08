@@ -1868,14 +1868,21 @@ footer{
     <!-- Simple clean form -->
     <div class="simple-form reveal">
       <h4><i class="fa fa-paper-plane"></i> Drop me a message</h4>
-      <!--
-        FORMSPREE SETUP (free, takes 2 minutes):
-        1. Go to https://formspree.io  Sign up free
-        2. Create a new form  copy your form ID (looks like: xpzgkwqr)
-        3. Replace "YOUR_FORM_ID" below with your actual ID
-        Until then the form falls back to mailto
-      -->
-      <form id="contact-form" novalidate>
+      <form id="contact-form" action="https://api.web3forms.com/submit" method="POST" novalidate>
+
+        <!-- Web3Forms access key -->
+        <input type="hidden" name="access_key" value="f7921c4f-281a-48b0-8b2f-906f06991ccc"/>
+
+        <!-- Emails will be delivered to abdulbha77@gmail.com -->
+        <input type="hidden" name="subject" value="New Portfolio Message — Muhammad Abdullah Bhatti"/>
+        <input type="hidden" name="from_name" value="Portfolio Contact Form"/>
+
+        <!-- Stay on page after submit -->
+        <input type="hidden" name="redirect" value="false"/>
+
+        <!-- Honeypot spam protection -->
+        <input type="checkbox" name="botcheck" style="display:none"/>
+
         <div class="form-inline-row">
           <div class="form-field">
             <label for="cf-name">Your Name</label>
@@ -1895,7 +1902,11 @@ footer{
         </div>
         <div class="form-sent-msg" id="form-success" role="alert">
           <i class="fa fa-check-circle"></i>
-          <span>Email client opened  your message is ready to send!</span>
+          <span>Message sent! I'll get back to you soon.</span>
+        </div>
+        <div class="form-error-msg" id="form-error" role="alert" style="display:none;align-items:center;gap:10px;padding:14px 18px;border-radius:10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;font-size:0.85rem;margin-bottom:12px;">
+          <i class="fa fa-exclamation-circle"></i>
+          <span>Something went wrong. Please try again or email me directly.</span>
         </div>
         <div class="form-submit-row">
           <p><i class="fa fa-lock" style="color:var(--cyan)"></i> Your info is never shared.</p>
@@ -2823,43 +2834,64 @@ const statObserver = new IntersectionObserver(entries => {
 document.querySelectorAll('.stats-row').forEach(el => statObserver.observe(el));
 
 /* 
-   CONTACT FORM
+   CONTACT FORM — Web3Forms
  */
-document.getElementById('contact-form').addEventListener('submit', function(e) {
+document.getElementById('contact-form').addEventListener('submit', async function(e) {
   e.preventDefault();
+
+  const name    = document.getElementById('cf-name');
+  const email   = document.getElementById('cf-email');
+  const msg     = document.getElementById('cf-message');
+  const btn     = document.getElementById('form-submit');
+  const success = document.getElementById('form-success');
+  const errBox  = document.getElementById('form-error');
+
+  // Clear previous state
+  ['cf-name','cf-email','cf-message'].forEach(id => document.getElementById(id).classList.remove('err'));
+  ['err-name','err-email','err-message'].forEach(id => document.getElementById(id).classList.remove('show'));
+  success.classList.remove('show');
+  errBox.style.display = 'none';
+
+  // Client-side validation
   let valid = true;
-  const name = document.getElementById('cf-name');
-  const email = document.getElementById('cf-email');
-  const msg = document.getElementById('cf-message');
-  // Clear errors
-  ['cf-name','cf-email','cf-message'].forEach(id => {
-    document.getElementById(id).classList.remove('err');
-  });
-  ['err-name','err-email','err-message'].forEach(id => {
-    document.getElementById(id).classList.remove('show');
-  });
   if (!name.value.trim()) {
-    name.classList.add('err'); document.getElementById('err-name').classList.add('show'); valid=false;
+    name.classList.add('err'); document.getElementById('err-name').classList.add('show'); valid = false;
   }
   if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-    email.classList.add('err'); document.getElementById('err-email').classList.add('show'); valid=false;
+    email.classList.add('err'); document.getElementById('err-email').classList.add('show'); valid = false;
   }
   if (!msg.value.trim() || msg.value.trim().length < 20) {
-    msg.classList.add('err'); document.getElementById('err-message').classList.add('show'); valid=false;
+    msg.classList.add('err'); document.getElementById('err-message').classList.add('show'); valid = false;
   }
   if (!valid) return;
-  const btn = document.getElementById('form-submit');
-  btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Opening...';
-  const sub = encodeURIComponent(`Portfolio Contact from ${name.value}`);
-  const body = encodeURIComponent(`Name: ${name.value}\nEmail: ${email.value}\n\nMessage:\n${msg.value}`);
-  window.open(`mailto:abdulbha77@gmail.com?subject=${sub}&body=${body}`, '_blank');
-  setTimeout(() => {
+
+  // Send via Web3Forms
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sending...';
+
+  try {
+    const formData = new FormData(this);
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      success.classList.add('show');
+      this.reset();
+      setTimeout(() => success.classList.remove('show'), 6000);
+    } else {
+      errBox.style.display = 'flex';
+      setTimeout(() => { errBox.style.display = 'none'; }, 6000);
+    }
+  } catch (err) {
+    errBox.style.display = 'flex';
+    setTimeout(() => { errBox.style.display = 'none'; }, 6000);
+  } finally {
     btn.disabled = false;
     btn.innerHTML = '<i class="fa fa-paper-plane"></i> Send Message';
-    document.getElementById('form-success').classList.add('show');
-    this.reset();
-    setTimeout(() => document.getElementById('form-success').classList.remove('show'), 5000);
-  }, 800);
+  }
 });
 
 /* 
