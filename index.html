@@ -55,16 +55,20 @@
 [data-theme="light"] {
   --bg-primary: #f4f7ff;
   --bg-secondary: #eef1fa;
-  --bg-card: rgba(255,255,255,0.85);
+  --bg-card: rgba(255,255,255,0.92);
   --bg-glass: rgba(0,0,0,0.04);
-  --border: rgba(0,0,0,0.08);
+  --border: rgba(0,0,0,0.1);
   --border-hover: rgba(0,150,200,0.5);
-  --cyan: #0099bb;
-  --cyan-dim: rgba(0,153,187,0.12);
-  --cyan-glow: rgba(0,153,187,0.4);
+  --cyan: #0088aa;
+  --cyan-dim: rgba(0,136,170,0.12);
+  --cyan-glow: rgba(0,136,170,0.35);
+  --gold: #c48a00;
+  --gold-dim: rgba(196,138,0,0.12);
+  --purple: #8b31d4;
+  --green: #0d9669;
   --text-primary: #0a0f1e;
-  --text-secondary: #4a5568;
-  --text-muted: #9aa3b2;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
 }
 
 /* 
@@ -148,7 +152,7 @@ body.cursor-click #cursor-dot{transform:translate(-50%,-50%) scale(0.6)}
   transition:background var(--transition),backdrop-filter var(--transition),border-color var(--transition);
 }
 #navbar.scrolled{
-  background:rgba(5,8,16,0.85);backdrop-filter:blur(24px);
+  background:var(--bg-primary);backdrop-filter:blur(24px);
   border-bottom:1px solid var(--border);
 }
 [data-theme="light"] #navbar.scrolled{background:rgba(244,247,255,0.85)}
@@ -194,7 +198,7 @@ body.cursor-click #cursor-dot{transform:translate(-50%,-50%) scale(0.6)}
 .hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
 .mobile-menu{
   display:none;position:fixed;inset:0;top:72px;z-index:899;
-  background:rgba(5,8,16,0.97);backdrop-filter:blur(24px);
+  background:var(--bg-primary);backdrop-filter:blur(24px);
   flex-direction:column;align-items:center;justify-content:center;gap:2rem;
   opacity:0;pointer-events:none;transition:opacity 0.3s;
 }
@@ -388,7 +392,7 @@ section{padding:120px 5%;position:relative}
   font-size:0.8rem;color:var(--green);
 }
 .status-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-.about-info-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.about-info-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
 .info-card{
   padding:12px 14px;border-radius:var(--radius-sm);
   background:var(--bg-glass);border:1px solid var(--border);
@@ -447,26 +451,42 @@ section{padding:120px 5%;position:relative}
   backdrop-filter:blur(16px);
   transition:all var(--transition);position:relative;overflow:hidden;cursor:default;
 }
+.service-card:nth-child(1){grid-column:span 1;grid-row:span 2}
+.service-card:nth-child(4){grid-column:span 1;grid-row:span 2}
+.service-card:nth-child(3){background:linear-gradient(135deg,rgba(245,197,66,0.08),rgba(168,85,247,0.04))}
+.service-card:nth-child(6){background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(16,185,129,0.04))}
 .service-card::before{
   content:'';position:absolute;inset:0;
   background:radial-gradient(circle at top left,rgba(0,217,255,0.06),transparent 60%);
   opacity:0;transition:opacity var(--transition);
 }
-.service-card:hover{border-color:var(--border-hover);transform:translateY(-6px);box-shadow:0 16px 50px rgba(0,217,255,0.12)}
+.service-card::after{
+  content:'';position:absolute;bottom:-2px;right:-2px;width:100px;height:100px;
+  background:radial-gradient(circle,rgba(0,217,255,0.15),transparent 70%);
+  border-radius:50%;opacity:0;transition:opacity var(--transition),transform var(--transition);
+}
+.service-card:hover{border-color:var(--border-hover);transform:translateY(-8px);box-shadow:0 20px 60px rgba(0,217,255,0.18)}
 .service-card:hover::before{opacity:1}
-.service-card:hover .service-icon i{transform:scale(1.2) rotate(-5deg);color:var(--gold)}
+.service-card:hover::after{opacity:1;transform:scale(1.1)}
+.service-card:hover .service-icon{background:var(--cyan-glow);border-color:rgba(0,217,255,0.4);box-shadow:0 0 20px var(--cyan-dim)}
+.service-card:hover .service-icon i{transform:scale(1.3) rotate(-8deg);color:var(--gold)}
+.service-card:hover .service-title{color:var(--cyan)}
 .service-icon{
   width:56px;height:56px;border-radius:14px;
   background:var(--cyan-dim);border:1px solid rgba(0,217,255,0.2);
   display:flex;align-items:center;justify-content:center;
-  margin-bottom:20px;transition:all var(--transition);
+  margin-bottom:20px;transition:all var(--transition);position:relative;z-index:1;
 }
 .service-icon i{font-size:22px;color:var(--cyan);transition:all var(--transition)}
 .service-title{
   font-family:var(--font-display);font-size:1.2rem;font-weight:700;
-  color:var(--text-primary);margin-bottom:10px;
+  color:var(--text-primary);margin-bottom:10px;transition:color var(--transition);
 }
-.service-desc{font-size:0.88rem;color:var(--text-secondary);line-height:1.7;font-weight:300}
+.service-desc{font-size:0.88rem;color:var(--text-secondary);line-height:1.7;font-weight:300;transition:color var(--transition)}
+.service-level{
+  margin-top:16px;padding-top:16px;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;font-size:0.75rem;
+}
 
 /* 
    PROJECTS
@@ -496,17 +516,34 @@ section{padding:120px 5%;position:relative}
   box-shadow:0 20px 60px rgba(0,217,255,0.12);
 }
 .project-thumb{
-  position:relative;height:180px;overflow:hidden;
+  position:relative;height:200px;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
 }
 .project-thumb-bg{
   position:absolute;inset:0;
-  transition:transform 0.5s ease;
+  transition:transform 0.6s ease;
 }
-.project-card:hover .project-thumb-bg{transform:scale(1.06)}
-.project-emoji{font-size:3.5rem;position:relative;z-index:1}
+.project-card:hover .project-thumb-bg{transform:scale(1.08)}
+.project-thumb-art{
+  position:relative;z-index:2;
+  display:flex;align-items:center;justify-content:center;
+  width:100%;height:100%;
+  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.project-card:hover .project-thumb-art{transform:scale(1.06) translateY(-3px)}
+.project-thumb-art svg{
+  filter:drop-shadow(0 8px 24px rgba(0,0,0,0.5));
+  transition:filter 0.4s ease;
+}
+.project-card:hover .project-thumb-art svg{
+  filter:drop-shadow(0 12px 32px rgba(0,217,255,0.3));
+}
+.project-thumb img.project-logo{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:72px;height:72px;object-fit:contain;z-index:1;
+}
 .project-overlay{
-  position:absolute;inset:0;background:rgba(5,8,16,0.82);
+  position:absolute;inset:0;background:rgba(0,0,0,0.78);
   display:flex;align-items:center;justify-content:center;gap:12px;
   opacity:0;transition:opacity var(--transition);z-index:2;
 }
@@ -647,19 +684,19 @@ section{padding:120px 5%;position:relative}
 .timeline-item:nth-child(even) .timeline-card-left{order:3}
 .timeline-item:nth-child(even) .timeline-card-right{order:1}
 .timeline-dot{
-  width:44px;height:44px;border-radius:50%;
+  width:52px;height:52px;border-radius:50%;
   border:2px solid var(--border);
   display:flex;align-items:center;justify-content:center;
   font-size:16px;z-index:1;flex-shrink:0;
   transition:all var(--transition);
+  overflow:hidden;
 }
+.timeline-dot svg{width:28px;height:28px;flex-shrink:0}
 .timeline-dot.work{
-  background:var(--cyan-dim);border-color:var(--cyan);
-  box-shadow:0 0 20px rgba(0,217,255,0.3);
+  background:var(--bg-secondary);border-color:rgba(0,136,170,0.35);
 }
 .timeline-dot.edu{
-  background:var(--gold-dim);border-color:var(--gold);
-  box-shadow:0 0 20px rgba(245,197,66,0.3);
+  background:var(--bg-secondary);border-color:rgba(196,138,0,0.35);
 }
 .timeline-year{
   font-family:var(--font-mono);font-size:0.75rem;color:var(--cyan);
@@ -770,7 +807,7 @@ section{padding:120px 5%;position:relative}
 .quick-btn:hover .quick-btn-icon{transform:scale(1.12)}
 .quick-btn.email .quick-btn-icon{background:rgba(0,217,255,0.12);border:1px solid rgba(0,217,255,0.2);color:var(--cyan)}
 .quick-btn.linkedin .quick-btn-icon{background:rgba(10,102,194,0.15);border:1px solid rgba(10,102,194,0.3);color:#0a66c2}
-.quick-btn.github .quick-btn-icon{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#fff}
+.quick-btn.github .quick-btn-icon{background:var(--bg-glass);border:1px solid var(--border);color:var(--text-primary)}
 .quick-btn.whatsapp .quick-btn-icon{background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25d366}
 .quick-btn-text strong{display:block;font-size:0.9rem;font-weight:600;margin-bottom:2px}
 .quick-btn-text span{font-size:0.75rem;color:var(--text-secondary);font-family:var(--font-mono)}
@@ -868,7 +905,7 @@ section{padding:120px 5%;position:relative}
 .chatbot-panel.open{display:flex;animation:chatbot-pop 0.28s ease-out forwards}
 .chatbot-header{
   display:flex;align-items:center;justify-content:space-between;
-  gap:12px;padding:16px 18px;background:rgba(5,8,16,0.95);
+  gap:12px;padding:16px 18px;background:var(--bg-secondary);
   border-bottom:1px solid var(--border);
 }
 .chatbot-header h4{font-family:var(--font-display);font-size:0.95rem;margin:0;color:var(--text-primary)}
@@ -877,7 +914,7 @@ section{padding:120px 5%;position:relative}
 .chatbot-body{display:flex;flex-direction:column;gap:12px;padding:16px;max-height:360px;overflow-y:auto}
 .chatbot-messages{display:flex;flex-direction:column;gap:10px}
 .chatbot-message{max-width:100%;padding:12px 14px;border-radius:18px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-.chatbot-message.bot{align-self:flex-start;background:rgba(255,255,255,0.06);color:var(--text-primary)}
+.chatbot-message.bot{align-self:flex-start;background:var(--bg-glass);border:1px solid var(--border);color:var(--text-primary)}
 .chatbot-message.user{align-self:flex-end;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#000}
 .chatbot-suggestions{display:flex;flex-wrap:wrap;gap:8px}
 .chatbot-suggestion{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:0.78rem;cursor:pointer}
@@ -906,7 +943,7 @@ section{padding:120px 5%;position:relative}
 }
 .form-field input,.form-field textarea{
   padding:12px 16px;border-radius:var(--radius-sm);
-  border:1px solid var(--border);background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);background:var(--bg-card);
   color:var(--text-primary);font-family:var(--font-body);font-size:0.88rem;
   transition:all var(--transition);resize:none;
 }
@@ -1014,17 +1051,139 @@ footer{
   .timeline-dot{position:absolute;left:0;top:0}
   .timeline-spacer{display:none}
 }
+/* 
+   SERVICES - INTERACTIVE DESIGN
+ */
+#services{background:var(--bg-secondary)}
+
+.services-tabs{
+  display:flex;gap:12px;flex-wrap:wrap;margin:40px 0 60px;
+  justify-content:center;
+}
+.service-tab{
+  padding:10px 24px;border-radius:50px;
+  border:1.5px solid var(--border);background:var(--bg-glass);
+  color:var(--text-secondary);font-size:0.85rem;font-weight:600;
+  letter-spacing:0.05em;transition:all var(--transition);
+  cursor:pointer;text-transform:uppercase;
+}
+.service-tab:hover{border-color:var(--cyan);color:var(--cyan)}
+.service-tab.active{
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border-color:transparent;color:#fff;
+  box-shadow:0 0 30px rgba(0,217,255,0.3);
+}
+
+.services-showcase{
+  display:grid;grid-template-columns:1.2fr 1fr;
+  gap:48px;align-items:start;margin-top:60px;
+}
+.services-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:16px;
+}
+.service-card{
+  position:relative;padding:24px;border-radius:14px;
+  background:var(--bg-card);border:1px solid var(--border);
+  backdrop-filter:blur(16px);
+  transition:all var(--transition);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  min-height:200px;justify-content:center;
+  overflow:hidden;
+}
+.service-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at center,rgba(0,217,255,0.08),transparent 70%);
+  opacity:0;transition:opacity var(--transition);
+}
+.service-card:hover{
+  transform:translateY(-8px);border-color:var(--cyan);
+  box-shadow:0 20px 60px rgba(0,217,255,0.15);
+}
+.service-card:hover::before{opacity:1}
+.service-card.hidden{display:none}
+.service-icon{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--cyan-dim);border:2px solid rgba(0,217,255,0.3);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:16px;transition:all var(--transition);
+  font-size:28px;color:var(--cyan);
+}
+.service-card:hover .service-icon{
+  transform:scale(1.2) rotate(-10deg);
+  background:var(--cyan-glow);border-color:var(--cyan);
+  box-shadow:0 0 20px var(--cyan-dim);
+}
+.service-title{
+  font-family:var(--font-display);font-size:1rem;font-weight:700;
+  color:var(--text-primary);line-height:1.3;margin-bottom:12px;
+}
+.service-bullets{
+  font-size:0.75rem;color:var(--text-secondary);line-height:1.6;
+  text-align:left;display:none;margin-top:12px;
+}
+.service-card:hover .service-bullets{display:block}
+.service-bullets li{
+  list-style:none;padding-left:12px;position:relative;margin-bottom:6px;
+}
+.service-bullets li::before{
+  content:'▸';position:absolute;left:0;color:var(--cyan);font-weight:bold;
+}
+
+.service-detail-panel{
+  padding:40px;border-radius:var(--radius-lg);
+  background:linear-gradient(135deg,var(--bg-card) 0%,rgba(10,16,32,0.5) 100%);
+  border:1px solid var(--border);backdrop-filter:blur(16px);
+  min-height:400px;display:flex;align-items:center;
+  position:sticky;top:200px;
+}
+.detail-content h3{
+  font-family:var(--font-display);font-size:1.6rem;font-weight:800;
+  color:var(--cyan);margin-bottom:12px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.detail-content p{
+  color:var(--text-secondary);line-height:1.8;margin-bottom:24px;font-size:0.95rem;
+}
+.detail-stack{
+  margin-bottom:28px;
+}
+.detail-stack span{
+  display:inline-block;padding:6px 14px;
+  border-radius:50px;background:var(--cyan-dim);
+  border:1px solid rgba(0,217,255,0.3);
+  color:var(--cyan);font-size:0.75rem;font-weight:600;
+  margin-bottom:8px;margin-right:8px;letter-spacing:0.05em;
+}
+.detail-meter{
+  padding-top:24px;border-top:1px solid var(--border);
+}
+.detail-meter span{
+  display:block;color:var(--text-muted);font-size:0.8rem;
+  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;
+}
+.meter-bar{
+  height:6px;background:var(--border);border-radius:3px;
+  overflow:hidden;
+}
+.meter-fill{
+  height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold));
+  border-radius:3px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
+  width:0%;
+}
+
+@media(max-width:1024px){
+  .services-showcase{grid-template-columns:1fr;gap:40px}
+  .service-detail-panel{position:relative;top:0;min-height:auto}
+}
 @media(max-width:768px){
-  .nav-links,.nav-actions .btn-hire{display:none}
-  .hamburger{display:flex}
-  .stats-row{grid-template-columns:repeat(2,1fr)}
-  .form-row{grid-template-columns:1fr}
-  .testimonial-slide{padding:40px 28px}
-  .footer-top{grid-template-columns:1fr}
-  .about-avatar-wrap{flex-direction:column;align-items:center}
-  .about-info-cards{grid-template-columns:1fr 1fr}
-  .projects-grid{grid-template-columns:1fr}
-  section{padding:80px 5%}
+  .services-tabs{justify-content:flex-start;overflow-x:auto;padding-bottom:8px;gap:8px}
+  .service-tab{flex-shrink:0;padding:8px 18px;font-size:0.75rem}
+  .services-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .service-card{min-height:160px;padding:16px}
+  .service-detail-panel{padding:24px;min-height:auto}
+  .detail-content h3{font-size:1.3rem}
 }
 @media(max-width:480px){
   .hero-cta{flex-direction:column;align-items:center}
@@ -1052,6 +1211,73 @@ footer{
 /* 
    CERTIFICATES
  */
+/* ─── Light theme overrides for hardcoded values ─────────── */
+[data-theme="light"] .typewriter-prefix{color:#0a0f1e;font-weight:600}
+[data-theme="light"] .hero-tagline{color:var(--text-primary);opacity:0.75}
+[data-theme="light"] .hero-typewriter{color:#0a0f1e;font-weight:600}
+[data-theme="light"] .typewriter-text{color:#0a0f1e;font-weight:600}
+[data-theme="light"] .typewriter-cursor{background:#0a0f1e}
+[data-theme="light"] .hero-scroll{color:var(--text-secondary)}
+[data-theme="light"] .hero-name .line1{color:var(--text-primary)}
+[data-theme="light"] .section-subtitle{color:var(--text-secondary)}
+[data-theme="light"] .about-text p{color:var(--text-secondary)}
+[data-theme="light"] .stat-label{color:var(--text-secondary)}
+[data-theme="light"] .project-desc{color:var(--text-secondary)}
+[data-theme="light"] .service-desc{color:var(--text-secondary)}
+[data-theme="light"] .timeline-desc{color:var(--text-secondary)}
+[data-theme="light"] .testimonial-quote{color:var(--text-secondary)}
+[data-theme="light"] .testimonial-role{color:var(--text-secondary)}
+[data-theme="light"] .cert-issuer{color:var(--cyan)}
+[data-theme="light"] .cert-title{color:var(--text-primary)}
+[data-theme="light"] .footer-copy{color:var(--text-secondary)}
+[data-theme="light"] .footer-col h4{color:var(--text-secondary)}
+[data-theme="light"] .footer-col ul li a{color:var(--text-secondary)}
+[data-theme="light"] .nav-links a{color:var(--text-secondary)}
+[data-theme="light"] .skill-group-title{color:var(--text-secondary)}
+[data-theme="light"] .skill-pill{color:var(--text-secondary)}
+[data-theme="light"] .contact-divider span{color:var(--text-secondary)}
+[data-theme="light"] .quick-btn-text span{color:var(--text-secondary)}
+[data-theme="light"] .quick-btn-text strong{color:var(--text-primary)}
+[data-theme="light"] .form-submit-row p{color:var(--text-secondary)}
+[data-theme="light"] .hero-badge{color:var(--text-primary)}
+[data-theme="light"] .chatbot-header p{color:var(--text-secondary)}
+[data-theme="light"] .preloader-pct{color:var(--text-secondary)}
+[data-theme="light"] .mobile-menu a:hover{color:var(--cyan)}
+[data-theme="light"] body{background-image:radial-gradient(ellipse at 20% 50%,rgba(0,136,170,0.05) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(139,49,212,0.04) 0%,transparent 50%)}
+[data-theme="light"] .glass-card{background:rgba(255,255,255,0.85);border-color:rgba(0,0,0,0.09)}
+[data-theme="light"] .stat-card,[data-theme="light"] .service-card{background:rgba(255,255,255,0.8)}
+[data-theme="light"] .project-card,[data-theme="light"] .timeline-card{background:rgba(255,255,255,0.88)}
+[data-theme="light"] .testimonial-slide,[data-theme="light"] .cert-card{background:rgba(255,255,255,0.88)}
+[data-theme="light"] .quick-btn{background:rgba(255,255,255,0.85);border-color:rgba(0,0,0,0.1)}
+[data-theme="light"] .simple-form{background:rgba(255,255,255,0.92);border-color:rgba(0,0,0,0.1)}
+[data-theme="light"] .filter-btn{background:rgba(255,255,255,0.75);color:var(--text-secondary)}
+[data-theme="light"] .filter-btn.active{background:linear-gradient(135deg,#0088aa,#6b31d4);border-color:transparent;color:#fff;box-shadow:0 0 20px rgba(0,136,170,0.4)}
+[data-theme="light"] .btn-outline{border-color:rgba(0,0,0,0.25);color:var(--text-primary)}
+[data-theme="light"] .btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
+[data-theme="light"] .skill-bar-track{background:rgba(0,0,0,0.08)}
+[data-theme="light"] .timeline-dot.work{background:#e8f4f8;border-color:rgba(0,136,170,0.5)}
+[data-theme="light"] .timeline-dot.edu{background:#fdf8ed;border-color:rgba(196,138,0,0.5)}
+[data-theme="light"] .chatbot-panel{background:var(--bg-primary)}
+[data-theme="light"] .chatbot-footer{background:var(--bg-secondary)}
+[data-theme="light"] .chatbot-input{background:var(--bg-card);color:var(--text-primary)}
+[data-theme="light"] .hero-badge{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.12);color:var(--text-secondary)}
+[data-theme="light"] .floating-badge{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.12)}
+[data-theme="light"] .project-tag{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1);color:var(--text-secondary)}
+[data-theme="light"] .value-tag{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.1)}
+[data-theme="light"] .info-card,[data-theme="light"] .contact-item{background:rgba(0,0,0,0.04)}
+[data-theme="light"] .social-link{background:rgba(0,0,0,0.04)}
+[data-theme="light"] .lightbox-card,[data-theme="light"] .cert-lb-card{background:var(--bg-primary)}
+[data-theme="light"] #lightbox,[data-theme="light"] #cert-lightbox{background:rgba(0,0,0,0.65)}
+[data-theme="light"] ::-webkit-scrollbar-track{background:var(--bg-secondary)}
+[data-theme="light"] footer{border-color:rgba(0,0,0,0.08)}
+[data-theme="light"] .section-divider{background:linear-gradient(to right,transparent,rgba(0,0,0,0.1),transparent)}
+[data-theme="light"] .chatbot-message.bot{background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.08)}
+[data-theme="light"] .chatbot-suggestion{background:rgba(255,255,255,0.9)}
+[data-theme="light"] .about-info-cards .info-card{background:rgba(0,0,0,0.04)}
+[data-theme="light"] .quick-btn.github .quick-btn-icon{color:var(--text-primary);background:rgba(0,0,0,0.06);border-color:rgba(0,0,0,0.12)}
+[data-theme="light"] .skills-tooltip{background:var(--bg-card);border-color:rgba(0,0,0,0.1);color:var(--text-primary)}
+[data-theme="light"] #skills-canvas-wrap{background:radial-gradient(ellipse at center,rgba(0,136,170,0.06),transparent 70%)}
+
 #certificates{background:var(--bg-secondary)}
 .certs-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
@@ -1069,31 +1295,33 @@ footer{
 }
 .cert-preview{
   position:relative;height:200px;overflow:hidden;
-  background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(168,85,247,0.08));
   display:flex;align-items:center;justify-content:center;
   border-bottom:1px solid var(--border);cursor:pointer;
 }
-.cert-preview iframe{
-  width:100%;height:100%;border:none;pointer-events:none;
-  transform:scale(1);transform-origin:top left;
+.cert-preview-art{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.cert-card:hover .cert-preview-art{transform:scale(1.05) translateY(-4px)}
+.cert-preview-art svg{filter:drop-shadow(0 4px 12px rgba(0,0,0,0.5))}
+.cert-issuer-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:50px;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;
+  text-transform:uppercase;font-weight:700;
 }
 .cert-preview-overlay{
   position:absolute;inset:0;
-  background:rgba(5,8,16,0.5);
+  background:rgba(0,0,0,0.6);
   display:flex;align-items:center;justify-content:center;
   opacity:0;transition:opacity var(--transition);
-  flex-direction:column;gap:8px;
+  flex-direction:column;gap:8px;z-index:3;
 }
 .cert-card:hover .cert-preview-overlay{opacity:1}
 .cert-preview-overlay span{
   font-size:0.78rem;color:#fff;font-family:var(--font-mono);
   letter-spacing:0.1em;text-transform:uppercase;
-}
-.cert-icon-wrap{
-  width:72px;height:72px;border-radius:50%;
-  background:linear-gradient(135deg,var(--cyan-dim),rgba(168,85,247,0.15));
-  border:1px solid rgba(0,217,255,0.2);
-  display:flex;align-items:center;justify-content:center;font-size:2rem;
 }
 .cert-body{padding:22px 22px 24px;flex:1;display:flex;flex-direction:column;gap:10px}
 .cert-issuer{
@@ -1272,7 +1500,6 @@ footer{
         </div>
         <div class="status-badge"><span class="dot"></span>Open to Work</div>
         <div class="about-info-cards">
-          <div class="info-card"><span class="label">Location</span><span class="val">Pakistan </span></div>
           <div class="info-card"><span class="label">Education</span><span class="val">4th Sem CS</span></div>
           <div class="info-card"><span class="label">Focus</span><span class="val">AI/ML + DS</span></div>
           <div class="info-card"><span class="label">Experience</span><span class="val">1.5+ Years</span></div>
@@ -1345,9 +1572,33 @@ footer{
 <section id="services" aria-labelledby="services-title">
   <div class="container">
     <span class="section-label reveal">02  What I Do</span>
-    <h2 class="section-title reveal" id="services-title">Services &amp; <span>Expertise</span></h2>
-    <p class="section-subtitle reveal">From intelligent AI systems to beautiful web interfaces  here's what I bring to the table.</p>
-    <div class="services-grid" id="services-grid"></div>
+    <h2 class="section-title reveal" id="services-title">Services & <span>Expertise</span></h2>
+    <p class="section-subtitle reveal">Hover to explore my skill categories and see what I bring to every project.</p>
+    
+    <!-- Interactive Tabs -->
+    <div class="services-tabs reveal">
+      <button class="service-tab active" data-category="all">All Services</button>
+      <button class="service-tab" data-category="ai">AI/ML</button>
+      <button class="service-tab" data-category="web">Web Dev</button>
+      <button class="service-tab" data-category="data">Data</button>
+      <button class="service-tab" data-category="backend">Backend</button>
+    </div>
+
+    <!-- Services Cards with Icons and Animations -->
+    <div class="services-showcase">
+      <div class="services-grid" id="services-grid"></div>
+      <div class="service-detail-panel reveal from-right" id="service-detail">
+        <div class="detail-content">
+          <h3 id="detail-title">Select a service</h3>
+          <p id="detail-desc"></p>
+          <div id="detail-stack" class="detail-stack"></div>
+          <div class="detail-meter">
+            <span>Expertise Level</span>
+            <div class="meter-bar" id="detail-level"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1575,23 +1826,341 @@ footer{
    DATA
  */
 const SERVICES = [
-  { icon:'fa-brain', title:'AI / ML Development', desc:'Building intelligent models and pipelines  from data preprocessing to model deployment. Experienced with TensorFlow, PyTorch, and scikit-learn.' },
-  { icon:'fa-code', title:'Full Stack Engineering', desc:'End-to-end web applications with React frontends and Flask/Python backends. RESTful APIs, database design, and deployment.' },
-  { icon:'fa-chart-line', title:'Data Science & Analytics', desc:'Transforming raw data into actionable insights. Statistical analysis, predictive modeling, and visualization with NumPy, Pandas, and Matplotlib.' },
-  { icon:'fa-globe', title:'Web Development', desc:'Crafting responsive, interactive, and visually stunning web experiences using HTML5, CSS3, JavaScript, and modern frameworks.' },
-  { icon:'fa-cogs', title:'Python Automation', desc:'Automating repetitive tasks, building CLI tools, and creating desktop applications. QR generators, reminders, scrapers, and more.' },
-  { icon:'fa-database', title:'Database & SQL', desc:'Designing efficient schemas, writing complex queries, and managing data for robust applications using MySQL, SQLite, and PostgreSQL.' },
+  { 
+    icon:'fa-brain', 
+    title:'AI / ML Development', 
+    desc:'🤖 Engineer intelligent systems that learn and adapt. From neural networks to NLP models, I build AI solutions that solve real-world problems with TensorFlow, PyTorch, and cutting-edge frameworks.',
+    long:'Building production-grade machine learning pipelines, computer vision applications, and natural language processing systems. Experienced in model training, optimization, and deployment.',
+    bullet1:'Design & train neural networks for complex pattern recognition',
+    bullet2:'Build NLP models and chatbot integrations',
+    bullet3:'Optimize ML pipelines for production deployment',
+    tech:['TensorFlow','PyTorch','Scikit-learn','NLTK','OpenCV'],
+    category:'ai',
+    level:95
+  },
+  { 
+    icon:'fa-code', 
+    title:'Full Stack Engineering', 
+    desc:'⚡ End-to-end web applications that scale. React frontends that dazzle, Python/Flask backends that perform, APIs that integrate seamlessly.',
+    long:'Complete web application development from frontend to backend. Building scalable systems with modern frameworks and best practices.',
+    bullet1:'Develop responsive UIs with React and modern JavaScript',
+    bullet2:'Build robust backend APIs with Python/Flask & Node.js',
+    bullet3:'Deploy scalable applications with database optimization',
+    tech:['React','Node.js','Flask','MongoDB','PostgreSQL'],
+    category:'web',
+    level:92
+  },
+  { 
+    icon:'fa-chart-line', 
+    title:'Data Science & Analytics', 
+    desc:'📊 Transform chaos into clarity. Extract patterns, predict trends, and make data-driven decisions.',
+    long:'Statistical analysis, data visualization, and predictive modeling. Turning raw data into actionable business intelligence.',
+    bullet1:'Perform statistical analysis & predictive modeling',
+    bullet2:'Create compelling data visualizations & dashboards',
+    bullet3:'Extract insights from complex datasets',
+    tech:['Pandas','NumPy','Matplotlib','Seaborn','Jupyter'],
+    category:'data',
+    level:88
+  },
+  { 
+    icon:'fa-globe', 
+    title:'Web Development', 
+    desc:'🌐 Pixel-perfect, lightning-fast web experiences. Responsive design, smooth interactions, and modern stack.',
+    long:'Frontend development with focus on UX/UI, performance optimization, and accessibility standards.',
+    bullet1:'Create pixel-perfect, responsive user interfaces',
+    bullet2:'Optimize performance & implement smooth animations',
+    bullet3:'Ensure accessibility & cross-browser compatibility',
+    tech:['React','CSS3','JavaScript','Tailwind','Vite'],
+    category:'web',
+    level:90
+  },
+  { 
+    icon:'fa-cogs', 
+    title:'Python Automation', 
+    desc:'🚀 Work smarter, not harder. Automate the mundane—build CLI tools, desktop apps, web scrapers.',
+    long:'Automation scripts, CLI applications, and desktop software. Streamlining workflows and eliminating repetitive tasks.',
+    bullet1:'Build CLI tools & automation scripts for efficiency',
+    bullet2:'Create web scrapers & data collection systems',
+    bullet3:'Develop desktop applications with modern Python',
+    tech:['Python','BeautifulSoup','Selenium','Click','Tkinter'],
+    category:'backend',
+    level:85
+  },
+  { 
+    icon:'fa-database', 
+    title:'Database & SQL', 
+    desc:'🗄️ Rock-solid data architecture. Design schemas that scale, write queries that fly.',
+    long:'Database design, optimization, and management. Creating efficient data structures for robust applications.',
+    bullet1:'Design optimized database schemas & relationships',
+    bullet2:'Write complex queries & stored procedures',
+    bullet3:'Implement caching & performance optimization',
+    tech:['PostgreSQL','MySQL','SQLite','MongoDB','Redis'],
+    category:'backend',
+    level:88
+  },
 ];
 
 const PROJECTS = [
-  { id:1, title:'AI YouTube Summarizer', desc:'Full-stack AI application that ingests YouTube transcripts and generates intelligent summaries using advanced language models.', long:'End-to-end Flask application with YouTube Transcript API integration, AI summarization via LLM APIs, and a clean web frontend. Features include history, export, and multi-language support.', tech:['Python','Flask','AI/ML','API Integration','Full Stack'], cat:'AI/ML', featured:true, icon:'', gh:'https://github.com/abdulbhati07-a11y/AI-Text-Summarizer.git', demo:'#', grad:'linear-gradient(135deg,rgba(0,217,255,0.15),rgba(168,85,247,0.15))' },
-  { id:2, title:'Algorithm Visualizer', desc:'Real-time interactive visualization of sorting and search algorithms built with C++ and OpenGL for deep algorithmic understanding.', long:'Built using C++ with OpenGL rendering, this tool animates Bubble Sort, Quick Sort, Merge Sort, Binary Search and more in real time. Step controls, speed sliders, and color coding included.', tech:['C++','OpenGL','Visualization','Data Structures'], cat:'C++', featured:true, icon:'', gh:'https://github.com/abdulbhati07-a11y/Algorithm-Visualizer.git', demo:'#', grad:'linear-gradient(135deg,rgba(245,197,66,0.15),rgba(239,68,68,0.15))' },
-  { id:3, title:'Pawfect Pet Sitting', desc:'Premium pet sitting service frontend with responsive layouts, interactive components, and a polished UX that builds owner trust.', long:'Designed and built a complete multi-page frontend for a pet sitting platform  featuring service listings, booking forms, testimonials, and a responsive mobile-first layout.', tech:['HTML','CSS','JavaScript','Responsive Design'], cat:'Web', featured:false, icon:'', gh:'https://github.com/abdulbhati07-a11y/Pawfect-Petsitting.git', demo:'https://pawfect-petsitting.vercel.app/', grad:'linear-gradient(135deg,rgba(236,72,153,0.15),rgba(168,85,247,0.15))' },
-  { id:4, title:'Laundry Service Web', desc:'Complete frontend architecture for a laundry platform built with Bootstrap  clean, professional, and fully responsive.', long:'A polished frontend for a laundry service including service pricing cards, scheduling UI, a contact section, and a Bootstrap-powered responsive grid layout.', tech:['HTML','CSS','JavaScript','Bootstrap'], cat:'Web', featured:false, icon:'', gh:'#', demo:'#', grad:'linear-gradient(135deg,rgba(59,130,246,0.15),rgba(0,217,255,0.15))' },
-  { id:5, title:'Birthday Experience Web', desc:'Delightful interactive animated birthday web experience with particle effects, multi-scene presentation, and heartfelt animations.', long:'A multi-scene, single-page animated birthday experience using pure CSS animations, JavaScript confetti, and smooth scene transitions. Personalized with the recipient\'s name.', tech:['HTML','CSS','JavaScript','Animations'], cat:'Web', featured:false, icon:'', gh:'https://github.com/abdulbhati07-a11y/Happy-Birthday-Interactive-web.git', demo:'#', grad:'linear-gradient(135deg,rgba(245,197,66,0.15),rgba(249,115,22,0.15))' },
-  { id:6, title:'Drink Water Reminder', desc:'Smart Python desktop app with configurable hydration reminders, system tray integration, and daily tracking.', long:'Python Tkinter application that sits in the system tray and sends desktop notifications at configurable intervals. Features daily hydration log, custom intervals, and a minimal UI.', tech:['Python','GUI','Tkinter','Automation'], cat:'Python', featured:false, icon:'', gh:'https://github.com/abdulbhati07-a11y/Drink-water-Reminder.git', demo:'#', grad:'linear-gradient(135deg,rgba(16,185,129,0.15),rgba(0,217,255,0.15))' },
-  { id:7, title:'QR Code Generator', desc:'Versatile Python tool to generate, customize, and export QR codes for URLs, text, and contact info with styling options.', long:'Feature-rich QR generator using the qrcode library. Supports custom colors, logos, error correction levels, and batch generation. Export to PNG, SVG, or clipboard.', tech:['Python','PyQR','File I/O','Automation'], cat:'Python', featured:false, icon:'', gh:'https://github.com/abdulbhati07-a11y/QR-Code-Generator.git', demo:'#', grad:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(168,85,247,0.15))' },
-  { id:8, title:'Protein 3D Folding Structure', desc:'Interactive full-stack application that visualizes protein 3D folding structures in real time, combining bioinformatics with cutting-edge 3D rendering in the browser.', long:'A full-stack web application that fetches protein data and renders interactive 3D molecular folding structures directly in the browser. Built with a modern React frontend and deployed on Vercel. Features real-time 3D visualization, molecular structure exploration, and a clean scientific UI  bridging AI/ML and computational biology.', tech:['React','Full Stack','3D Visualization','Bioinformatics','Vercel'], cat:'Full Stack', featured:true, icon:'', gh:'https://github.com/abdulbhati07-a11y/Protein-3d-Folding-Structure.git', demo:'https://protein-3d-folding-structure.vercel.app/', grad:'linear-gradient(135deg,rgba(16,185,129,0.2),rgba(0,217,255,0.15))' },
+  {
+    id:1, title:'AI YouTube Summarizer',
+    desc:'Full-stack AI application that ingests YouTube transcripts and generates intelligent summaries using advanced language models.',
+    long:'End-to-end Flask application with YouTube Transcript API integration, AI summarization via LLM APIs, and a clean web frontend. Features include history, export, and multi-language support.',
+    tech:['Python','Flask','AI/ML','API Integration','Full Stack'], cat:'AI/ML', featured:true,
+    gh:'https://github.com/abdulbhati07-a11y/AI-Text-Summarizer.git', demo:'#',
+    grad:'linear-gradient(135deg,#050f1a,#071428)',
+    accentA:'#00d9ff', accentB:'#a855f7',
+    svg:`<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="g1a" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#00d9ff" stop-opacity="0.3"/><stop offset="100%" stop-color="#00d9ff" stop-opacity="0"/></radialGradient>
+        <linearGradient id="g1b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00d9ff"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+      </defs>
+      <circle cx="60" cy="60" r="54" fill="url(#g1a)"/>
+      <!-- YouTube play button -->
+      <rect x="22" y="36" width="76" height="48" rx="12" fill="none" stroke="url(#g1b)" stroke-width="2.5" opacity="0.7"/>
+      <polygon points="48,48 48,72 78,60" fill="url(#g1b)" opacity="0.9"/>
+      <!-- AI sparks -->
+      <circle cx="95" cy="28" r="4" fill="#00d9ff" opacity="0.9"/>
+      <circle cx="105" cy="40" r="2.5" fill="#a855f7" opacity="0.8"/>
+      <circle cx="88" cy="20" r="2" fill="#00d9ff" opacity="0.6"/>
+      <!-- Brain waves -->
+      <path d="M30 98 Q42 90 54 98 Q66 106 78 98 Q90 90 102 98" stroke="#a855f7" stroke-width="2" fill="none" opacity="0.5" stroke-dasharray="4 3"/>
+      <path d="M34 106 Q46 98 58 106 Q70 114 82 106" stroke="#00d9ff" stroke-width="1.5" fill="none" opacity="0.35" stroke-dasharray="3 3"/>
+    </svg>`
+  },
+  {
+    id:2, title:'Algorithm Visualizer',
+    desc:'Real-time interactive visualization of sorting and search algorithms built with C++ and OpenGL for deep algorithmic understanding.',
+    long:'Built using C++ with OpenGL rendering, this tool animates Bubble Sort, Quick Sort, Merge Sort, Binary Search and more in real time. Step controls, speed sliders, and color coding included.',
+    tech:['C++','OpenGL','Visualization','Data Structures'], cat:'C++', featured:true,
+    gh:'https://github.com/abdulbhati07-a11y/Algorithm-Visualizer.git', demo:'#',
+    grad:'linear-gradient(135deg,#120a00,#1a0800)',
+    accentA:'#f5c542', accentB:'#ef4444',
+    svg:`<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g2a" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f5c542"/><stop offset="1" stop-color="#ef4444"/></linearGradient>
+        <linearGradient id="g2b" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f5c542" stop-opacity="0.6"/><stop offset="1" stop-color="#ef4444" stop-opacity="0.6"/></linearGradient>
+      </defs>
+      <!-- Bar chart bars — sorting visualization -->
+      <rect x="14" y="72" width="12" height="32" rx="3" fill="url(#g2b)" opacity="0.5"/>
+      <rect x="30" y="52" width="12" height="52" rx="3" fill="url(#g2a)" opacity="0.7"/>
+      <rect x="46" y="38" width="12" height="66" rx="3" fill="url(#g2a)" opacity="0.9"/>
+      <rect x="62" y="22" width="12" height="82" rx="3" fill="url(#g2a)"/>
+      <rect x="78" y="44" width="12" height="60" rx="3" fill="url(#g2a)" opacity="0.85"/>
+      <rect x="94" y="60" width="12" height="44" rx="3" fill="url(#g2b)" opacity="0.6"/>
+      <!-- Active compare highlight -->
+      <rect x="46" y="38" width="12" height="66" rx="3" fill="none" stroke="#f5c542" stroke-width="2"/>
+      <rect x="62" y="22" width="12" height="82" rx="3" fill="none" stroke="#f5c542" stroke-width="2"/>
+      <!-- Swap arrow -->
+      <path d="M52 18 L68 18" stroke="#f5c542" stroke-width="2" stroke-linecap="round"/>
+      <path d="M64 14 L68 18 L64 22" stroke="#f5c542" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M56 14 L52 18 L56 22" stroke="#f5c542" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`
+  },
+  {
+    id:3, title:'Pawfect Pet Sitting',
+    desc:'Premium pet sitting service frontend with responsive layouts, interactive components, and a polished UX that builds owner trust.',
+    long:'Designed and built a complete multi-page frontend for a pet sitting platform featuring service listings, booking forms, testimonials, and a responsive mobile-first layout.',
+    tech:['HTML','CSS','JavaScript','Responsive Design'], cat:'Web', featured:false,
+    gh:'https://github.com/abdulbhati07-a11y/Pawfect-Petsitting.git', demo:'https://pawfect-petsitting.vercel.app/',
+    grad:'linear-gradient(135deg,#140818,#0e0616)',
+    accentA:'#f472b6', accentB:'#a855f7',
+    svg:`<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g3a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f472b6"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+      </defs>
+      <!-- Paw print -->
+      <!-- Main pad -->
+      <ellipse cx="60" cy="74" rx="22" ry="18" fill="url(#g3a)" opacity="0.85"/>
+      <!-- Toe pads -->
+      <ellipse cx="36" cy="52" rx="9" ry="11" fill="url(#g3a)" opacity="0.75"/>
+      <ellipse cx="52" cy="42" rx="9" ry="11" fill="url(#g3a)" opacity="0.75"/>
+      <ellipse cx="68" cy="42" rx="9" ry="11" fill="url(#g3a)" opacity="0.75"/>
+      <ellipse cx="84" cy="52" rx="9" ry="11" fill="url(#g3a)" opacity="0.75"/>
+      <!-- Heart inside paw -->
+      <path d="M60 82 C60 82 50 74 50 68 C50 64 53 62 56 62 C58 62 60 64 60 64 C60 64 62 62 64 62 C67 62 70 64 70 68 C70 74 60 82 60 82Z" fill="white" opacity="0.9"/>
+      <!-- Sparkles -->
+      <circle cx="20" cy="30" r="3" fill="#f472b6" opacity="0.8"/>
+      <circle cx="100" cy="25" r="2" fill="#a855f7" opacity="0.7"/>
+      <circle cx="108" cy="85" r="2.5" fill="#f472b6" opacity="0.5"/>
+    </svg>`
+  },
+  {
+    id:4, title:'Laundry Service Web',
+    desc:'Complete frontend architecture for a laundry platform built with Bootstrap — clean, professional, and fully responsive.',
+    long:'A polished frontend for a laundry service including service pricing cards, scheduling UI, a contact section, and a Bootstrap-powered responsive grid layout.',
+    tech:['HTML','CSS','JavaScript','Bootstrap'], cat:'Web', featured:false,
+    gh:'#', demo:'#',
+    grad:'linear-gradient(135deg,#060e1a,#040c18)',
+    accentA:'#38bdf8', accentB:'#00d9ff',
+    svg:`<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g4a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#00d9ff"/></linearGradient>
+      </defs>
+      <!-- Washing machine body -->
+      <rect x="22" y="28" width="76" height="72" rx="10" fill="none" stroke="url(#g4a)" stroke-width="2.5"/>
+      <!-- Door circle -->
+      <circle cx="60" cy="72" r="22" fill="none" stroke="url(#g4a)" stroke-width="2.5"/>
+      <circle cx="60" cy="72" r="14" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.5"/>
+      <!-- Water swirl inside drum -->
+      <path d="M52 72 Q60 62 68 72 Q60 82 52 72Z" fill="#38bdf8" opacity="0.3"/>
+      <path d="M56 66 Q64 74 56 82" stroke="#00d9ff" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round"/>
+      <!-- Control panel -->
+      <rect x="30" y="36" width="60" height="18" rx="4" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.4"/>
+      <circle cx="42" cy="45" r="4" fill="#38bdf8" opacity="0.7"/>
+      <circle cx="56" cy="45" r="3" fill="#00d9ff" opacity="0.5"/>
+      <rect x="65" y="41" width="18" height="8" rx="2" fill="#38bdf8" opacity="0.3"/>
+      <!-- Steam bubbles -->
+      <circle cx="96" cy="24" r="4" fill="#38bdf8" opacity="0.6"/>
+      <circle cx="104" cy="16" r="3" fill="#00d9ff" opacity="0.4"/>
+      <circle cx="90" cy="15" r="2" fill="#38bdf8" opacity="0.3"/>
+    </svg>`
+  },
+  {
+    id:5, title:'Birthday Experience Web',
+    desc:'Delightful interactive animated birthday web experience with particle effects, multi-scene presentation, and heartfelt animations.',
+    long:"A multi-scene, single-page animated birthday experience using pure CSS animations, JavaScript confetti, and smooth scene transitions. Personalized with the recipient's name.",
+    tech:['HTML','CSS','JavaScript','Animations'], cat:'Web', featured:false,
+    gh:'https://github.com/abdulbhati07-a11y/Happy-Birthday-Interactive-web.git', demo:'#',
+    grad:'linear-gradient(135deg,#150c00,#120900)',
+    accentA:'#f5c542', accentB:'#f97316',
+    svg:`<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g5a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5c542"/><stop offset="1" stop-color="#f97316"/></linearGradient>
+      </defs>
+      <!-- Cake base layers -->
+      <rect x="24" y="82" width="72" height="22" rx="6" fill="url(#g5a)" opacity="0.8"/>
+      <rect x="30" y="62" width="60" height="22" rx="5" fill="url(#g5a)" opacity="0.65"/>
+      <rect x="38" y="46" width="44" height="18" rx="4" fill="url(#g5a)" opacity="0.5"/>
+      <!-- Candles -->
+      <rect x="50" y="30" width="5" height="16" rx="2" fill="#f5c542" opacity="0.9"/>
+      <rect x="65" y="30" width="5" height="16" rx="2" fill="#f97316" opacity="0.9"/>
+      <!-- Flames -->
+      <ellipse cx="52.5" cy="27" rx="4" ry="6" fill="#f5c542" opacity="0.9"/>
+      <ellipse cx="52.5" cy="25" rx="2.5" ry="4" fill="white" opacity="0.7"/>
+      <ellipse cx="67.5" cy="27" rx="4" ry="6" fill="#f97316" opacity="0.9"/>
+      <ellipse cx="67.5" cy="25" rx="2.5" ry="4" fill="white" opacity="0.7"/>
+      <!-- Confetti -->
+      <rect x="14" y="14" width="6" height="6" rx="1" fill="#f5c542" opacity="0.8" transform="rotate(20 17 17)"/>
+      <rect x="100" y="20" width="5" height="5" rx="1" fill="#f97316" opacity="0.7" transform="rotate(-15 102 22)"/>
+      <circle cx="20" cy="50" r="3" fill="#f5c542" opacity="0.6"/>
+      <circle cx="103" cy="55" r="3" fill="#f97316" opacity="0.5"/>
+      <rect x="95" y="10" width="4" height="4" rx="1" fill="#f5c542" opacity="0.6" transform="rotate(30 97 12)"/>
+      <circle cx="15" cy="80" r="2.5" fill="#f97316" opacity="0.5"/>
+    </svg>`
+  },
+  {
+    id:6, title:'Drink Water Reminder',
+    desc:'Smart Python desktop app with configurable hydration reminders, system tray integration, and daily tracking.',
+    long:'Python Tkinter application that sits in the system tray and sends desktop notifications at configurable intervals. Features daily hydration log, custom intervals, and a minimal UI.',
+    tech:['Python','GUI','Tkinter','Automation'], cat:'Python', featured:false,
+    gh:'https://github.com/abdulbhati07-a11y/Drink-water-Reminder.git', demo:'#',
+    grad:'linear-gradient(135deg,#040f0e,#031210)',
+    accentA:'#10b981', accentB:'#00d9ff',
+    svg:`<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g6a" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#10b981"/><stop offset="1" stop-color="#00d9ff"/></linearGradient>
+        <linearGradient id="g6b" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#00d9ff" stop-opacity="0.4"/><stop offset="1" stop-color="#10b981" stop-opacity="0.7"/></linearGradient>
+      </defs>
+      <!-- Water glass -->
+      <path d="M38 28 L30 96 Q30 102 36 102 L84 102 Q90 102 90 96 L82 28 Z" fill="none" stroke="url(#g6a)" stroke-width="2.5"/>
+      <!-- Water fill -->
+      <path d="M42 62 L35 96 Q35 100 40 100 L80 100 Q85 100 85 96 L78 62 Z" fill="url(#g6b)"/>
+      <!-- Wave on water surface -->
+      <path d="M42 62 Q50 56 60 62 Q70 68 78 62" stroke="#10b981" stroke-width="2" fill="none" opacity="0.8"/>
+      <!-- Droplet above glass -->
+      <path d="M60 8 Q60 8 52 20 Q48 26 60 28 Q72 26 68 20 Q60 8 60 8Z" fill="url(#g6a)" opacity="0.8"/>
+      <!-- Droplet shine -->
+      <ellipse cx="55" cy="20" rx="3" ry="5" fill="white" opacity="0.25" transform="rotate(-20 55 20)"/>
+      <!-- Notification bell -->
+      <path d="M90 38 Q90 30 100 30 Q110 30 110 38 L110 50 L90 50 Z" fill="none" stroke="#10b981" stroke-width="1.8" opacity="0.7"/>
+      <circle cx="100" cy="54" r="3" fill="#10b981" opacity="0.7"/>
+      <circle cx="108" cy="28" r="4" fill="#10b981" opacity="0.9"/>
+    </svg>`
+  },
+  {
+    id:7, title:'QR Code Generator',
+    desc:'Versatile Python tool to generate, customize, and export QR codes for URLs, text, and contact info with styling options.',
+    long:'Feature-rich QR generator using the qrcode library. Supports custom colors, logos, error correction levels, and batch generation. Export to PNG, SVG, or clipboard.',
+    tech:['Python','PyQR','File I/O','Automation'], cat:'Python', featured:false,
+    gh:'https://github.com/abdulbhati07-a11y/QR-Code-Generator.git', demo:'#',
+    grad:'linear-gradient(135deg,#080818,#050510)',
+    accentA:'#6366f1', accentB:'#a855f7',
+    svg:`<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g7a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+      </defs>
+      <!-- QR code structure -->
+      <!-- Top-left finder pattern -->
+      <rect x="18" y="18" width="32" height="32" rx="4" fill="none" stroke="url(#g7a)" stroke-width="2.5"/>
+      <rect x="24" y="24" width="20" height="20" rx="2" fill="url(#g7a)" opacity="0.5"/>
+      <rect x="29" y="29" width="10" height="10" rx="1" fill="url(#g7a)"/>
+      <!-- Top-right finder pattern -->
+      <rect x="70" y="18" width="32" height="32" rx="4" fill="none" stroke="url(#g7a)" stroke-width="2.5"/>
+      <rect x="76" y="24" width="20" height="20" rx="2" fill="url(#g7a)" opacity="0.5"/>
+      <rect x="81" y="29" width="10" height="10" rx="1" fill="url(#g7a)"/>
+      <!-- Bottom-left finder pattern -->
+      <rect x="18" y="70" width="32" height="32" rx="4" fill="none" stroke="url(#g7a)" stroke-width="2.5"/>
+      <rect x="24" y="76" width="20" height="20" rx="2" fill="url(#g7a)" opacity="0.5"/>
+      <rect x="29" y="81" width="10" height="10" rx="1" fill="url(#g7a)"/>
+      <!-- Data dots bottom-right -->
+      <rect x="70" y="70" width="8" height="8" rx="1.5" fill="url(#g7a)" opacity="0.8"/>
+      <rect x="82" y="70" width="8" height="8" rx="1.5" fill="url(#g7a)" opacity="0.5"/>
+      <rect x="94" y="70" width="8" height="8" rx="1.5" fill="url(#g7a)" opacity="0.7"/>
+      <rect x="70" y="82" width="8" height="8" rx="1.5" fill="url(#g7a)" opacity="0.4"/>
+      <rect x="82" y="82" width="8" height="8" rx="1.5" fill="url(#g7a)" opacity="0.9"/>
+      <rect x="94" y="82" width="8" height="8" rx="1.5" fill="url(#g7a)" opacity="0.3"/>
+      <rect x="70" y="94" width="8" height="8" rx="1.5" fill="url(#g7a)" opacity="0.6"/>
+      <rect x="82" y="94" width="8" height="8" rx="1.5" fill="url(#g7a)" opacity="0.7"/>
+      <rect x="94" y="94" width="8" height="8" rx="1.5" fill="url(#g7a)" opacity="0.5"/>
+      <!-- Timing dots -->
+      <rect x="54" y="18" width="6" height="6" rx="1" fill="url(#g7a)" opacity="0.5"/>
+      <rect x="54" y="30" width="6" height="6" rx="1" fill="url(#g7a)" opacity="0.3"/>
+      <rect x="54" y="42" width="6" height="6" rx="1" fill="url(#g7a)" opacity="0.5"/>
+      <rect x="18" y="54" width="6" height="6" rx="1" fill="url(#g7a)" opacity="0.5"/>
+      <rect x="30" y="54" width="6" height="6" rx="1" fill="url(#g7a)" opacity="0.3"/>
+      <rect x="42" y="54" width="6" height="6" rx="1" fill="url(#g7a)" opacity="0.5"/>
+    </svg>`
+  },
+  {
+    id:8, title:'Protein 3D Folding',
+    desc:'Interactive full-stack application that visualizes protein 3D folding structures in real time, combining bioinformatics with cutting-edge 3D rendering.',
+    long:'A full-stack web application that fetches protein data and renders interactive 3D molecular folding structures directly in the browser. Built with React and deployed on Vercel. Features real-time 3D visualization and molecular structure exploration.',
+    tech:['React','Full Stack','3D Visualization','Bioinformatics','Vercel'], cat:'Full Stack', featured:true,
+    gh:'https://github.com/abdulbhati07-a11y/Protein-3d-Folding-Structure.git', demo:'https://protein-3d-folding-structure.vercel.app/',
+    grad:'linear-gradient(135deg,#030f0a,#041410)',
+    accentA:'#10b981', accentB:'#00d9ff',
+    svg:`<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g8a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#10b981"/><stop offset="1" stop-color="#00d9ff"/></linearGradient>
+        <radialGradient id="g8b" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#10b981" stop-opacity="0.2"/><stop offset="100%" stop-color="#00d9ff" stop-opacity="0"/></radialGradient>
+      </defs>
+      <circle cx="60" cy="60" r="54" fill="url(#g8b)"/>
+      <!-- Protein helix backbone -->
+      <path d="M20 80 Q35 55 60 60 Q85 65 100 40" stroke="url(#g8a)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- Amino acid nodes -->
+      <circle cx="20" cy="80" r="6" fill="#10b981" opacity="0.9"/>
+      <circle cx="36" cy="62" r="5" fill="url(#g8a)" opacity="0.85"/>
+      <circle cx="52" cy="58" r="6" fill="url(#g8a)"/>
+      <circle cx="68" cy="62" r="5" fill="url(#g8a)" opacity="0.85"/>
+      <circle cx="84" cy="52" r="6" fill="url(#g8a)"/>
+      <circle cx="100" cy="40" r="6" fill="#00d9ff" opacity="0.9"/>
+      <!-- Bond connections -->
+      <line x1="20" y1="80" x2="36" y2="62" stroke="#10b981" stroke-width="1.5" opacity="0.5"/>
+      <line x1="36" y1="62" x2="52" y2="58" stroke="url(#g8a)" stroke-width="1.5" opacity="0.5"/>
+      <line x1="52" y1="58" x2="68" y2="62" stroke="url(#g8a)" stroke-width="1.5" opacity="0.5"/>
+      <line x1="68" y1="62" x2="84" y2="52" stroke="url(#g8a)" stroke-width="1.5" opacity="0.5"/>
+      <line x1="84" y1="52" x2="100" y2="40" stroke="#00d9ff" stroke-width="1.5" opacity="0.5"/>
+      <!-- Side chains -->
+      <line x1="36" y1="62" x2="28" y2="45" stroke="#10b981" stroke-width="1.5" opacity="0.4"/>
+      <circle cx="28" cy="42" r="3.5" fill="#10b981" opacity="0.5"/>
+      <line x1="68" y1="62" x2="76" y2="78" stroke="#00d9ff" stroke-width="1.5" opacity="0.4"/>
+      <circle cx="76" cy="81" r="3.5" fill="#00d9ff" opacity="0.5"/>
+      <line x1="52" y1="58" x2="44" y2="42" stroke="url(#g8a)" stroke-width="1.5" opacity="0.35"/>
+      <circle cx="44" cy="39" r="3" fill="#10b981" opacity="0.4"/>
+      <!-- 3D depth orbiting ring -->
+      <ellipse cx="60" cy="60" rx="46" ry="16" fill="none" stroke="url(#g8a)" stroke-width="1" opacity="0.2" stroke-dasharray="5 4"/>
+    </svg>`
+  },
 ];
 
 const SKILLS_DATA = {
@@ -1607,11 +2176,36 @@ const SKILLS_DATA = {
 };
 
 const TIMELINE_DATA = [
-  { year:'2023', title:'Started CS Degree', sub:'University  Education', desc:'Began formal CS education with focus on programming fundamentals, data structures, algorithms, and discrete mathematics.', type:'edu' },
-  { year:'2023', title:'First Web Projects', sub:'Self-Taught  Development', desc:'Built my first web projects  Pet Sitting and Laundry Service platforms  mastering HTML, CSS, JavaScript, and responsive design.', type:'work' },
-  { year:'2024', title:'AI/ML Specialization', sub:'Data Science Track', desc:'Began DS/AI/ML specialization. Built the YouTube AI Summarizer integrating LLM APIs with Flask. Started exploring TensorFlow and scikit-learn.', type:'edu' },
-  { year:'2024', title:'C++ & Algorithms', sub:'Advanced Programming', desc:'Developed the Algorithm Visualizer in C++ with OpenGL. Deep-dived into data structures, rendering pipelines, and systems programming.', type:'work' },
-  { year:'2025', title:'Full Stack & Automation', sub:'Current  Expanding', desc:'Expanding into full-stack development with React, Python automation tools, database design, and AI-integrated application architectures.', type:'work' },
+  {
+    year:'2023', title:'Started CS Degree', sub:'University â€” Education',
+    desc:'Began formal CS education with focus on programming fundamentals, data structures, algorithms, and discrete mathematics.',
+    type:'edu',
+    svg:`<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="14,4 28,11 14,18 0,11" fill="#c8960c"/><polygon points="14,4 28,11 22,11 14,7" fill="#e8b020" opacity="0.5"/><line x1="24" y1="11" x2="24" y2="18" stroke="#c8960c" stroke-width="1.5" stroke-linecap="round"/><circle cx="24" cy="20" r="2" fill="#a07008"/><rect x="8" y="18" width="12" height="8" rx="1.5" fill="#e8d5a0"/><line x1="10" y1="21" x2="18" y2="21" stroke="#c8960c" stroke-width="1"/><line x1="10" y1="23" x2="16" y2="23" stroke="#c8960c" stroke-width="0.8" opacity="0.6"/></svg>`
+  },
+  {
+    year:'2023', title:'First Web Projects', sub:'Self-Taught â€” Development',
+    desc:'Built my first web projects â€” Pet Sitting and Laundry Service platforms â€” mastering HTML, CSS, JavaScript, and responsive design.',
+    type:'work',
+    svg:`<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="5" width="20" height="14" rx="2" fill="#1e2a2a"/><rect x="5" y="6" width="18" height="12" rx="1" fill="#0a1414"/><rect x="7" y="8" width="7" height="1.5" rx="0.5" fill="#00d9ff" opacity="0.8"/><rect x="7" y="11" width="5" height="1.5" rx="0.5" fill="#a855f7" opacity="0.7"/><rect x="7" y="14" width="9" height="1.5" rx="0.5" fill="#10b981" opacity="0.7"/><rect x="16" y="8" width="5" height="1.5" rx="0.5" fill="#a855f7" opacity="0.5"/><rect x="2" y="19" width="24" height="3" rx="1.5" fill="#2a3a3a"/><rect x="10" y="19.5" width="8" height="2" rx="0.8" fill="#1e2a2a"/></svg>`
+  },
+  {
+    year:'2024', title:'AI/ML Specialization', sub:'Data Science Track',
+    desc:'Began DS/AI/ML specialization. Built the YouTube AI Summarizer integrating LLM APIs with Flask. Started exploring TensorFlow and scikit-learn.',
+    type:'edu',
+    svg:`<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 14 C6 8 10 5 14 6 C18 5 22 8 22 14 C22 20 18 23 14 22 C10 23 6 20 6 14Z" fill="#1a1008" stroke="#c8960c" stroke-width="1.2"/><path d="M10 12 Q12 10 14 12 Q16 10 18 12" stroke="#c8960c" stroke-width="1" fill="none" opacity="0.7"/><path d="M9 16 Q11 14 13 16" stroke="#c8960c" stroke-width="1" fill="none" opacity="0.5"/><path d="M15 16 Q17 14 19 16" stroke="#c8960c" stroke-width="1" fill="none" opacity="0.5"/><circle cx="14" cy="6" r="2" fill="#e8b020"/><circle cx="6" cy="14" r="2" fill="#c8960c"/><circle cx="22" cy="14" r="2" fill="#c8960c"/><circle cx="14" cy="22" r="2" fill="#e8b020"/><line x1="14" y1="8" x2="14" y2="12" stroke="#c8960c" stroke-width="0.8" opacity="0.6"/><line x1="8" y1="14" x2="12" y2="14" stroke="#c8960c" stroke-width="0.8" opacity="0.6"/><line x1="16" y1="14" x2="20" y2="14" stroke="#c8960c" stroke-width="0.8" opacity="0.6"/></svg>`
+  },
+  {
+    year:'2024', title:'C++ & Algorithms', sub:'Advanced Programming',
+    desc:'Developed the Algorithm Visualizer in C++ with OpenGL. Deep-dived into data structures, rendering pipelines, and systems programming.',
+    type:'work',
+    svg:`<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="11" width="22" height="15" rx="3" fill="#6b3a1f"/><path d="M3 11 Q3 6 8 6 L20 6 Q25 6 25 11Z" fill="#8b4a28"/><path d="M10 6 Q10 3 14 3 Q18 3 18 6" stroke="#5a2e14" stroke-width="2" fill="none" stroke-linecap="round"/><rect x="11" y="13" width="6" height="4" rx="1" fill="#c8960c"/><rect x="12" y="14" width="4" height="2" rx="0.5" fill="#8b4a28"/><line x1="5" y1="13" x2="5" y2="24" stroke="#5a2e14" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.6"/><line x1="23" y1="13" x2="23" y2="24" stroke="#5a2e14" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.6"/><rect x="7" y="17" width="14" height="7" rx="1.5" fill="#3a1a08"/><text x="14" y="23" text-anchor="middle" font-family="monospace" font-size="5.5" font-weight="bold" fill="#e8b020">C++</text></svg>`
+  },
+  {
+    year:'2025', title:'Full Stack & Automation', sub:'Current â€” Expanding',
+    desc:'Expanding into full-stack development with React, Python automation tools, database design, and AI-integrated application architectures.',
+    type:'work',
+    svg:`<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 3 Q18 6 18 14 L14 18 L10 14 Q10 6 14 3Z" fill="#1e2a2a"/><path d="M14 3 Q16 5 16 8 L14 10 L12 8 Q12 5 14 3Z" fill="#00d9ff" opacity="0.85"/><circle cx="14" cy="13" r="2.5" fill="#0a1a1a"/><circle cx="14" cy="13" r="1.5" fill="#00d9ff" opacity="0.4"/><path d="M10 14 L6 20 L10 18Z" fill="#1e2a2a"/><path d="M18 14 L22 20 L18 18Z" fill="#1e2a2a"/><path d="M12 18 Q14 24 16 18 Q15 22 14 25 Q13 22 12 18Z" fill="#f97316" opacity="0.8"/><path d="M13 18 Q14 22 15 18 Q14.5 21 14 23 Q13.5 21 13 18Z" fill="#f5c542" opacity="0.9"/></svg>`
+  },
 ];
 
 /* 
@@ -1756,14 +2350,73 @@ type();
    SERVICES RENDER
  */
 const sg = document.getElementById('services-grid');
+const detailPanel = document.getElementById('service-detail');
+const allServiceCards = [];
+
 SERVICES.forEach((s,i) => {
   const el = document.createElement('article');
   el.className = 'service-card reveal';
-  el.style.transitionDelay = (i*0.08)+'s';
-  el.innerHTML = `<div class="service-icon"><i class="fas ${s.icon}"></i></div><h3 class="service-title">${s.title}</h3><p class="service-desc">${s.desc}</p>`;
+  el.dataset.category = s.category;
+  el.style.transitionDelay = (i*0.06)+'s';
+  el.innerHTML = `
+    <div class="service-icon"><i class="fas ${s.icon}"></i></div>
+    <h3 class="service-title">${s.title}</h3>
+    <ul class="service-bullets">
+      <li>${s.bullet1}</li>
+      <li>${s.bullet2}</li>
+      <li>${s.bullet3}</li>
+    </ul>
+  `;
+  
+  el.addEventListener('click', () => showServiceDetail(s, el));
+  el.addEventListener('mouseenter', () => showServiceDetail(s, el));
+  
   sg.appendChild(el);
+  allServiceCards.push({el, data: s});
   revealObserver.observe(el);
 });
+
+function showServiceDetail(service, cardEl) {
+  // Remove active class from all cards
+  document.querySelectorAll('.service-card').forEach(c => c.classList.remove('active'));
+  cardEl.classList.add('active');
+  
+  // Update detail panel
+  document.getElementById('detail-title').textContent = service.title;
+  document.getElementById('detail-desc').textContent = service.long;
+  
+  const stackEl = document.getElementById('detail-stack');
+  if (stackEl) {
+    stackEl.innerHTML = service.tech.map(t => `<span>${t}</span>`).join('');
+  }
+  
+  const levelBar = document.querySelector('.meter-fill');
+  if (levelBar) {
+    levelBar.style.width = service.level + '%';
+  }
+}
+
+// Category filtering
+document.querySelectorAll('.service-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.service-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    
+    const category = tab.dataset.category;
+    allServiceCards.forEach(({el, data}) => {
+      if(category === 'all' || data.category === category) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    });
+  });
+});
+
+// Show first service on load
+if(allServiceCards.length > 0) {
+  showServiceDetail(allServiceCards[0].data, allServiceCards[0].el);
+}
 
 /* 
    PROJECTS RENDER + FILTER
@@ -1771,60 +2424,91 @@ SERVICES.forEach((s,i) => {
 const cats = ['All','AI/ML','Web','Python','C++'];
 const fb = document.getElementById('filter-bar');
 const pg = document.getElementById('projects-grid');
-let activeFilter = 'All';
 
-cats.forEach(c => {
-  const btn = document.createElement('button');
-  btn.className = 'filter-btn' + (c==='All' ? ' active' : '');
-  btn.textContent = c;
-  btn.setAttribute('aria-pressed', c==='All' ? 'true' : 'false');
-  btn.addEventListener('click', () => {
-    activeFilter = c;
-    document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
-    btn.classList.add('active'); btn.setAttribute('aria-pressed','true');
-    renderProjects();
-  });
-  fb.appendChild(btn);
-});
+console.log('Projects init - fb:', !!fb, 'pg:', !!pg, 'PROJECTS length:', PROJECTS?.length);
 
-function renderProjects() {
-  pg.innerHTML = '';
-  const filtered = activeFilter==='All' ? PROJECTS : PROJECTS.filter(p => p.cat===activeFilter);
-  filtered.forEach((p,i) => {
-    const card = document.createElement('article');
-    card.className = 'project-card reveal';
-    card.style.transitionDelay = (i*0.07)+'s';
-    const ghLink = (!p.gh || p.gh==='#') 
-      ? `<span class="project-link gh" style="opacity:0.3;cursor:not-allowed" aria-hidden="true"><i class="fab fa-github"></i> GitHub</span>`
-      : `<a href="${p.gh}" class="project-link gh" target="_blank" rel="noopener noreferrer" aria-label="View ${p.title} on GitHub"><i class="fab fa-github"></i> GitHub</a>`;
-    const demoLink = (!p.demo || p.demo==='#')
-      ? `<span class="project-link" style="opacity:0.3;cursor:not-allowed;border:1px solid var(--border);color:var(--text-secondary);background:var(--bg-glass)" aria-hidden="true"><i class="fa fa-external-link-alt"></i> Live</span>`
-      : `<a href="${p.demo}" class="project-link demo" target="_blank" rel="noopener noreferrer" aria-label="View ${p.title} live demo"><i class="fa fa-external-link-alt"></i> Live</a>`;
-    card.innerHTML = `
-      <div class="project-thumb" style="background:${p.grad}">
-        <div class="project-thumb-bg" style="background:${p.grad}"></div>
-        <span class="project-emoji" aria-hidden="true">${p.icon}</span>
-        <div class="project-overlay" aria-hidden="true">
-          <button class="overlay-btn primary" data-id="${p.id}">Details</button>
-          ${p.gh&&p.gh!=='#'?`<a href="${p.gh}" class="overlay-btn secondary" target="_blank" rel="noopener noreferrer">GitHub</a>`:''}
-        </div>
-      </div>
-      <div class="project-body">
-        <div class="project-meta">
-          <span class="project-category">${p.cat}</span>
-          ${p.featured?'<span class="featured-badge"><i class="fa fa-star" aria-hidden="true"></i> Featured</span>':''}
-        </div>
-        <h3 class="project-title">${p.title}</h3>
-        <p class="project-desc">${p.desc}</p>
-        <div class="project-tags">${p.tech.map(t=>`<span class="project-tag">${t}</span>`).join('')}</div>
-        <div class="project-links">${ghLink}${demoLink}</div>
-      </div>`;
-    card.querySelector('.overlay-btn.primary')?.addEventListener('click', () => openLightbox(p.id));
-    pg.appendChild(card);
-    revealObserver.observe(card);
+if (!fb || !pg) {
+  console.error('Projects elements not found. fb:', fb, 'pg:', pg);
+} else if (!PROJECTS || PROJECTS.length === 0) {
+  console.error('PROJECTS array is empty or undefined');
+} else {
+  let activeFilter = 'All';
+
+  cats.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (c==='All' ? ' active' : '');
+    btn.textContent = c;
+    btn.setAttribute('aria-pressed', c==='All' ? 'true' : 'false');
+    btn.addEventListener('click', () => {
+      activeFilter = c;
+      document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+      btn.classList.add('active'); btn.setAttribute('aria-pressed','true');
+      renderProjects();
+    });
+    fb.appendChild(btn);
   });
+
+  function renderProjects() {
+    console.log('Rendering projects for filter:', activeFilter);
+    pg.innerHTML = '';
+    const filtered = activeFilter==='All' ? PROJECTS : PROJECTS.filter(p => p.cat===activeFilter);
+    
+    console.log('Filtered projects:', filtered.length);
+    
+    if (!filtered || filtered.length === 0) {
+      pg.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-secondary)">No projects found</p>';
+      return;
+    }
+    
+    filtered.forEach((p,i) => {
+      try {
+        const card = document.createElement('article');
+        card.className = 'project-card reveal';
+        card.style.transitionDelay = (i*0.07)+'s';
+        const ghLink = p.gh && p.gh!=='#' ? `<a href="${p.gh}" class="project-link gh" target="_blank" rel="noopener noreferrer" aria-label="View ${p.title} on GitHub"><i class="fab fa-github"></i> GitHub</a>` : '';
+        const demoLink = p.demo && p.demo!=='#' ? `<a href="${p.demo}" class="project-link demo" target="_blank" rel="noopener noreferrer" aria-label="View ${p.title} live demo"><i class="fa fa-external-link-alt"></i> Live</a>` : '';
+        
+        const accentA = p.accentA || '#00d9ff';
+        const grad = p.grad || 'linear-gradient(135deg,rgba(0,217,255,0.1),rgba(168,85,247,0.1))';
+        const svg = p.svg || '<svg width="80" height="80" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="35" stroke="currentColor" stroke-width="2" opacity="0.3"/><circle cx="40" cy="40" r="25" stroke="currentColor" stroke-width="2" opacity="0.5"/></svg>';
+        
+        card.innerHTML = `
+          <div class="project-thumb" style="background:${grad}">
+            <div class="project-thumb-bg" style="background:${grad}"></div>
+            <!-- Glow blob -->
+            <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,${accentA}22,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none"></div>
+            <div class="project-thumb-art">${svg}</div>
+            <div class="project-overlay" aria-hidden="true">
+              <button class="overlay-btn primary" data-id="${p.id}">Details</button>
+              ${p.gh&&p.gh!=='#'?`<a href="${p.gh}" class="overlay-btn secondary" target="_blank" rel="noopener noreferrer">GitHub</a>`:''}
+            </div>
+          </div>
+          <div class="project-body">
+            <div class="project-meta">
+              <span class="project-category">${p.cat}</span>
+              ${p.featured?'<span class="featured-badge"><i class="fa fa-star" aria-hidden="true"></i> Featured</span>':''}
+            </div>
+            <h3 class="project-title">${p.title}</h3>
+            <p class="project-desc">${p.desc}</p>
+            <div class="project-tags">${p.tech.map(t=>`<span class="project-tag">${t}</span>`).join('')}</div>
+            <div class="project-links">${ghLink}${demoLink}</div>
+          </div>`;
+        card.querySelector('.overlay-btn.primary')?.addEventListener('click', () => openLightbox(p.id));
+        pg.appendChild(card);
+        if (typeof revealObserver !== 'undefined' && revealObserver) {
+          revealObserver.observe(card);
+        }
+      } catch(e) {
+        console.error('Error rendering project:', p.title, e);
+      }
+    });
+    console.log('Projects rendered successfully');
+  }
+  
+  // Initialize projects
+  console.log('Initializing projects...');
+  renderProjects();
 }
-renderProjects();
 
 /* Lightbox */
 function openLightbox(id) {
@@ -1867,9 +2551,9 @@ TIMELINE_DATA.forEach((item, i) => {
   const el = document.createElement('div');
   el.className = 'timeline-item';
   el.setAttribute('role','listitem');
-  const icon = item.type==='edu' ? '' : '';
+  const logoHtml = item.svg ? item.svg : '';
   const card = `<div class="timeline-card"><span class="timeline-year">${item.year}</span><h3 class="timeline-title">${item.title}</h3><p class="timeline-sub">${item.sub}</p><p class="timeline-desc">${item.desc}</p></div>`;
-  const dotEl = `<div class="timeline-dot ${item.type}" aria-hidden="true">${icon}</div>`;
+  const dotEl = `<div class="timeline-dot ${item.type}" aria-hidden="true">${logoHtml}</div>`;
   if (i%2===0) {
     el.innerHTML = `<div class="timeline-card-left">${card}</div>${dotEl}<div class="timeline-card-right"></div>`;
   } else {
@@ -2318,16 +3002,66 @@ const CERTS_DATA = [
     issuer: 'Udemy',
     file: '/[English]_Complete_2025_Python_Bootcamp__Learn_Python_from_Scratch_Certificate.pdf',
     tags: ['Python', 'Programming', 'Automation'],
-    icon: '',
-    color: 'rgba(0,217,255,0.15)',
+    bg: 'linear-gradient(135deg,#070e18,#0b1020)',
+    badgeColor: '#e8a020', badgeBg: 'rgba(232,160,32,0.12)',
+    // Udemy logo (U shape) + Python snake illustration
+    svg: `<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="pyG" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3776ab"/><stop offset="1" stop-color="#ffd43b"/></linearGradient>
+      </defs>
+      <!-- Udemy U badge -->
+      <rect x="30" y="10" width="40" height="40" rx="10" fill="#a435f0"/>
+      <path d="M42 22 L42 38 Q42 46 50 46 Q58 46 58 38 L58 22" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <line x1="42" y1="48" x2="58" y2="48" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      <!-- Python snake body -->
+      <path d="M20 70 Q20 62 30 62 L50 62 Q62 62 62 72 Q62 82 50 82 L38 82 Q28 82 28 76" stroke="url(#pyG)" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <!-- Python head -->
+      <circle cx="22" cy="76" r="7" fill="#3776ab"/>
+      <circle cx="25" cy="74" r="1.5" fill="white"/>
+      <circle cx="19" cy="74" r="1.5" fill="white"/>
+      <!-- Python tongue -->
+      <path d="M22 83 L20 87 M22 83 L24 87" stroke="#e53e3e" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- Stars decoration -->
+      <circle cx="78" cy="18" r="2" fill="#ffd43b" opacity="0.8"/>
+      <circle cx="85" cy="28" r="1.5" fill="#ffd43b" opacity="0.5"/>
+      <circle cx="75" cy="30" r="1" fill="#ffd43b" opacity="0.4"/>
+    </svg>`
   },
   {
     title: 'Ultimate Job-Ready Data Science Course',
     issuer: 'Udemy',
     file: '/The_Ultimate_Job_Ready_Data_Science_Course_Certificate.pdf',
     tags: ['Data Science', 'ML', 'Python', 'AI'],
-    icon: '',
-    color: 'rgba(168,85,247,0.15)',
+    bg: 'linear-gradient(135deg,#08060f,#0e0818)',
+    badgeColor: '#a435f0', badgeBg: 'rgba(164,53,240,0.12)',
+    // Udemy U badge + data chart + brain node illustration
+    svg: `<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="dsG" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#a435f0"/><stop offset="1" stop-color="#e040fb"/></linearGradient>
+        <linearGradient id="dsBar" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#a435f0" stop-opacity="0.7"/><stop offset="1" stop-color="#e040fb"/></linearGradient>
+      </defs>
+      <!-- Udemy U badge -->
+      <rect x="30" y="8" width="40" height="40" rx="10" fill="#a435f0"/>
+      <path d="M42 20 L42 36 Q42 44 50 44 Q58 44 58 36 L58 20" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <line x1="42" y1="46" x2="58" y2="46" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      <!-- Bar chart -->
+      <rect x="14" y="74" width="10" height="20" rx="2" fill="url(#dsBar)" opacity="0.6"/>
+      <rect x="28" y="64" width="10" height="30" rx="2" fill="url(#dsBar)" opacity="0.8"/>
+      <rect x="42" y="56" width="10" height="38" rx="2" fill="url(#dsBar)"/>
+      <rect x="56" y="60" width="10" height="34" rx="2" fill="url(#dsBar)" opacity="0.85"/>
+      <rect x="70" y="68" width="10" height="26" rx="2" fill="url(#dsBar)" opacity="0.65"/>
+      <!-- Trend line over bars -->
+      <path d="M19 72 L33 62 L47 54 L61 58 L75 66" stroke="#ffd43b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Trend dots -->
+      <circle cx="19" cy="72" r="2.5" fill="#ffd43b"/>
+      <circle cx="47" cy="54" r="2.5" fill="#ffd43b"/>
+      <circle cx="75" cy="66" r="2.5" fill="#ffd43b"/>
+      <!-- AI node top right decoration -->
+      <circle cx="82" cy="18" r="5" fill="none" stroke="#e040fb" stroke-width="1.5" opacity="0.6"/>
+      <circle cx="82" cy="18" r="2" fill="#a435f0" opacity="0.7"/>
+      <line x1="82" y1="13" x2="82" y2="10" stroke="#e040fb" stroke-width="1" opacity="0.5"/>
+      <line x1="87" y1="18" x2="90" y2="18" stroke="#e040fb" stroke-width="1" opacity="0.5"/>
+    </svg>`
   },
 ];
 
@@ -2337,9 +3071,12 @@ CERTS_DATA.forEach((cert, i) => {
   card.className = 'cert-card reveal';
   card.style.transitionDelay = (i * 0.1) + 's';
   card.innerHTML = `
-    <div class="cert-preview" style="background:linear-gradient(135deg,${cert.color},rgba(5,8,16,0.6))" onclick="openCertLightbox(${i})">
-      <div class="cert-icon-wrap">
-        <span>${cert.icon}</span>
+    <div class="cert-preview" style="background:${cert.bg}" onclick="openCertLightbox(${i})">
+      <div class="cert-preview-art">
+        ${cert.svg}
+        <div class="cert-issuer-badge" style="background:${cert.badgeBg};border:1px solid ${cert.badgeColor}40;color:${cert.badgeColor}">
+          <i class="fab fa-udemy"></i> ${cert.issuer}
+        </div>
       </div>
       <div class="cert-preview-overlay">
         <i class="fa fa-expand" style="font-size:1.4rem;color:#fff"></i>
@@ -2347,7 +3084,7 @@ CERTS_DATA.forEach((cert, i) => {
       </div>
     </div>
     <div class="cert-body">
-      <span class="cert-issuer">${cert.issuer}</span>
+      <span class="cert-issuer" style="color:${cert.badgeColor}">${cert.issuer}</span>
       <div class="cert-title">${cert.title}</div>
       <div class="cert-tags">
         ${cert.tags.map(t => `<span class="project-tag">${t}</span>`).join('')}
