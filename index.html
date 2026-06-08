@@ -1159,17 +1159,32 @@ footer{
 .detail-meter{
   padding-top:24px;border-top:1px solid var(--border);
 }
-.detail-meter span{
-  display:block;color:var(--text-muted);font-size:0.8rem;
-  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;
+.detail-meter-title{
+  display:block;color:var(--text-muted);font-size:0.75rem;
+  text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px;
+  font-family:var(--font-mono);
+}
+.meter-row{
+  display:flex;flex-direction:column;gap:5px;margin-bottom:14px;
+}
+.meter-row:last-child{margin-bottom:0}
+.meter-row-header{
+  display:flex;justify-content:space-between;align-items:center;
+}
+.meter-label{
+  font-size:0.78rem;color:var(--text-secondary);font-weight:500;
+}
+.meter-pct{
+  font-family:var(--font-mono);font-size:0.72rem;font-weight:700;
+  color:var(--cyan);letter-spacing:0.05em;
 }
 .meter-bar{
-  height:6px;background:var(--border);border-radius:3px;
+  height:5px;background:var(--border);border-radius:3px;
   overflow:hidden;
 }
 .meter-fill{
   height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold));
-  border-radius:3px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
+  border-radius:3px;transition:width 0.9s cubic-bezier(0.4,0,0.2,1);
   width:0%;
 }
 
@@ -1780,10 +1795,7 @@ footer{
           <h3 id="detail-title">Select a service</h3>
           <p id="detail-desc"></p>
           <div id="detail-stack" class="detail-stack"></div>
-          <div class="detail-meter">
-            <span>Expertise Level</span>
-            <div class="meter-bar" id="detail-level"></div>
-          </div>
+          <div class="detail-meter" id="detail-meter"></div>
         </div>
       </div>
     </div>
@@ -2024,7 +2036,12 @@ const SERVICES = [
     bullet3:'Optimize ML pipelines for production deployment',
     tech:['TensorFlow','PyTorch','Scikit-learn','NLTK','OpenCV'],
     category:'ai',
-    level:95
+    levels:[
+      {label:'Model Training',     pct:95},
+      {label:'NLP & Transformers', pct:88},
+      {label:'Computer Vision',    pct:82},
+      {label:'ML Deployment',      pct:78},
+    ]
   },
   { 
     icon:'fa-code', 
@@ -2036,7 +2053,12 @@ const SERVICES = [
     bullet3:'Deploy scalable applications with database optimization',
     tech:['React','Node.js','Flask','MongoDB','PostgreSQL'],
     category:'web',
-    level:92
+    levels:[
+      {label:'Frontend (React)',  pct:92},
+      {label:'Backend (Flask)',   pct:88},
+      {label:'REST APIs',         pct:90},
+      {label:'DevOps & Deploy',   pct:72},
+    ]
   },
   { 
     icon:'fa-chart-line', 
@@ -2048,7 +2070,12 @@ const SERVICES = [
     bullet3:'Extract insights from complex datasets',
     tech:['Pandas','NumPy','Matplotlib','Seaborn','Jupyter'],
     category:'data',
-    level:88
+    levels:[
+      {label:'Data Wrangling',    pct:92},
+      {label:'Visualization',     pct:88},
+      {label:'Statistical Models',pct:84},
+      {label:'BI & Dashboards',   pct:75},
+    ]
   },
   { 
     icon:'fa-globe', 
@@ -2060,7 +2087,12 @@ const SERVICES = [
     bullet3:'Ensure accessibility & cross-browser compatibility',
     tech:['React','CSS3','JavaScript','Tailwind','Vite'],
     category:'web',
-    level:90
+    levels:[
+      {label:'UI / UX Design',    pct:90},
+      {label:'Responsive Layout', pct:95},
+      {label:'Animations / CSS',  pct:85},
+      {label:'Performance',       pct:80},
+    ]
   },
   { 
     icon:'fa-cogs', 
@@ -2072,7 +2104,12 @@ const SERVICES = [
     bullet3:'Develop desktop applications with modern Python',
     tech:['Python','BeautifulSoup','Selenium','Click','Tkinter'],
     category:'backend',
-    level:85
+    levels:[
+      {label:'Scripting & CLI',   pct:95},
+      {label:'Web Scraping',      pct:88},
+      {label:'Task Scheduling',   pct:82},
+      {label:'Desktop Apps',      pct:70},
+    ]
   },
   { 
     icon:'fa-database', 
@@ -2084,7 +2121,12 @@ const SERVICES = [
     bullet3:'Implement caching & performance optimization',
     tech:['PostgreSQL','MySQL','SQLite','MongoDB','Redis'],
     category:'backend',
-    level:88
+    levels:[
+      {label:'SQL & Queries',     pct:90},
+      {label:'Schema Design',     pct:88},
+      {label:'NoSQL (MongoDB)',    pct:80},
+      {label:'Caching (Redis)',    pct:68},
+    ]
   },
 ];
 
@@ -2578,9 +2620,31 @@ function showServiceDetail(service, cardEl) {
     stackEl.innerHTML = service.tech.map(t => `<span>${t}</span>`).join('');
   }
   
-  const levelBar = document.querySelector('.meter-fill');
-  if (levelBar) {
-    levelBar.style.width = service.level + '%';
+  // Render multiple expertise level bars
+  const meterEl = document.getElementById('detail-meter');
+  if (meterEl && service.levels) {
+    meterEl.innerHTML = `
+      <span class="detail-meter-title">Expertise Levels</span>
+      ${service.levels.map(l => `
+        <div class="meter-row">
+          <div class="meter-row-header">
+            <span class="meter-label">${l.label}</span>
+            <span class="meter-pct">${l.pct}%</span>
+          </div>
+          <div class="meter-bar">
+            <div class="meter-fill" data-pct="${l.pct}" style="width:0%"></div>
+          </div>
+        </div>
+      `).join('')}
+    `;
+    // Animate bars after paint
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        meterEl.querySelectorAll('.meter-fill').forEach(bar => {
+          bar.style.width = bar.dataset.pct + '%';
+        });
+      });
+    });
   }
 }
 
