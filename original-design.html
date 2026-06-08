@@ -1132,7 +1132,7 @@ footer{
 
 .service-detail-panel{
   padding:40px;border-radius:var(--radius-lg);
-  background:linear-gradient(135deg,var(--bg-card) 0%,rgba(10,16,32,0.5) 100%);
+  background:linear-gradient(135deg,var(--bg-card) 0%,var(--bg-secondary) 100%);
   border:1px solid var(--border);backdrop-filter:blur(16px);
   min-height:400px;display:flex;align-items:center;
   position:sticky;top:200px;
@@ -1152,7 +1152,7 @@ footer{
 .detail-stack span{
   display:inline-block;padding:6px 14px;
   border-radius:50px;background:var(--cyan-dim);
-  border:1px solid rgba(0,217,255,0.3);
+  border:1px solid var(--border);
   color:var(--cyan);font-size:0.75rem;font-weight:600;
   margin-bottom:8px;margin-right:8px;letter-spacing:0.05em;
 }
@@ -1429,6 +1429,11 @@ footer{
 [data-theme="light"] body{background-image:radial-gradient(ellipse at 20% 50%,rgba(0,136,170,0.05) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(139,49,212,0.04) 0%,transparent 50%)}
 [data-theme="light"] .glass-card{background:rgba(255,255,255,0.85);border-color:rgba(0,0,0,0.09)}
 [data-theme="light"] .stat-card,[data-theme="light"] .service-card{background:rgba(255,255,255,0.8)}
+[data-theme="light"] .service-detail-panel{
+  background:rgba(255,255,255,0.97);
+  border-color:rgba(59,130,246,0.12);
+  box-shadow:0 4px 24px rgba(0,0,0,0.04);
+}
 [data-theme="light"] .project-card,[data-theme="light"] .timeline-card{background:rgba(255,255,255,0.88)}
 [data-theme="light"] .testimonial-slide,[data-theme="light"] .cert-card{background:rgba(255,255,255,0.88)}
 [data-theme="light"] .quick-btn{background:rgba(255,255,255,0.85);border-color:rgba(0,0,0,0.1)}
