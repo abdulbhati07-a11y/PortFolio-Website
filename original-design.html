@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#18181B" media="(prefers-color-scheme: dark)"/>
+<meta name="theme-color" content="#F8FAFC" media="(prefers-color-scheme: light)"/>
 <meta name="description" content="Muhammad Abdullah Bhatti  AI/ML Developer, Full Stack Engineer, Data Science Enthusiast. Portfolio showcasing projects in Python, AI/ML, C++, and Web Development."/>
 <title>Muhammad Abdullah Bhatti  AI/ML Developer</title>
 
@@ -677,50 +679,6 @@ section{padding:120px 5%;position:relative}
 .timeline-desc{font-size:0.83rem;color:var(--text-secondary);line-height:1.65;font-weight:300}
 
 /* 
-   TESTIMONIALS
- */
-#testimonials{background:var(--bg-primary)}
-.testimonials-slider{
-  position:relative;overflow:hidden;margin-top:60px;
-  border-radius:var(--radius-lg);
-}
-.testimonials-track{display:flex;transition:transform 0.6s cubic-bezier(0.4,0,0.2,1)}
-.testimonial-slide{
-  min-width:100%;padding:60px 80px;
-  background:var(--bg-card);border:1px solid var(--border);
-  border-radius:var(--radius-lg);backdrop-filter:blur(16px);
-  text-align:center;
-}
-.testimonial-stars{color:var(--gold);font-size:1.2rem;margin-bottom:24px;letter-spacing:3px}
-.testimonial-quote{
-  font-size:clamp(1rem,2vw,1.25rem);color:var(--text-secondary);
-  line-height:1.9;font-style:italic;font-weight:300;
-  max-width:700px;margin:0 auto 32px;
-  position:relative;
-}
-.testimonial-quote::before{
-  content:'\201C';font-family:Georgia,serif;font-size:6rem;
-  color:var(--cyan);opacity:0.15;position:absolute;top:-20px;left:-20px;
-  line-height:1;
-}
-.testimonial-author{font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:4px}
-.testimonial-role{font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em}
-.slider-nav{display:flex;justify-content:center;gap:10px;margin-top:32px}
-.slider-dot{
-  width:8px;height:8px;border-radius:50%;border:1px solid var(--border);
-  background:transparent;transition:all var(--transition);
-}
-.slider-dot.active{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 10px var(--cyan)}
-.slider-arrows{display:flex;justify-content:center;gap:16px;margin-top:20px}
-.slider-arrow{
-  width:44px;height:44px;border-radius:50%;border:1px solid var(--border);
-  background:var(--bg-glass);display:flex;align-items:center;justify-content:center;
-  color:var(--text-secondary);font-size:15px;transition:all var(--transition);
-  backdrop-filter:blur(8px);
-}
-.slider-arrow:hover{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim)}
-
-/* 
    CONTACT  REDESIGNED
  */
 #contact{background:var(--bg-secondary)}
@@ -880,6 +838,12 @@ section{padding:120px 5%;position:relative}
 .chatbot-message{max-width:100%;padding:12px 14px;border-radius:18px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .chatbot-message.bot{align-self:flex-start;background:var(--bg-glass);border:1px solid var(--border);color:var(--text-primary)}
 .chatbot-message.user{align-self:flex-end;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#000}
+.chatbot-typing{display:flex;align-items:center;gap:5px;padding:14px 18px}
+.chatbot-typing span{width:7px;height:7px;border-radius:50%;background:var(--text-muted);display:inline-block;animation:typingBounce 1.2s infinite ease-in-out}
+.chatbot-typing span:nth-child(1){animation-delay:0s}
+.chatbot-typing span:nth-child(2){animation-delay:0.2s}
+.chatbot-typing span:nth-child(3){animation-delay:0.4s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-6px);opacity:1}}
 .chatbot-suggestions{display:flex;flex-wrap:wrap;gap:8px}
 .chatbot-suggestion{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:0.78rem;cursor:pointer}
 .chatbot-suggestion:hover{border-color:var(--cyan);color:var(--text-primary)}
@@ -1387,8 +1351,6 @@ footer{
 [data-theme="light"] .project-desc{color:var(--text-secondary)}
 [data-theme="light"] .service-desc{color:var(--text-secondary)}
 [data-theme="light"] .timeline-desc{color:var(--text-secondary)}
-[data-theme="light"] .testimonial-quote{color:var(--text-secondary)}
-[data-theme="light"] .testimonial-role{color:var(--text-secondary)}
 [data-theme="light"] .cert-issuer{color:var(--cyan)}
 [data-theme="light"] .cert-title{color:var(--text-primary)}
 [data-theme="light"] .footer-copy{color:var(--text-secondary)}
@@ -1414,7 +1376,7 @@ footer{
   box-shadow:0 4px 24px rgba(0,0,0,0.04);
 }
 [data-theme="light"] .project-card,[data-theme="light"] .timeline-card{background:rgba(255,255,255,0.88)}
-[data-theme="light"] .testimonial-slide,[data-theme="light"] .cert-card{background:rgba(255,255,255,0.88)}
+[data-theme="light"] .cert-card{background:rgba(255,255,255,0.88)}
 [data-theme="light"] .quick-btn{background:rgba(255,255,255,0.85);border-color:rgba(0,0,0,0.1)}
 [data-theme="light"] .simple-form{background:rgba(255,255,255,0.92);border-color:rgba(0,0,0,0.1)}
 [data-theme="light"] .filter-btn{background:rgba(255,255,255,0.75);color:var(--text-secondary)}
@@ -1805,7 +1767,7 @@ footer{
 <!--  CERTIFICATES  -->
 <section id="certificates" aria-labelledby="certificates-title">
   <div class="container">
-    <span class="section-label reveal">08  Achievements</span>
+    <span class="section-label reveal">06  Achievements</span>
     <h2 class="section-title reveal" id="certificates-title">Certificates &amp; <span>Credentials</span></h2>
     <p class="section-subtitle reveal">Professional certifications validating my skills in Python, Data Science, and AI/ML.</p>
     <div class="certs-grid reveal" id="certs-grid"></div>
@@ -2455,20 +2417,27 @@ themeToggle.addEventListener('click', () => {
  */
 const dot = document.getElementById('cursor-dot');
 const ring = document.getElementById('cursor-ring');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; dot.style.left=mx+'px'; dot.style.top=my+'px'; });
-function animateRing() {
-  rx += (mx-rx)*0.1; ry += (my-ry)*0.1;
-  ring.style.left=rx+'px'; ring.style.top=ry+'px';
-  requestAnimationFrame(animateRing);
+// Hide cursor elements on touch devices
+if (window.matchMedia('(pointer: coarse)').matches) {
+  dot.style.display = 'none';
+  ring.style.display = 'none';
+  document.body.style.cursor = 'auto';
+} else {
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; dot.style.left=mx+'px'; dot.style.top=my+'px'; });
+  function animateRing() {
+    rx += (mx-rx)*0.1; ry += (my-ry)*0.1;
+    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+  document.querySelectorAll('a,button,[role="button"]').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+  document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+  document.addEventListener('mouseup', () => document.body.classList.remove('cursor-click'));
 }
-animateRing();
-document.querySelectorAll('a,button,[role="button"]').forEach(el => {
-  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-});
-document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
-document.addEventListener('mouseup', () => document.body.classList.remove('cursor-click'));
 
 /* 
    SCROLL PROGRESS
@@ -2563,6 +2532,9 @@ SERVICES.forEach((s,i) => {
   el.className = 'service-card reveal';
   el.dataset.category = s.category;
   el.style.transitionDelay = (i*0.06)+'s';
+  el.setAttribute('tabindex', '0');
+  el.setAttribute('role', 'button');
+  el.setAttribute('aria-label', s.title);
   el.innerHTML = `
     <div class="service-icon"><i class="fas ${s.icon}"></i></div>
     <h3 class="service-title">${s.title}</h3>
@@ -2575,6 +2547,13 @@ SERVICES.forEach((s,i) => {
   
   el.addEventListener('click', () => showServiceDetail(s, el));
   el.addEventListener('mouseenter', () => showServiceDetail(s, el));
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      showServiceDetail(s, el);
+    }
+  });
+  el.addEventListener('focus', () => showServiceDetail(s, el));
   
   sg.appendChild(el);
   allServiceCards.push({el, data: s});
@@ -2648,7 +2627,7 @@ if(allServiceCards.length > 0) {
 /* 
    PROJECTS RENDER + FILTER
  */
-const cats = ['All','AI/ML','Web','Python','C++'];
+const cats = ['All','AI/ML','Full Stack','Web','Python','C++'];
 const fb = document.getElementById('filter-bar');
 const pg = document.getElementById('projects-grid');
 
@@ -2746,7 +2725,7 @@ function openLightbox(id) {
   const ghBtn = p.gh&&p.gh!=='#' ? `<a href="${p.gh}" class="project-link gh" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>` : '';
   const dmBtn = p.demo&&p.demo!=='#' ? `<a href="${p.demo}" class="project-link demo" target="_blank" rel="noopener noreferrer"><i class="fa fa-external-link-alt"></i> Live Demo</a>` : '';
   lbContent.innerHTML = `
-    <div class="lb-emoji">${p.icon}</div>
+    <div class="lb-thumb" style="background:${p.grad||'var(--bg-secondary)'};border-radius:12px;padding:28px;display:flex;justify-content:center;margin-bottom:20px;">${p.svg||''}</div>
     <h2 class="lb-title">${p.title}</h2>
     <p class="lb-desc">${p.long}</p>
     <div class="lb-tags">${p.tech.map(t=>`<span class="project-tag">${t}</span>`).join('')}</div>
@@ -2871,6 +2850,8 @@ document.getElementById('contact-form').addEventListener('submit', async functio
 
   try {
     const formData = new FormData(this);
+    // Override subject with sender's name for quick inbox scanning
+    formData.set('subject', `Portfolio: ${name.value.trim()} — New Message`);
     const response = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       body: formData
@@ -2961,11 +2942,25 @@ document.getElementById('contact-form').addEventListener('submit', async functio
     chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
   }
 
+  function showTyping() {
+    const typing = document.createElement('div');
+    typing.className = 'chatbot-message bot chatbot-typing';
+    typing.id = 'chatbot-typing-indicator';
+    typing.innerHTML = '<span></span><span></span><span></span>';
+    chatbotMessages.appendChild(typing);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById('chatbot-typing-indicator');
+    if (t) t.remove();
+  }
+
   function getResponse(input) {
     const trimmed = input.trim();
     if (!trimmed) return 'Please type a question about my skills, projects, or experience.';
     const match = knowledge.find(item => item.patterns.test(trimmed));
-    return match ? match.answer : 'Im still learning, but I can answer questions about my skills, projects, experience, and how to contact me.';
+    return match ? match.answer : "I'm still learning, but I can answer questions about my skills, projects, experience, and how to contact me.";
   }
 
   function sendChat() {
@@ -2973,7 +2968,11 @@ document.getElementById('contact-form').addEventListener('submit', async functio
     if (!value) return;
     addMessage(value, 'user');
     chatbotInput.value = '';
-    setTimeout(() => addMessage(getResponse(value), 'bot'), 250);
+    showTyping();
+    setTimeout(() => {
+      removeTyping();
+      addMessage(getResponse(value), 'bot');
+    }, 900);
   }
 
   chatbotToggle.addEventListener('click', () => {
@@ -3426,8 +3425,9 @@ class MagneticButton {
   }
 }
 
-// Apply magnetic effect to all interactive buttons
+// Apply magnetic effect to all interactive buttons — skip on touch devices
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.matchMedia('(pointer: coarse)').matches) return; // touch device, no cursor
   const magneticButtons = document.querySelectorAll('.btn-primary, .btn-outline, .btn-hire, .filter-btn, .overlay-btn, .project-link');
   magneticButtons.forEach(btn => {
     new MagneticButton(btn);
