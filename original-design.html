@@ -3119,30 +3119,20 @@ document.getElementById('cert-lightbox').addEventListener('click', e => {
   }
 });
 
-// Magnetic Button Effect
+// Magnetic Button Effect - Button moves toward cursor
 class MagneticButton {
   constructor(button) {
     this.button = button;
     this.x = 0;
     this.y = 0;
-    this.width = button.offsetWidth;
-    this.height = button.offsetHeight;
     this.magneticRange = 80;
+    this.strength = 0.4;
     
-    // Create a wrapper for the magnetic effect
-    this.inner = document.createElement('div');
-    this.inner.style.position = 'relative';
-    this.inner.style.width = '100%';
-    this.inner.style.height = '100%';
+    // Set up positioning context
+    this.button.style.position = 'relative';
     
-    // Move button content to inner wrapper
-    while (this.button.firstChild) {
-      this.inner.appendChild(this.button.firstChild);
-    }
-    this.button.appendChild(this.inner);
-    
-    this.button.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-    this.button.addEventListener('mouseleave', (e) => this.handleMouseLeave(e));
+    document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+    this.button.addEventListener('mouseleave', () => this.handleMouseLeave());
   }
   
   handleMouseMove(e) {
@@ -3158,31 +3148,39 @@ class MagneticButton {
     const distance = Math.sqrt(distX * distX + distY * distY);
     
     if (distance < this.magneticRange) {
+      // Calculate magnetic pull: stronger when closer
       const pull = (this.magneticRange - distance) / this.magneticRange;
-      this.x = (distX * pull) * 0.3;
-      this.y = (distY * pull) * 0.3;
+      // Move button toward cursor
+      this.x = (distX * pull) * this.strength;
+      this.y = (distY * pull) * this.strength;
+      
+      this.button.style.transition = 'transform 0.05s ease-out';
     } else {
-      this.x *= 0.9;
-      this.y *= 0.9;
+      // Return to origin smoothly
+      this.x *= 0.85;
+      this.y *= 0.85;
+      this.button.style.transition = 'transform 0.05s ease-out';
+      
+      if (Math.abs(this.x) < 0.1 && Math.abs(this.y) < 0.1) {
+        this.x = 0;
+        this.y = 0;
+      }
     }
     
-    this.inner.style.transform = `translate(${this.x}px, ${this.y}px)`;
+    this.button.style.transform = `translate(${this.x}px, ${this.y}px)`;
   }
   
   handleMouseLeave() {
     this.x = 0;
     this.y = 0;
-    this.inner.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-    this.inner.style.transform = 'translate(0, 0)';
-    setTimeout(() => {
-      this.inner.style.transition = '';
-    }, 400);
+    this.button.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    this.button.style.transform = 'translate(0, 0)';
   }
 }
 
 // Apply magnetic effect to all interactive buttons
 document.addEventListener('DOMContentLoaded', () => {
-  const magneticButtons = document.querySelectorAll('.btn-primary, .btn-outline, .btn-hire, .filter-btn, .overlay-btn');
+  const magneticButtons = document.querySelectorAll('.btn-primary, .btn-outline, .btn-hire, .filter-btn, .overlay-btn, .project-link');
   magneticButtons.forEach(btn => {
     new MagneticButton(btn);
   });
@@ -3193,5 +3191,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
-
