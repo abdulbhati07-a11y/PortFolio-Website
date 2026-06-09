@@ -272,14 +272,14 @@ section{padding:120px 5%;position:relative}
 .hero-name{
   font-family:var(--font-display);
   font-size:clamp(2.8rem,8vw,7rem);
-  font-weight:800;line-height:1.0;
+  font-weight:800;line-height:1.1;
   letter-spacing:-0.04em;
   margin-bottom:1rem;
   animation:fadeInUp 0.9s ease 0.1s both;
+  text-align:center;
 }
 .hero-name .line1,.hero-name .line2{
   display:block;color:var(--text-primary);
-  text-align:justify;text-align-last:justify;
 }
 .hero-name .line3{
   display:block;
@@ -3439,6 +3439,43 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // CV download is handled directly by the anchor href attribute
+
+/* ── HERO NAME EQUALIZER ──────────────────────────────────────────────────────
+   Makes "Muhammad" and "Abdullah" span the exact same pixel width by
+   computing the letter-spacing needed so the shorter word stretches to match
+   the longer one. Runs on load and on every resize.
+*/
+function equalizeHeroName() {
+  const h1    = document.getElementById('hero-name');
+  const line1 = h1.querySelector('.line1');
+  const line2 = h1.querySelector('.line2');
+  if (!h1 || !line1 || !line2) return;
+
+  // Reset spacing first so we measure natural widths
+  line1.style.letterSpacing = '';
+  line2.style.letterSpacing = '';
+
+  const w1 = line1.scrollWidth;
+  const w2 = line2.scrollWidth;
+  const target = Math.max(w1, w2);
+
+  // letter-spacing is added AFTER each character, including the last one,
+  // so effective extra width = letterSpacing * charCount.
+  // We only need to stretch the shorter line.
+  function stretch(el, naturalWidth) {
+    const chars = el.textContent.length;
+    if (chars < 2) return;
+    const extra = (target - naturalWidth) / chars;
+    el.style.letterSpacing = extra + 'px';
+  }
+
+  if (w1 < target) stretch(line1, w1);
+  if (w2 < target) stretch(line2, w2);
+}
+
+equalizeHeroName();
+window.addEventListener('resize', equalizeHeroName);
+window.addEventListener('load',   equalizeHeroName);
 
 </script>
 </body>
