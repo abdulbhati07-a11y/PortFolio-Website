@@ -3451,24 +3451,27 @@ function equalizeHeroName() {
   const line2 = h1.querySelector('.line2');
   if (!h1 || !line1 || !line2) return;
 
-  // Reset first to get natural widths
+  // Reset to natural widths
   line1.style.letterSpacing = '';
   line2.style.letterSpacing = '';
 
-  const w1 = line1.scrollWidth;
-  const w2 = line2.scrollWidth;
-  const target = Math.min(w1, w2); // compress to the SHORTER word
+  const w1 = line1.scrollWidth; // Muhammad (wider, 9 chars)
+  const w2 = line2.scrollWidth; // Abdullah (shorter, 8 chars)
 
-  // Only compress the longer word  never add spacing
-  function compress(el, naturalWidth) {
+  // Target = midpoint between the two, biased 30% toward the shorter
+  // This means Muhammad compresses a little, Abdullah expands a little
+  // Neither goes far enough to look weird
+  const target = w2 + (w1 - w2) * 0.3;
+
+  function adjust(el, naturalWidth) {
     const chars = el.textContent.length;
     if (chars < 2) return;
-    const delta = (target - naturalWidth) / chars; // negative value
+    const delta = (target - naturalWidth) / chars;
     el.style.letterSpacing = delta + 'px';
   }
 
-  if (w1 > target) compress(line1, w1);
-  if (w2 > target) compress(line2, w2);
+  adjust(line1, w1); // slight compress on Muhammad
+  adjust(line2, w2); // slight expand on Abdullah
 }
 
 equalizeHeroName();
