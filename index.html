@@ -3451,26 +3451,24 @@ function equalizeHeroName() {
   const line2 = h1.querySelector('.line2');
   if (!h1 || !line1 || !line2) return;
 
-  // Reset spacing first so we measure natural widths
+  // Reset first to get natural widths
   line1.style.letterSpacing = '';
   line2.style.letterSpacing = '';
 
   const w1 = line1.scrollWidth;
   const w2 = line2.scrollWidth;
-  const target = Math.max(w1, w2);
+  const target = Math.min(w1, w2); // compress to the SHORTER word
 
-  // letter-spacing is added AFTER each character, including the last one,
-  // so effective extra width = letterSpacing * charCount.
-  // We only need to stretch the shorter line.
-  function stretch(el, naturalWidth) {
+  // Only compress the longer word  never add spacing
+  function compress(el, naturalWidth) {
     const chars = el.textContent.length;
     if (chars < 2) return;
-    const extra = (target - naturalWidth) / chars;
-    el.style.letterSpacing = extra + 'px';
+    const delta = (target - naturalWidth) / chars; // negative value
+    el.style.letterSpacing = delta + 'px';
   }
 
-  if (w1 < target) stretch(line1, w1);
-  if (w2 < target) stretch(line2, w2);
+  if (w1 > target) compress(line1, w1);
+  if (w2 > target) compress(line2, w2);
 }
 
 equalizeHeroName();

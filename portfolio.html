@@ -3451,17 +3451,17 @@ function equalizeHeroName() {
 
   const w1 = line1.scrollWidth;
   const w2 = line2.scrollWidth;
-  const target = Math.max(w1, w2);
+  const target = Math.min(w1, w2);
 
-  function stretch(el, naturalWidth) {
+  function compress(el, naturalWidth) {
     const chars = el.textContent.length;
     if (chars < 2) return;
-    const extra = (target - naturalWidth) / chars;
-    el.style.letterSpacing = extra + 'px';
+    const delta = (target - naturalWidth) / chars;
+    el.style.letterSpacing = delta + 'px';
   }
 
-  if (w1 < target) stretch(line1, w1);
-  if (w2 < target) stretch(line2, w2);
+  if (w1 > target) compress(line1, w1);
+  if (w2 > target) compress(line2, w2);
 }
 
 equalizeHeroName();
