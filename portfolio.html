@@ -277,8 +277,12 @@ section{padding:120px 5%;position:relative}
   margin-bottom:1rem;
   animation:fadeInUp 0.9s ease 0.1s both;
 }
-.hero-name .line1{display:inline;color:var(--text-primary)}
-.hero-name .line2{ display:inline;
+.hero-name .line1,.hero-name .line2{
+  display:block;color:var(--text-primary);
+  text-align:justify;text-align-last:justify;
+}
+.hero-name .line3{
+  display:block;
   background:linear-gradient(135deg,var(--cyan) 0%,var(--gold) 60%,var(--purple) 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
@@ -1343,7 +1347,7 @@ footer{
 [data-theme="light"] .typewriter-text{color:#0a0f1e;font-weight:600}
 [data-theme="light"] .typewriter-cursor{background:#0a0f1e}
 [data-theme="light"] .hero-scroll{color:var(--text-secondary)}
-[data-theme="light"] .hero-name .line1{color:var(--text-primary)}
+[data-theme="light"] .hero-name .line1,[data-theme="light"] .hero-name .line2{color:var(--text-primary)}
 [data-theme="light"] .section-subtitle{color:var(--text-secondary)}
 [data-theme="light"] .about-text p{color:var(--text-secondary)}
 [data-theme="light"] .stat-label{color:var(--text-secondary)}
@@ -1590,8 +1594,9 @@ footer{
   <canvas id="hero-canvas" aria-hidden="true"></canvas>
   <div class="hero-content">
     <h1 class="hero-name" id="hero-name">
-      <span class="line1">Muhammad Abdullah</span>
-      <span class="line2">Bhatti</span>
+      <span class="line1">Muhammad</span>
+      <span class="line2">Abdullah</span>
+      <span class="line3">Bhatti</span>
     </h1>
     <div class="hero-typewriter" aria-live="polite" aria-label="Role">
       <span class="typewriter-prefix">&gt;&nbsp;</span>
