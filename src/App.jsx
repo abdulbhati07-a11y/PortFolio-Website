@@ -13,19 +13,19 @@ const Projects = lazy(() => import('./components/Projects'));
 import CustomCursor from './components/CustomCursor';
 import { DEVELOPER_INFO } from './utils/constants';
 
-/* ─── Page transition config ──────────────────────────────────────────── */
+
 const pageVariants = {
   initial: { opacity: 0, y: 16 },
   enter: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } },
   exit: { opacity: 0, y: -12, transition: { duration: 0.3, ease: [0.4, 0, 1, 1] } },
 };
 
-/* ─── Loading Screen ──────────────────────────────────────────────────── */
+
 const LoadingScreen = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Real mount-based load state
+   
     const handleLoad = () => {
       setProgress(100);
       setTimeout(onComplete, 300);

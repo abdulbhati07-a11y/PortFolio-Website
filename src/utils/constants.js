@@ -58,7 +58,7 @@ export const PROJECTS = [
     tech: ["HTML", "CSS", "JavaScript", "Bootstrap", "Web Projects"],
     category: "Web Projects",
     featured: false,
-    links: { github: "#", demo: "#" },
+    links: { github: "https://github.com/abdulbhati07-a11y/LunaWashweb.git", demo: "https://luna-washweb.vercel.app/" },
     gradient: "from-blue-500/20 to-cyan-500/20",
     icon: "👕",
     logo: "/assets/logos/laundry.svg"
