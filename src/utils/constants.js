@@ -193,3 +193,40 @@ export const TIMELINE = [
     logo: "/assets/logos/timeline-2025.svg"
   }
 ];
+
+export const ARTICLES = [
+  {
+    id: 1,
+    title: "Understanding Attention Mechanisms in Transformers",
+    excerpt: "A deep dive into how self-attention works and why it revolutionized natural language processing, transforming the landscape of AI models.",
+    date: "July 12, 2026",
+    readTime: "8 min read",
+    tags: ["AI/ML", "Transformers", "NLP"],
+    link: "#",
+    gradient: "from-purple-500/20 to-pink-500/20",
+    icon: "🧠"
+  },
+  {
+    id: 2,
+    title: "Building Scalable Backend APIs with Flask",
+    excerpt: "Best practices for architecting robust, scalable, and maintainable RESTful APIs using Python and Flask for data-intensive applications.",
+    date: "June 28, 2026",
+    readTime: "6 min read",
+    tags: ["Python", "Flask", "Backend"],
+    link: "#",
+    gradient: "from-green-500/20 to-teal-500/20",
+    icon: "⚙️"
+  },
+  {
+    id: 3,
+    title: "Data Preprocessing: The Unsung Hero of Machine Learning",
+    excerpt: "Why spending 80% of your time on data cleaning and preprocessing is crucial for building accurate and reliable predictive models.",
+    date: "May 15, 2026",
+    readTime: "10 min read",
+    tags: ["Data Science", "Machine Learning", "Python"],
+    link: "#",
+    gradient: "from-blue-500/20 to-cyan-500/20",
+    icon: "📊"
+  }
+];
+

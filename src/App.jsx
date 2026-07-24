@@ -7,6 +7,8 @@ import About from './components/About';
 import Skills from './components/Skills';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import Blog from './components/Blog';
+import SEO from './components/SEO';
 
 const Projects = lazy(() => import('./components/Projects'));
 
@@ -123,6 +125,12 @@ function App() {
             </Suspense>
           </div>
         );
+      case 'writing':
+        return (
+          <div key="writing">
+            <Blog />
+          </div>
+        );
       case 'contact':
         return (
           <div key="contact">
@@ -140,6 +148,7 @@ function App() {
 
   return (
     <LazyMotion features={domAnimation}>
+      <SEO />
       <AnimatePresence mode="wait">
         {!isLoaded && (
           <LoadingScreen key="loader" onComplete={() => setIsLoaded(true)} />

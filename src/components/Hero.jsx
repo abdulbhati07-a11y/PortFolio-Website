@@ -9,10 +9,26 @@ import { DEVELOPER_INFO, STATS } from '../utils/constants';
 const FloatingShape = ({ position, rotationSpeed, scale, color, type }) => {
   const meshRef = useRef();
   useFrame((state, delta) => {
+    if (!meshRef.current) return;
+    
+    // Continuous rotation
     meshRef.current.rotation.x += rotationSpeed.x * delta;
     meshRef.current.rotation.y += rotationSpeed.y * delta;
-    meshRef.current.position.x = Math.sin(state.clock.elapsedTime * rotationSpeed.orbit) * position[0];
-    meshRef.current.position.z = Math.cos(state.clock.elapsedTime * rotationSpeed.orbit) * position[2];
+    
+    // Orbital movement targets
+    const targetX = Math.sin(state.clock.elapsedTime * rotationSpeed.orbit) * position[0];
+    const targetZ = Math.cos(state.clock.elapsedTime * rotationSpeed.orbit) * position[2];
+    const targetY = position[1]; // Maintain intended Y height
+    
+    // Mouse parallax offset (disabled if reduced motion)
+    const parallaxFactor = rotationSpeed.orbit === 0 ? 0 : scale * 1.5;
+    const parallaxX = state.pointer.x * parallaxFactor * (position[0] > 0 ? 1 : -1);
+    const parallaxY = state.pointer.y * parallaxFactor;
+    
+    // Smoothly interpolate to the final position
+    meshRef.current.position.x += ((targetX + parallaxX) - meshRef.current.position.x) * delta * 3;
+    meshRef.current.position.y += ((targetY + parallaxY) - meshRef.current.position.y) * delta * 3;
+    meshRef.current.position.z += (targetZ - meshRef.current.position.z) * delta * 3;
   });
 
   const material = (
@@ -40,10 +56,19 @@ const ParticleSystem = () => {
   const particlesRef = useRef();
   const positions = new Float32Array(600).map(() => (Math.random() - 0.5) * 25);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (particlesRef.current) {
+      // Base slow rotation
       particlesRef.current.rotation.y = state.clock.elapsedTime * 0.04;
       particlesRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.02) * 0.1;
+
+      // Mouse Parallax for particles
+      const parallaxX = state.pointer.x * 2.5;
+      const parallaxY = state.pointer.y * 2.5;
+      
+      // Smoothly interpolate position
+      particlesRef.current.position.x += (parallaxX - particlesRef.current.position.x) * delta * 2;
+      particlesRef.current.position.y += (parallaxY - particlesRef.current.position.y) * delta * 2;
     }
   });
 

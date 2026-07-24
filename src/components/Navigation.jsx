@@ -7,6 +7,7 @@ import { useTheme } from '../hooks/useTheme';
 const tabs = [
   { id: 'overview', label: 'Overview' },
   { id: 'projects', label: 'Work' },
+  { id: 'writing', label: 'Writing' },
   { id: 'contact', label: 'Contact' },
 ];
 

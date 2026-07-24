@@ -3,6 +3,7 @@ import { m, useScroll, useTransform, useReducedMotion, useInView, AnimatePresenc
 import { FaCode, FaBrain, FaRocket, FaDatabase } from 'react-icons/fa';
 import { DEVELOPER_INFO, TIMELINE } from '../utils/constants';
 import Skeleton from './Skeleton';
+import SkillSphere from './SkillSphere';
 
 // Generate a tiny SVG placeholder for timeline entries
 const getPlaceholder = (text, size = 48, bg = '#2563eb', fg = '#ffffff') => {
@@ -280,25 +281,12 @@ const About = ({ onSkillClick }) => {
 
         <AnimatePresence mode="wait">
           {!isLoaded ? (
-            <m.div key="comp-skeletons" className="flex flex-wrap gap-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              {[1, 2, 3, 4, 5, 6, 7].map(i => <Skeleton key={i} width="120px" height="48px" borderRadius="999px" />)}
+            <m.div key="comp-skeletons" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <Skeleton width="100%" height="400px" borderRadius="24px" />
             </m.div>
           ) : (
-            <m.div key="comp-real" className="flex flex-wrap gap-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              {skills.map((skill, idx) => (
-                <m.button
-                  key={idx}
-                  onClick={() => onSkillClick && onSkillClick(skill)}
-                  className="px-6 py-3 rounded-full border border-white/10 text-text-primary font-sans font-medium hover:border-accent-cyan hover:text-accent-cyan hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] hover:bg-accent-cyan/5 transition-all duration-300"
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
-                  whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
-                  initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.8 }}
-                  animate={shouldReduceMotion || isInView3 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-                  transition={{ delay: shouldReduceMotion ? 0 : idx * 0.06 }}
-                >
-                  {skill}
-                </m.button>
-              ))}
+            <m.div key="comp-real" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <SkillSphere skills={skills} onSkillClick={onSkillClick} />
             </m.div>
           )}
         </AnimatePresence>

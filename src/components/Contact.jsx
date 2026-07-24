@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { m } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope, FaDownload, FaCertificate, FaExternalLinkAlt, FaPaperPlane, FaCheck } from 'react-icons/fa';
+import emailjs from '@emailjs/browser';
 import { DEVELOPER_INFO } from '../utils/constants';
 
 const containerVariants = {
@@ -70,15 +71,33 @@ const ContactForm = () => {
       return;
     }
     setSending(true);
-    // Mailto fallback — opens the user's email client
-    const subject = encodeURIComponent(form.subject || `Portfolio Contact from ${form.name}`);
-    const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\nMessage:\n${form.message}`);
-    window.open(`mailto:${DEVELOPER_INFO.email}?subject=${subject}&body=${body}`, '_blank');
-    setTimeout(() => {
-      setSending(false);
-      setSent(true);
-      setForm({ name: '', email: '', subject: '', message: '' });
-    }, 800);
+    
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID';
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID';
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY';
+
+    const templateParams = {
+      from_name: form.name,
+      from_email: form.email,
+      subject: form.subject || 'New Portfolio Message',
+      message: form.message,
+      to_name: 'Developer',
+    };
+
+    emailjs
+      .send(serviceId, templateId, templateParams, publicKey)
+      .then(() => {
+        setSending(false);
+        setSent(true);
+        setForm({ name: '', email: '', subject: '', message: '' });
+        
+        setTimeout(() => setSent(false), 5000);
+      })
+      .catch((error) => {
+        console.error('Email sending failed:', error);
+        setSending(false);
+        alert('Something went wrong. Please try again later or use the direct email link.');
+      });
   };
 
   const inputClass = (field) =>
@@ -149,7 +168,7 @@ const ContactForm = () => {
       >
         {sent ? (
           <>
-            <FaCheck size={14} /> Message Sent — Email Client Opened
+            <FaCheck size={14} /> Message Sent Successfully!
           </>
         ) : sending ? (
           <>
