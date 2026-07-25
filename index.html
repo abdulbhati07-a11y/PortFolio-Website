@@ -2605,7 +2605,7 @@ class TextScramble {
           const fx1 = new TextScramble(el1);
           const fx2 = new TextScramble(el2);
           setTimeout(() => fx1.setText('Muhammad'), 400);
-          setTimeout(() => fx2.setText('Abdullah Bhatti'), 550);
+          setTimeout(() => fx2.setText('Abdullah'), 550);
         }
       }, 300);
     }
@@ -2787,7 +2787,6 @@ SERVICES.forEach((s,i) => {
   
   sg.appendChild(el);
   allServiceCards.push({el, data: s});
-  revealObserver.observe(el);
 });
 
 function showServiceDetail(service, cardEl) {
@@ -3576,7 +3575,6 @@ CERTS_DATA.forEach((cert, i) => {
       </div>
     </div>`;
   certsGrid.appendChild(card);
-  revealObserver.observe(card);
 });
 
 function openCertLightbox(i) {
