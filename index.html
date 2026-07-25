@@ -19,6 +19,13 @@
 <!-- Three.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
+<!-- GSAP & ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<!-- Lenis Smooth Scrolling -->
+<script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
 <style>
 /* 
    CSS CUSTOM PROPERTIES
@@ -73,6 +80,15 @@
   --text-secondary: #334155;
   --text-muted: #64748b;
 }
+
+/* 
+   LENIS SMOOTH SCROLLING
+ */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
 
 /* 
    RESET & BASE
@@ -333,6 +349,7 @@ section{padding:120px 5%;position:relative}
   background:linear-gradient(135deg,var(--cyan) 0%,var(--gold) 60%,var(--purple) 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
+.hero-name .dud { color: var(--text-muted); opacity: 0.7; }
 .hero-typewriter{
   font-family:var(--font-mono);font-size:clamp(0.9rem,2vw,1.2rem);
   color:var(--cyan);letter-spacing:0.1em;
@@ -1001,10 +1018,8 @@ footer{
 /* 
    SCROLL ANIMATIONS
  */
-.reveal{opacity:0;transform:translateY(40px);transition:all 0.8s cubic-bezier(0.16,1,0.3,1)}
-.reveal.from-left{transform:translateX(-40px)}
-.reveal.from-right{transform:translateX(40px)}
-.reveal.visible{opacity:1;transform:none}
+.reveal{opacity:0;}
+.reveal.visible{opacity:1;}
 
 /* 
    ANIMATIONS
@@ -1552,9 +1567,45 @@ footer{
 .cert-lb-body{flex:1;overflow:hidden}
 .cert-lb-body iframe{width:100%;height:70vh;border:none;display:block}
 
+/* 
+   NOISE OVERLAY
+ */
+.noise-overlay {
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  animation: noiseAnimation 0.5s infinite steps(1);
+}
+@keyframes noiseAnimation {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -5%); }
+  20% { transform: translate(-10%, 5%); }
+  30% { transform: translate(5%, -10%); }
+  40% { transform: translate(-5%, 15%); }
+  50% { transform: translate(-10%, 5%); }
+  60% { transform: translate(15%, 0); }
+  70% { transform: translate(0, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+  100% { transform: translate(0, 0); }
+}
+[data-theme="light"] .noise-overlay {
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+}
+
 </style>
 </head>
 <body class="loading">
+
+<!-- NOISE OVERLAY -->
+<div class="noise-overlay" aria-hidden="true"></div>
 
 <!-- PRELOADER -->
 <div id="preloader" role="status" aria-label="Loading portfolio">
@@ -2428,6 +2479,83 @@ const TIMELINE_DATA = [
 ];
 
 /* 
+   LENIS SMOOTH SCROLL SETUP
+ */
+const lenis = new Lenis({
+  duration: 1.2,
+  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  direction: 'vertical',
+  gestureDirection: 'vertical',
+  smooth: true,
+  mouseMultiplier: 1,
+  smoothTouch: false,
+  touchMultiplier: 2,
+  infinite: false,
+});
+function raf(time) {
+  lenis.raf(time);
+  requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
+
+/* 
+   TEXT SCRAMBLE EFFECT
+ */
+class TextScramble {
+  constructor(el) {
+    this.el = el;
+    this.chars = '!<>-_\\\\/[]{}—=+*^?#________';
+    this.update = this.update.bind(this);
+  }
+  setText(newText) {
+    const oldText = this.el.innerText;
+    const length = Math.max(oldText.length, newText.length);
+    const promise = new Promise((resolve) => this.resolve = resolve);
+    this.queue = [];
+    for (let i = 0; i < length; i++) {
+      const from = oldText[i] || '';
+      const to = newText[i] || '';
+      const start = Math.floor(Math.random() * 40);
+      const end = start + Math.floor(Math.random() * 40);
+      this.queue.push({ from, to, start, end });
+    }
+    cancelAnimationFrame(this.frameRequest);
+    this.frame = 0;
+    this.update();
+    return promise;
+  }
+  update() {
+    let output = '';
+    let complete = 0;
+    for (let i = 0, n = this.queue.length; i < n; i++) {
+      let { from, to, start, end, char } = this.queue[i];
+      if (this.frame >= end) {
+        complete++;
+        output += to;
+      } else if (this.frame >= start) {
+        if (!char || Math.random() < 0.28) {
+          char = this.randomChar();
+          this.queue[i].char = char;
+        }
+        output += `<span class="dud">${char}</span>`;
+      } else {
+        output += from;
+      }
+    }
+    this.el.innerHTML = output;
+    if (complete === this.queue.length) {
+      this.resolve();
+    } else {
+      this.frameRequest = requestAnimationFrame(this.update);
+      this.frame++;
+    }
+  }
+  randomChar() {
+    return this.chars[Math.floor(Math.random() * this.chars.length)];
+  }
+}
+
+/* 
    PRELOADER
  */
 (function() {
@@ -2435,6 +2563,15 @@ const TIMELINE_DATA = [
   const pct = document.getElementById('preloader-pct');
   const loader = document.getElementById('preloader');
   let p = 0;
+  
+  // Hide hero elements initially to prevent FOUC when preloader lifts
+  gsap.set(".hero-name", { y: 40, opacity: 0 });
+  gsap.set(".hero-typewriter", { y: 20, opacity: 0 });
+  gsap.set(".hero-tagline", { y: 20, opacity: 0 });
+  gsap.set(".hero-cta a", { y: 20, opacity: 0 });
+  gsap.set(".hero-socials a", { y: 20, opacity: 0 });
+  gsap.set("#navbar", { y: -40, opacity: 0 });
+  
   const iv = setInterval(() => {
     p += Math.random() * 20 + 5;
     if (p >= 100) { p = 100; clearInterval(iv); }
@@ -2442,8 +2579,34 @@ const TIMELINE_DATA = [
     pct.textContent = Math.floor(p) + '%';
     if (p >= 100) {
       setTimeout(() => {
-        loader.classList.add('hide');
+        // Slide preloader up smoothly
+        gsap.to(loader, {
+          yPercent: -100,
+          duration: 1.0,
+          ease: "power4.inOut",
+          onComplete: () => loader.style.display = 'none'
+        });
+        
+        // Staggered Entrance Animation for Hero
+        const tl = gsap.timeline({ delay: 0.4 });
+        tl.to(".hero-name", { y: 0, opacity: 1, duration: 1, ease: "power3.out" })
+          .to(".hero-typewriter", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, "-=0.6")
+          .to(".hero-tagline", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, "-=0.6")
+          .to(".hero-cta a", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.1 }, "-=0.6")
+          .to(".hero-socials a", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.1 }, "-=0.6")
+          .to("#navbar", { y: 0, opacity: 1, duration: 1, ease: "power3.out" }, "-=1");
+
         document.body.classList.remove('loading');
+        
+        // Trigger Scramble on hero name
+        const el1 = document.querySelector('.hero-name .line1');
+        const el2 = document.querySelector('.hero-name .line2');
+        if (el1 && el2) {
+          const fx1 = new TextScramble(el1);
+          const fx2 = new TextScramble(el2);
+          setTimeout(() => fx1.setText('Muhammad'), 400);
+          setTimeout(() => fx2.setText('Abdullah Bhatti'), 550);
+        }
       }, 300);
     }
   }, 80);
@@ -2568,17 +2731,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 });
 
 /* 
-   INTERSECTION OBSERVER  REVEAL
+   INTERSECTION OBSERVER REVEAL (Replaced by GSAP ScrollTrigger)
  */
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      revealObserver.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.12 });
-document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
 /* 
    TYPEWRITER
@@ -3512,6 +3666,75 @@ document.addEventListener('DOMContentLoaded', () => {
 // CV download is handled directly by the anchor href attribute
 
 // Hero name width equalization handled via CSS scaleX transform on .line1
+
+// GSAP ScrollTrigger Integration
+gsap.registerPlugin(ScrollTrigger);
+
+// 1. Staggered Skew Reveals for Cards
+gsap.utils.toArray('.project-card, .cert-card, .service-card, .timeline-item').forEach(card => {
+  gsap.fromTo(card,
+    { opacity: 0, y: 60, skewY: 2, scale: 0.96 },
+    {
+      opacity: 1, y: 0, skewY: 0, scale: 1,
+      duration: 1.0,
+      ease: "power4.out",
+      scrollTrigger: {
+        trigger: card,
+        start: "top 85%",
+        toggleActions: "play none none reverse"
+      }
+    }
+  );
+});
+
+// 2. Generic Reveals for other elements
+gsap.utils.toArray('.reveal:not(.project-card):not(.cert-card):not(.service-card):not(.timeline-item)').forEach(el => {
+  let x = 0, y = 40;
+  if (el.classList.contains('from-left')) { x = -40; y = 0; }
+  if (el.classList.contains('from-right')) { x = 40; y = 0; }
+  
+  gsap.fromTo(el,
+    { opacity: 0, x, y },
+    {
+      opacity: 1, x: 0, y: 0,
+      duration: 1.0,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
+        toggleActions: "play none none reverse"
+      }
+    }
+  );
+});
+
+// 3. Parallax Background
+const starfieldCanvas = document.getElementById('starfield-canvas');
+if (starfieldCanvas) {
+  gsap.to(starfieldCanvas, {
+    yPercent: 35,
+    ease: "none",
+    scrollTrigger: {
+      trigger: "#hero",
+      start: "top top",
+      end: "bottom top",
+      scrub: true
+    }
+  });
+}
+const heroCanvas = document.getElementById('hero-canvas');
+if (heroCanvas) {
+  gsap.to(heroCanvas, {
+    yPercent: 15,
+    ease: "none",
+    scrollTrigger: {
+      trigger: "#hero",
+      start: "top top",
+      end: "bottom top",
+      scrub: true
+    }
+  });
+}
 
 </script>
 </body>
