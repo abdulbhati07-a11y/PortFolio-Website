@@ -35,7 +35,7 @@ const REVIEWS = [
 ];
 
 const ReviewCard = ({ review }) => (
-  <div className="glass-card w-[280px] p-6 flex flex-col gap-4 mx-3 flex-shrink-0 snap-center">
+  <div className="glass-card w-[260px] sm:w-[280px] p-5 sm:p-6 flex flex-col gap-4 mx-2 sm:mx-3 flex-shrink-0 snap-center">
     <div className="flex items-center gap-3">
       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-cyan/20 to-accent-purple/20 border border-white/10 flex items-center justify-center text-white font-mono font-bold text-sm">
         {review.avatar}
@@ -87,7 +87,7 @@ const ProjectCard = ({ project, index }) => {
       aria-label={`${project.title} project — press Enter to view details`}
     >
       {/* Top area: project image (unchanged) */}
-      <div className={`w-full h-48 relative overflow-hidden bg-gradient-to-br ${project.gradient} shrink-0`}>
+      <div className={`w-full h-36 sm:h-44 md:h-48 relative overflow-hidden bg-gradient-to-br ${project.gradient} shrink-0`}>
         <div className="absolute inset-0 flex items-center justify-center w-full h-full object-cover z-10">
           {project.logo ? (
             <img src={project.logo} alt={`${project.title} logo`} className="w-20 h-20 object-contain" />
@@ -99,7 +99,7 @@ const ProjectCard = ({ project, index }) => {
       </div>
 
       {/* Middle & Bottom areas (Resting State) */}
-      <div className="p-7 flex flex-col flex-1 relative z-0">
+      <div className="p-4 sm:p-7 flex flex-col flex-1 relative z-0">
         
         {/* Middle: type badge + project title — nothing else */}
         <div className="flex-1">
@@ -172,7 +172,7 @@ const ProjectCard = ({ project, index }) => {
         </div>
       </div>
 
-      {/* HOVER OVERLAY */}
+      {/* HOVER OVERLAY — visible on hover (desktop) */}
       <m.div
         className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center"
         style={{ 
@@ -253,7 +253,7 @@ const Projects = ({ activeFilter, clearFilter }) => {
                   initial={{ opacity: 0, x: -30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6 }}
-                  className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter"
+                  className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tighter"
                 >
                   {activeFilter ? (
                     <>{activeFilter} <span className="text-gradient">Work</span></>

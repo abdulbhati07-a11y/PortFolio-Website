@@ -24,7 +24,7 @@ const SkillCard = ({ skill, index }) => {
   return (
     <m.div
       ref={cardRef}
-      className="glass-card p-5 rounded-2xl group flex flex-col gap-3 justify-between h-full hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)]"
+      className="glass-card p-4 sm:p-5 rounded-2xl group flex flex-col gap-3 justify-between h-full hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)]"
       initial={shouldReduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
       animate={shouldReduceMotion || isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
       transition={{ delay: index * 0.05, duration: 0.5 }}
@@ -165,7 +165,7 @@ const Skills = () => {
               <span className="font-mono text-accent-cyan text-sm tracking-widest">Skills</span>
               <div className="flex-1 h-px bg-white/[0.06]" />
             </div>
-            <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
+            <h2 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tighter">
               Technical <span className="text-gradient">Arsenal</span>
             </h2>
             <p className="text-text-secondary font-sans text-base mt-4 font-light max-w-xl">

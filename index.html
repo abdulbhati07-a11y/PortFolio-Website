@@ -87,6 +87,8 @@ body{
   cursor:none;
   line-height:1.6;
   transition:background-color var(--transition), color var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 body::before {
@@ -113,7 +115,7 @@ body::before {
 body.loading{overflow:hidden}
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
-button{font-family:inherit;cursor:none;border:none;background:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:var(--bg-primary)}
 ::-webkit-scrollbar-thumb{background:linear-gradient(var(--cyan),var(--purple));border-radius:3px}
@@ -143,29 +145,33 @@ button{font-family:inherit;cursor:none;border:none;background:none}
    SCROLL PROGRESS BAR
  */
 #progress-bar{
-  position:fixed;top:0;left:0;height:2px;width:0;
+  position:fixed;top:0;left:0;height:2px;width:100%;
+  transform:scaleX(0);transform-origin:left;
   background:linear-gradient(90deg,var(--cyan),var(--purple),var(--gold));
-  z-index:1000;transition:width 0.1s linear;
+  z-index:1000;will-change:transform;
 }
 
 /* 
    CUSTOM CURSOR
  */
 #cursor-dot{
-  position:fixed;width:8px;height:8px;border-radius:50%;
+  position:fixed;top:0;left:0;width:8px;height:8px;border-radius:50%;
   background:var(--cyan);pointer-events:none;z-index:10020;
-  transform:translate(-50%,-50%);
+  transform:translate3d(-50%,-50%,0);
   box-shadow:0 0 12px var(--cyan-glow),0 0 24px var(--cyan-glow);
-  transition:transform 0.1s,background 0.2s,width 0.2s,height 0.2s;
+  transition:background 0.2s,width 0.2s,height 0.2s;
+  will-change:transform;
 }
 #cursor-ring{
-  position:fixed;width:36px;height:36px;border-radius:50%;
+  position:fixed;top:0;left:0;width:36px;height:36px;border-radius:50%;
   border:1.5px solid rgba(96, 165, 250, 0.5);pointer-events:none;z-index:10010;
-  transform:translate(-50%,-50%);transition:width 0.3s,height 0.3s,border-color 0.3s,background 0.3s;
+  transform:translate3d(-50%,-50%,0);
+  transition:width 0.3s,height 0.3s,border-color 0.3s,background 0.3s;
+  will-change:transform;
 }
 body.cursor-hover #cursor-dot{width:12px;height:12px;background:var(--gold)}
 body.cursor-hover #cursor-ring{width:52px;height:52px;border-color:var(--gold);background:rgba(245,197,66,0.06)}
-body.cursor-click #cursor-dot{transform:translate(-50%,-50%) scale(0.6)}
+body.cursor-click #cursor-dot{transform:translate3d(-50%,-50%,0) scale(0.6)}
 
 /* 
    NAVIGATION
@@ -233,6 +239,14 @@ body.cursor-click #cursor-dot{transform:translate(-50%,-50%) scale(0.6)}
   color:var(--text-secondary);transition:color var(--transition);
 }
 .mobile-menu a:hover{color:var(--cyan)}
+.mobile-menu .hire-btn{
+  padding:14px 36px;border-radius:50px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  color:#fff;font-weight:600;font-size:1rem;letter-spacing:0.04em;
+  box-shadow:0 0 30px rgba(96,165,250,0.3);
+  transition:all var(--transition);
+  margin-top:1rem;
+}
 
 /* 
    SECTION BASE
@@ -1206,10 +1220,11 @@ footer{
   .stat-number{font-size:1.8rem}
   .stat-label{font-size:0.7rem}
   
-  /* Navbar mobile */
+  /* Navbar mobile — show hamburger, hide desktop nav */
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  .btn-hire{display:none}
   section{padding:80px 4%}
-  .nav-links{gap:1rem}
-  .nav-links a{font-size:0.8rem}
   
   /* Hero mobile */
   .hero-content{padding:0 4%;max-width:100%}
@@ -2450,6 +2465,16 @@ themeToggle.addEventListener('click', () => {
 });
 
 /* 
+   GLOBAL MOUSE TRACKER
+ */
+window.mouseX = window.innerWidth / 2 || 0;
+window.mouseY = window.innerHeight / 2 || 0;
+window.addEventListener('mousemove', e => {
+  window.mouseX = e.clientX;
+  window.mouseY = e.clientY;
+}, { passive: true });
+
+/* 
    CUSTOM CURSOR
  */
 const dot = document.getElementById('cursor-dot');
@@ -2460,14 +2485,14 @@ if (window.matchMedia('(pointer: coarse)').matches) {
   ring.style.display = 'none';
   document.body.style.cursor = 'auto';
 } else {
-  let mx=0,my=0,rx=0,ry=0;
-  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; dot.style.left=mx+'px'; dot.style.top=my+'px'; });
-  function animateRing() {
-    rx += (mx-rx)*0.1; ry += (my-ry)*0.1;
-    ring.style.left=rx+'px'; ring.style.top=ry+'px';
-    requestAnimationFrame(animateRing);
+  let rx=window.mouseX, ry=window.mouseY;
+  function animateCursor() {
+    dot.style.transform = `translate3d(${window.mouseX}px, ${window.mouseY}px, 0) translate(-50%, -50%)`;
+    rx += (window.mouseX-rx)*0.15; ry += (window.mouseY-ry)*0.15;
+    ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
+    requestAnimationFrame(animateCursor);
   }
-  animateRing();
+  animateCursor();
   document.querySelectorAll('a,button,[role="button"]').forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
@@ -2480,9 +2505,16 @@ if (window.matchMedia('(pointer: coarse)').matches) {
    SCROLL PROGRESS
  */
 const progressBar = document.getElementById('progress-bar');
+let scrollTicking = false;
 window.addEventListener('scroll', () => {
-  const pct = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-  progressBar.style.width = pct + '%';
+  if (!scrollTicking) {
+    window.requestAnimationFrame(() => {
+      const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+      progressBar.style.transform = `scaleX(${pct})`;
+      scrollTicking = false;
+    });
+    scrollTicking = true;
+  }
 }, { passive: true });
 
 /* 
@@ -2491,13 +2523,20 @@ window.addEventListener('scroll', () => {
 const navbar = document.getElementById('navbar');
 const navLinks = document.querySelectorAll('.nav-links a');
 const sections = document.querySelectorAll('section[id]');
+let navTicking = false;
 window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 50);
-  let cur = '';
-  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 200) cur = s.id; });
-  navLinks.forEach(a => {
-    a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
-  });
+  if (!navTicking) {
+    window.requestAnimationFrame(() => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+      let cur = '';
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 200) cur = s.id; });
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+      });
+      navTicking = false;
+    });
+    navTicking = true;
+  }
 }, { passive: true });
 
 /* 
@@ -3411,54 +3450,53 @@ class MagneticButton {
     this.y = 0;
     this.magneticRange = 80;
     this.strength = 0.4;
-    
-    // Set up positioning context
     this.button.style.position = 'relative';
-    
-    document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
     this.button.addEventListener('mouseleave', () => this.handleMouseLeave());
+    
+    if (!window.magneticButtonsList) {
+      window.magneticButtonsList = [];
+      const updateMagnetic = () => {
+        window.magneticButtonsList.forEach(btn => btn.calculate());
+        window.magneticButtonsList.forEach(btn => btn.render());
+        requestAnimationFrame(updateMagnetic);
+      };
+      updateMagnetic();
+    }
+    window.magneticButtonsList.push(this);
   }
   
-  handleMouseMove(e) {
+  calculate() {
     const rect = this.button.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-    
-    const distX = mouseX - centerX;
-    const distY = mouseY - centerY;
-    const distance = Math.sqrt(distX * distX + distY * distY);
-    
-    if (distance < this.magneticRange) {
-      // Calculate magnetic pull: stronger when closer
-      const pull = (this.magneticRange - distance) / this.magneticRange;
-      // Move button toward cursor
-      this.x = (distX * pull) * this.strength;
-      this.y = (distY * pull) * this.strength;
-      
+    this.distX = window.mouseX - centerX;
+    this.distY = window.mouseY - centerY;
+    this.distance = Math.sqrt(this.distX * this.distX + this.distY * this.distY);
+  }
+
+  render() {
+    if (this.distance < this.magneticRange) {
+      const pull = (this.magneticRange - this.distance) / this.magneticRange;
+      this.x = (this.distX * pull) * this.strength;
+      this.y = (this.distY * pull) * this.strength;
       this.button.style.transition = 'transform 0.05s ease-out';
     } else {
-      // Return to origin smoothly
       this.x *= 0.85;
       this.y *= 0.85;
       this.button.style.transition = 'transform 0.05s ease-out';
-      
       if (Math.abs(this.x) < 0.1 && Math.abs(this.y) < 0.1) {
         this.x = 0;
         this.y = 0;
       }
     }
-    
-    this.button.style.transform = `translate(${this.x}px, ${this.y}px)`;
+    this.button.style.transform = `translate3d(${this.x}px, ${this.y}px, 0)`;
   }
   
   handleMouseLeave() {
     this.x = 0;
     this.y = 0;
     this.button.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-    this.button.style.transform = 'translate(0, 0)';
+    this.button.style.transform = 'translate3d(0, 0, 0)';
   }
 }
 

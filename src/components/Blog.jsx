@@ -22,7 +22,7 @@ const ArticleCard = ({ article }) => {
       rel="noopener noreferrer"
       variants={itemVariants}
       whileHover={{ y: -5 }}
-      className="glass-card rounded-3xl p-6 md:p-8 flex flex-col group cursor-pointer hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)] transition-all duration-500 overflow-hidden relative block"
+      className="glass-card rounded-3xl p-5 sm:p-6 md:p-8 flex flex-col group cursor-pointer hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)] transition-all duration-500 overflow-hidden relative block"
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${article.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0`} />
       
@@ -83,7 +83,7 @@ const Blog = () => {
           <span className="font-mono text-accent-cyan text-sm tracking-widest">Articles</span>
           <div className="flex-1 h-px bg-white/[0.06]" />
         </div>
-        <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
+        <h2 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tighter">
           Technical <span className="text-gradient">Writing</span>
         </h2>
         <p className="text-text-secondary font-sans text-base mt-4 font-light max-w-xl">

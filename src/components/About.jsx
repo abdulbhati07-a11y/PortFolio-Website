@@ -91,7 +91,7 @@ const About = ({ onSkillClick }) => {
                 <span className="font-mono text-accent-cyan text-sm tracking-widest">01.</span>
                 <div className="flex-1 h-px bg-white/[0.06]" />
               </div>
-              <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
+              <h2 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tighter">
                 About <span className="text-gradient">Me</span>
               </h2>
             </m.div>
@@ -154,7 +154,7 @@ const About = ({ onSkillClick }) => {
 
           {/* Bio + highlights */}
           <m.div 
-            className="lg:col-span-2 glass-card rounded-3xl p-8 flex flex-col gap-6"
+            className="lg:col-span-2 glass-card rounded-3xl p-5 sm:p-8 flex flex-col gap-6"
             initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             animate={shouldReduceMotion || isInView1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -202,7 +202,7 @@ const About = ({ onSkillClick }) => {
                   <span className="font-mono text-accent-cyan text-sm tracking-widest">02.</span>
                   <div className="flex-1 h-px bg-white/[0.06]" />
                 </div>
-                <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
+                <h2 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tighter">
                   My <span className="text-gradient">Journey</span>
                 </h2>
               </m.div>
@@ -272,7 +272,7 @@ const About = ({ onSkillClick }) => {
                 <span className="font-mono text-accent-cyan text-sm tracking-widest">03.</span>
                 <div className="flex-1 h-px bg-white/[0.06]" />
               </div>
-              <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
+              <h2 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tighter">
                 Core <span className="text-gradient">Competencies</span>
               </h2>
             </m.div>
@@ -339,7 +339,7 @@ const TimelineItem = ({ item, isEven, shouldReduceMotion }) => {
 
       {/* Content Card */}
       <div className="w-full pl-16 md:pl-0 md:w-5/12">
-        <div className="glass-card rounded-2xl p-6 md:p-8 hover:border-white/[0.15] transition-all duration-300 group">
+        <div className="glass-card rounded-2xl p-4 sm:p-6 md:p-8 hover:border-white/[0.15] transition-all duration-300 group">
           <div className="flex items-start justify-between mb-3 gap-4 flex-wrap">
             <div className="flex items-center gap-3">
               {item.logo ? (
@@ -347,7 +347,7 @@ const TimelineItem = ({ item, isEven, shouldReduceMotion }) => {
               ) : (
                 <img src={getPlaceholder(item.title)} alt={`${item.title} logo`} className="w-10 h-10 rounded-md object-cover z-10" />
               )}
-              <h3 className="font-sans text-xl font-bold text-white tracking-tight group-hover:text-accent-cyan transition-colors">{item.title}</h3>
+              <h3 className="font-sans text-base sm:text-xl font-bold text-white tracking-tight group-hover:text-accent-cyan transition-colors">{item.title}</h3>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <span className="md:hidden font-mono text-[10px] text-text-secondary border border-white/10 px-2 py-1 rounded-full">

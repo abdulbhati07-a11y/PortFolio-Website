@@ -142,7 +142,7 @@ const StatCounter = ({ stat, delay, isInView }) => {
         visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
       }}
     >
-      <span className="font-mono text-2xl md:text-3xl font-bold text-white">
+      <span className="font-mono text-xl sm:text-2xl md:text-3xl font-bold text-white">
         {stat.decimals > 0 ? count.toFixed(1) : Math.floor(count)}
         <span className="text-accent-cyan">{stat.suffix}</span>
       </span>
@@ -181,7 +181,7 @@ const Hero = ({ setActiveTab }) => {
   return (
     <m.section
       ref={sectionRef}
-      className="relative w-full min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden"
+      className="relative w-full min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden px-0"
       variants={containerVariants}
       initial={shouldReduceMotion ? { opacity: 1, y: 0 } : "hidden"}
       animate={shouldReduceMotion ? { opacity: 1, y: 0 } : (isInView ? "visible" : "hidden")}
@@ -209,11 +209,11 @@ const Hero = ({ setActiveTab }) => {
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-purple/5 rounded-full blur-3xl pointer-events-none z-0" />
 
       {/* Main content */}
-      <div className="z-10 text-center max-w-5xl px-6 pointer-events-none mt-[-3%]">
+      <div className="z-10 text-center max-w-5xl w-full px-4 sm:px-6 mt-[-3%]">
 
         {/* Name */}
         <m.h1
-          className="font-sans text-5xl md:text-7xl lg:text-[82px] font-bold text-white mb-4 tracking-tighter leading-[1.05]"
+          className="font-sans text-[2.2rem] xs:text-5xl sm:text-6xl md:text-7xl lg:text-[82px] font-bold text-white mb-3 md:mb-4 tracking-tighter leading-[1.05]"
           variants={itemVariants}
         >
           {DEVELOPER_INFO.name.split(' ').slice(0, 2).join(' ')}
@@ -223,17 +223,17 @@ const Hero = ({ setActiveTab }) => {
 
         {/* Typewriter role */}
         <m.div
-          className="font-mono text-xl md:text-2xl font-medium text-accent-cyan mb-6 tracking-wide h-8 flex items-center justify-center gap-1"
+          className="font-mono text-base xs:text-lg sm:text-xl md:text-2xl font-medium text-accent-cyan mb-4 md:mb-6 tracking-wide h-7 md:h-8 flex items-center justify-center gap-1"
           variants={itemVariants}
         >
           <span>&gt;</span>
           <span>{typedRole}</span>
-          <span className="w-[2px] h-6 bg-accent-cyan animate-pulse ml-0.5 rounded-full" />
+          <span className="w-[2px] h-5 md:h-6 bg-accent-cyan animate-pulse ml-0.5 rounded-full" />
         </m.div>
 
         {/* Tagline */}
         <m.p
-          className="font-sans text-lg md:text-xl text-text-secondary/80 mb-10 mx-auto max-w-2xl leading-relaxed font-light"
+          className="font-sans text-sm xs:text-base sm:text-lg md:text-xl text-text-secondary/80 mb-6 md:mb-10 mx-auto max-w-2xl leading-relaxed font-light px-2"
           variants={itemVariants}
         >
           {DEVELOPER_INFO.tagline}
@@ -241,14 +241,14 @@ const Hero = ({ setActiveTab }) => {
 
         {/* CTA Buttons */}
         <m.div
-          className="flex flex-col sm:flex-row gap-4 justify-center mb-12 pointer-events-auto"
+          className="flex flex-col xs:flex-row flex-wrap gap-3 justify-center mb-8 md:mb-12 pointer-events-auto"
           variants={itemVariants}
         >
           <m.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => setActiveTab('projects')}
-            className="btn-primary"
+            className="btn-primary text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4"
           >
             Explore Projects
           </m.button>
@@ -256,7 +256,7 @@ const Hero = ({ setActiveTab }) => {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => setActiveTab('contact')}
-            className="btn-secondary"
+            className="btn-secondary text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4"
           >
             Get In Touch
           </m.button>
@@ -266,7 +266,7 @@ const Hero = ({ setActiveTab }) => {
             href={DEVELOPER_INFO.resume}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-secondary"
+            className="btn-secondary text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4"
           >
             View Resume
           </m.a>
@@ -274,7 +274,7 @@ const Hero = ({ setActiveTab }) => {
 
         {/* Social links */}
         <m.div
-          className="flex items-center justify-center gap-6 mb-16 pointer-events-auto"
+          className="flex items-center justify-center gap-4 sm:gap-6 mb-10 md:mb-16 pointer-events-auto"
           variants={itemVariants}
         >
           {[
@@ -290,7 +290,7 @@ const Hero = ({ setActiveTab }) => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className="w-11 h-11 rounded-full border border-white/10 flex items-center justify-center text-text-secondary hover:text-white hover:border-accent-cyan hover:shadow-[0_0_15px_rgba(0,217,255,0.3)] hover:bg-accent-cyan/10 transition-all duration-300"
+              className="w-11 h-11 sm:w-11 sm:h-11 rounded-full border border-white/10 flex items-center justify-center text-text-secondary hover:text-white hover:border-accent-cyan hover:shadow-[0_0_15px_rgba(0,217,255,0.3)] hover:bg-accent-cyan/10 transition-all duration-300"
             >
               <Icon size={18} />
             </m.a>
@@ -299,7 +299,7 @@ const Hero = ({ setActiveTab }) => {
 
         {/* Stats */}
         <m.div
-          className="grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-2xl mx-auto pointer-events-none"
+          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-2xl mx-auto"
           variants={itemVariants}
         >
           {STATS.map((stat, i) => (

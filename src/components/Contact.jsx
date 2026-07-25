@@ -71,7 +71,7 @@ const ContactForm = () => {
       return;
     }
     setSending(true);
-    
+
     const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID';
     const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID';
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY';
@@ -90,7 +90,7 @@ const ContactForm = () => {
         setSending(false);
         setSent(true);
         setForm({ name: '', email: '', subject: '', message: '' });
-        
+
         setTimeout(() => setSent(false), 5000);
       })
       .catch((error) => {
@@ -160,11 +160,10 @@ const ContactForm = () => {
         disabled={sending || sent}
         whileHover={!sent ? { scale: 1.02 } : {}}
         whileTap={!sent ? { scale: 0.98 } : {}}
-        className={`flex items-center justify-center gap-2.5 w-full py-4 rounded-xl font-sans font-semibold text-sm transition-all duration-300 ${
-          sent
+        className={`flex items-center justify-center gap-2.5 w-full py-4 rounded-xl font-sans font-semibold text-sm transition-all duration-300 ${sent
             ? 'bg-green-400/20 border border-green-400/40 text-green-400 cursor-default'
             : 'bg-white text-primary hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:bg-white/90'
-        } ${sending ? 'opacity-70 cursor-wait' : ''}`}
+          } ${sending ? 'opacity-70 cursor-wait' : ''}`}
       >
         {sent ? (
           <>
