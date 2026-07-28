@@ -267,7 +267,7 @@ body.cursor-click #cursor-dot{transform:translate3d(-50%,-50%,0) scale(0.6)}
 /* 
    SECTION BASE
  */
-section{padding:120px 5%;position:relative}
+section{padding:120px 5%;position:relative;scroll-margin-top:88px}
 .section-label{
   font-family:var(--font-mono);font-size:11px;letter-spacing:0.3em;
   color:var(--cyan);text-transform:uppercase;margin-bottom:12px;display:block;
@@ -581,6 +581,15 @@ section{padding:120px 5%;position:relative}
   opacity:0;transition:opacity var(--transition);z-index:2;
 }
 .project-card:hover .project-overlay{opacity:1}
+/* Touch devices: overlay always reachable (hover never fires) */
+@media (hover: none) {
+  .project-overlay{
+    opacity:1;
+    background:linear-gradient(to top,rgba(0,0,0,0.82) 0%,rgba(0,0,0,0.35) 45%,transparent 70%);
+    align-items:flex-end;
+    padding-bottom:18px;
+  }
+}
 .overlay-btn{
   padding:9px 20px;border-radius:50px;font-size:0.78rem;font-weight:600;
   letter-spacing:0.04em;transition:all var(--transition);
@@ -611,16 +620,22 @@ section{padding:120px 5%;position:relative}
   border:1px solid var(--border);
   font-size:0.72rem;color:var(--text-secondary);background:var(--bg-glass);
 }
-.project-links{display:flex;gap:10px;margin-top:auto}
+.project-links{display:flex;gap:10px;margin-top:auto;flex-wrap:wrap}
 .project-link{
   display:inline-flex;align-items:center;gap:6px;
   padding:7px 16px;border-radius:50px;font-size:0.78rem;font-weight:500;
-  transition:all var(--transition);
+  transition:all var(--transition);border:none;cursor:pointer;font-family:inherit;
 }
 .project-link.gh{border:1px solid var(--border);color:var(--text-secondary);background:var(--bg-glass)}
 .project-link.gh:hover{border-color:var(--cyan);color:var(--cyan)}
 .project-link.demo{background:var(--cyan);color:#000;font-weight:600}
 .project-link.demo:hover{background:var(--gold);box-shadow:0 0 20px rgba(147, 197, 253, 0.3)}
+.project-link.details{border:1px solid var(--border);color:var(--text-primary);background:var(--bg-glass)}
+.project-link.details:hover{border-color:var(--cyan);color:var(--cyan)}
+/* Always show a Details control in the card body on touch */
+@media (hover: hover) and (pointer: fine) {
+  .project-link.details{display:none}
+}
 /* Lightbox */
 #lightbox{
   position:fixed;inset:0;z-index:9990;
@@ -1652,6 +1667,7 @@ footer{
   <a href="#timeline">Timeline</a>
   <a href="#certificates">Certificates</a>
   <a href="#contact">Contact</a>
+  <a href="#contact" class="hire-btn">Hire Me</a>
 </nav>
 
 <!-- NAVBAR -->
@@ -1705,7 +1721,7 @@ footer{
     <p class="hero-tagline">Building intelligent solutions with Python, AI/ML, and full-stack expertise.</p>
     <div class="hero-cta">
       <a href="#projects" class="btn-primary"><span><i class="fa fa-eye" style="margin-right:8px"></i>View My Work</span></a>
-      <a href="/Muhammad_Abdullah_Bhatti_Professional_Resume.docx" download="Muhammad_Abdullah_Bhatti_Professional_Resume.docx" class="btn-outline"><i class="fa fa-download" style="margin-right:8px"></i>Download CV</a>
+      <a href="Muhammad_Abdullah_Bhatti_Professional_Resume.docx" download="Muhammad_Abdullah_Bhatti_Professional_Resume.docx" class="btn-outline"><i class="fa fa-download" style="margin-right:8px"></i>Download CV</a>
     </div>
     <div class="hero-socials">
       <a href="https://github.com/abdulbhati07-a11y" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
@@ -2492,11 +2508,7 @@ const lenis = new Lenis({
   touchMultiplier: 2,
   infinite: false,
 });
-function raf(time) {
-  lenis.raf(time);
-  requestAnimationFrame(raf);
-}
-requestAnimationFrame(raf);
+// RAF loop is driven by GSAP ticker after ScrollTrigger registers (keeps scrub/parallax in sync)
 
 /* 
    TEXT SCRAMBLE EFFECT
@@ -2656,9 +2668,18 @@ if (window.matchMedia('(pointer: coarse)').matches) {
     requestAnimationFrame(animateCursor);
   }
   animateCursor();
-  document.querySelectorAll('a,button,[role="button"]').forEach(el => {
-    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  // Event delegation so dynamically re-rendered project/cert buttons keep cursor hover
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest && e.target.closest('a,button,[role="button"]')) {
+      document.body.classList.add('cursor-hover');
+    }
+  });
+  document.addEventListener('mouseout', e => {
+    const leftInteractive = e.target.closest && e.target.closest('a,button,[role="button"]');
+    const enteredInteractive = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('a,button,[role="button"]');
+    if (leftInteractive && !enteredInteractive) {
+      document.body.classList.remove('cursor-hover');
+    }
   });
   document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
   document.addEventListener('mouseup', () => document.body.classList.remove('cursor-click'));
@@ -2707,26 +2728,41 @@ window.addEventListener('scroll', () => {
  */
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobile-menu');
-hamburger.addEventListener('click', () => {
-  const open = hamburger.classList.toggle('open');
+
+function setMobileMenuOpen(open) {
+  hamburger.classList.toggle('open', open);
   mobileMenu.classList.toggle('open', open);
-  hamburger.setAttribute('aria-expanded', open);
+  hamburger.setAttribute('aria-expanded', String(open));
+  document.body.style.overflow = open ? 'hidden' : '';
+  if (typeof lenis !== 'undefined') {
+    if (open) lenis.stop();
+    else lenis.start();
+  }
+}
+
+hamburger.addEventListener('click', () => {
+  setMobileMenuOpen(!hamburger.classList.contains('open'));
 });
 mobileMenu.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => {
-    hamburger.classList.remove('open');
-    mobileMenu.classList.remove('open');
-    hamburger.setAttribute('aria-expanded', 'false');
-  });
+  a.addEventListener('click', () => setMobileMenuOpen(false));
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+    setMobileMenuOpen(false);
+  }
 });
 
 /* 
-   SMOOTH SCROLL
+   SMOOTH SCROLL (via Lenis — keeps ScrollTrigger scrub/parallax aligned)
  */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
-    const tgt = document.querySelector(a.getAttribute('href'));
-    if (tgt) { e.preventDefault(); tgt.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    const href = a.getAttribute('href');
+    if (!href || href === '#') return;
+    const tgt = document.querySelector(href);
+    if (!tgt) return;
+    e.preventDefault();
+    lenis.scrollTo(tgt, { offset: -72, duration: 1.2 });
   });
 });
 
@@ -2838,13 +2874,24 @@ document.querySelectorAll('.service-tab').forEach(tab => {
     tab.classList.add('active');
     
     const category = tab.dataset.category;
+    let firstVisible = null;
     allServiceCards.forEach(({el, data}) => {
-      if(category === 'all' || data.category === category) {
+      if (category === 'all' || data.category === category) {
         el.classList.remove('hidden');
+        // display:none can make ScrollTrigger reverse cards to opacity 0 — restore visibility
+        if (typeof gsap !== 'undefined') {
+          gsap.set(el, { opacity: 1, y: 0, skewY: 0, scale: 1 });
+        } else {
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+        }
+        if (!firstVisible) firstVisible = { el, data };
       } else {
         el.classList.add('hidden');
       }
     });
+    if (firstVisible) showServiceDetail(firstVisible.data, firstVisible.el);
+    if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
   });
 });
 
@@ -2868,6 +2915,7 @@ if (!fb || !pg) {
   console.error('PROJECTS array is empty or undefined');
 } else {
   let activeFilter = 'All';
+  let projectsFilterReady = false;
 
   cats.forEach(c => {
     const btn = document.createElement('button');
@@ -2883,8 +2931,42 @@ if (!fb || !pg) {
     fb.appendChild(btn);
   });
 
+  function killProjectCardTriggers() {
+    if (typeof ScrollTrigger === 'undefined') return;
+    ScrollTrigger.getAll().forEach(st => {
+      if (st.trigger?.classList?.contains('project-card')) st.kill();
+    });
+  }
+
+  function animateFilteredProjectCards() {
+    const cards = pg.querySelectorAll('.project-card');
+    if (!cards.length) return;
+
+    // Filter clicks happen while the section is on-screen — animate in immediately
+    // (initial page load still uses ScrollTrigger below).
+    if (typeof gsap !== 'undefined') {
+      gsap.utils.toArray(cards).forEach((card, i) => {
+        gsap.fromTo(card,
+          { opacity: 0, y: 36, skewY: 1.5, scale: 0.97 },
+          {
+            opacity: 1, y: 0, skewY: 0, scale: 1,
+            duration: 0.65,
+            delay: i * 0.05,
+            ease: 'power3.out'
+          }
+        );
+      });
+    } else {
+      cards.forEach(card => {
+        card.classList.add('visible');
+        card.style.opacity = '1';
+      });
+    }
+  }
+
   function renderProjects() {
     console.log('Rendering projects for filter:', activeFilter);
+    killProjectCardTriggers();
     pg.innerHTML = '';
     const filtered = activeFilter==='All' ? PROJECTS : PROJECTS.filter(p => p.cat===activeFilter);
     
@@ -2926,23 +3008,38 @@ if (!fb || !pg) {
             <h3 class="project-title">${p.title}</h3>
             <p class="project-desc">${p.desc}</p>
             <div class="project-tags">${p.tech.map(t=>`<span class="project-tag">${t}</span>`).join('')}</div>
-            <div class="project-links">${ghLink}${demoLink}</div>
+            <div class="project-links">
+              <button type="button" class="project-link details" aria-label="View ${p.title} details"><i class="fa fa-info-circle"></i> Details</button>
+              ${ghLink}${demoLink}
+            </div>
           </div>`;
-        card.querySelector('.overlay-btn.primary')?.addEventListener('click', () => openLightbox(p.id));
+        card.querySelector('.overlay-btn.primary')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openLightbox(p.id);
+        });
+        card.querySelector('.project-link.details')?.addEventListener('click', () => openLightbox(p.id));
         pg.appendChild(card);
-        if (typeof revealObserver !== 'undefined' && revealObserver) {
-          revealObserver.observe(card);
-        }
       } catch(e) {
         console.error('Error rendering project:', p.title, e);
       }
     });
+
+    // After a filter change, cards are recreated with opacity:0 (.reveal) but ScrollTrigger
+    // was only bound once on load — re-animate so the grid is visible again.
+    if (projectsFilterReady) {
+      animateFilteredProjectCards();
+      pruneMagneticButtons();
+      bindMagneticButtons(pg);
+      if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+    }
+
     console.log('Projects rendered successfully');
   }
   
   // Initialize projects
   console.log('Initializing projects...');
   renderProjects();
+  projectsFilterReady = true;
 }
 
 /* Lightbox */
@@ -2959,6 +3056,7 @@ function openLightbox(id) {
     <p class="lb-desc">${p.long}</p>
     <div class="lb-tags">${p.tech.map(t=>`<span class="project-tag">${t}</span>`).join('')}</div>
     <div class="lb-links">${ghBtn}${dmBtn}</div>`;
+  if (typeof bindMagneticButtons === 'function') bindMagneticButtons(lbContent);
   lb.classList.add('open');
   lb.querySelector('.lightbox-card').setAttribute('tabindex','-1');
   lb.querySelector('.lightbox-card').focus();
@@ -2996,10 +3094,7 @@ TIMELINE_DATA.forEach((item, i) => {
   }
   tw2.appendChild(el);
 });
-const tlObserver = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); tlObserver.unobserve(e.target); } });
-}, { threshold: 0.2 });
-document.querySelectorAll('.timeline-item').forEach(el => tlObserver.observe(el));
+// Visibility is handled by GSAP ScrollTrigger below — no separate IO needed
 
 /* 
    SKILL BARS ANIMATION
@@ -3476,7 +3571,7 @@ const CERTS_DATA = [
   {
     title: 'Complete Python Bootcamp 2025',
     issuer: 'Udemy',
-    file: '/[English]_Complete_2025_Python_Bootcamp__Learn_Python_from_Scratch_Certificate.pdf',
+    file: encodeURI('[English]_Complete_2025_Python_Bootcamp__Learn_Python_from_Scratch_Certificate.pdf'),
     tags: ['Python', 'Programming', 'Automation'],
     bg: 'linear-gradient(135deg,#070e18,#0b1020)',
     badgeColor: '#e8a020', badgeBg: 'rgba(232,160,32,0.12)',
@@ -3506,7 +3601,7 @@ const CERTS_DATA = [
   {
     title: 'Ultimate Job-Ready Data Science Course',
     issuer: 'Udemy',
-    file: '/The_Ultimate_Job_Ready_Data_Science_Course_Certificate.pdf',
+    file: 'The_Ultimate_Job_Ready_Data_Science_Course_Certificate.pdf',
     tags: ['Data Science', 'ML', 'Python', 'AI'],
     bg: 'linear-gradient(135deg,#08060f,#0e0818)',
     badgeColor: '#a435f0', badgeBg: 'rgba(164,53,240,0.12)',
@@ -3618,6 +3713,7 @@ class MagneticButton {
   }
   
   calculate() {
+    if (!this.button.isConnected) return;
     const rect = this.button.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -3627,6 +3723,7 @@ class MagneticButton {
   }
 
   render() {
+    if (!this.button.isConnected) return;
     if (this.distance < this.magneticRange) {
       const pull = (this.magneticRange - this.distance) / this.magneticRange;
       this.x = (this.distX * pull) * this.strength;
@@ -3652,13 +3749,24 @@ class MagneticButton {
   }
 }
 
-// Apply magnetic effect to all interactive buttons — skip on touch devices
-document.addEventListener('DOMContentLoaded', () => {
-  if (window.matchMedia('(pointer: coarse)').matches) return; // touch device, no cursor
-  const magneticButtons = document.querySelectorAll('.btn-primary, .btn-outline, .btn-hire, .filter-btn, .overlay-btn, .project-link');
-  magneticButtons.forEach(btn => {
+// Apply magnetic effect to interactive buttons — skip on touch devices
+function pruneMagneticButtons() {
+  if (!window.magneticButtonsList) return;
+  window.magneticButtonsList = window.magneticButtonsList.filter(m => m.button?.isConnected);
+}
+
+function bindMagneticButtons(root = document) {
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+  const selector = '.btn-primary, .btn-outline, .btn-hire, .filter-btn, .overlay-btn, .project-link';
+  root.querySelectorAll(selector).forEach(btn => {
+    if (btn.dataset.magneticBound === '1') return;
+    btn.dataset.magneticBound = '1';
     new MagneticButton(btn);
   });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  bindMagneticButtons();
 });
 
 // CV download is handled directly by the anchor href attribute
@@ -3668,7 +3776,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // GSAP ScrollTrigger Integration
 gsap.registerPlugin(ScrollTrigger);
 
+// Keep Lenis + ScrollTrigger on the same clock (prevents jittery scrub/parallax)
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add((time) => {
+  lenis.raf(time * 1000);
+});
+gsap.ticker.lagSmoothing(0);
+
 // 1. Staggered Skew Reveals for Cards
+// Use "none" on leave — reverse was hiding cards when scrolling away or when
+// service filters set display:none (ScrollTrigger treated them as left).
 gsap.utils.toArray('.project-card, .cert-card, .service-card, .timeline-item').forEach(card => {
   gsap.fromTo(card,
     { opacity: 0, y: 60, skewY: 2, scale: 0.96 },
@@ -3679,7 +3796,7 @@ gsap.utils.toArray('.project-card, .cert-card, .service-card, .timeline-item').f
       scrollTrigger: {
         trigger: card,
         start: "top 85%",
-        toggleActions: "play none none reverse"
+        toggleActions: "play none none none"
       }
     }
   );
@@ -3700,7 +3817,7 @@ gsap.utils.toArray('.reveal:not(.project-card):not(.cert-card):not(.service-card
       scrollTrigger: {
         trigger: el,
         start: "top 85%",
-        toggleActions: "play none none reverse"
+        toggleActions: "play none none none"
       }
     }
   );
