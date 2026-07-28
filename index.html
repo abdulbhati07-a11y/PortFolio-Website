@@ -255,6 +255,7 @@ body.cursor-click #cursor-dot{transform:translate3d(-50%,-50%,0) scale(0.6)}
   color:var(--text-secondary);transition:color var(--transition);
 }
 .mobile-menu a:hover{color:var(--cyan)}
+.mobile-menu a.active{color:var(--cyan)}
 .mobile-menu .hire-btn{
   padding:14px 36px;border-radius:50px;
   background:linear-gradient(135deg,var(--cyan),var(--purple));
@@ -263,6 +264,20 @@ body.cursor-click #cursor-dot{transform:translate3d(-50%,-50%,0) scale(0.6)}
   transition:all var(--transition);
   margin-top:1rem;
 }
+.mobile-menu .hire-btn.active{color:#fff}
+.skip-link{
+  position:absolute;left:16px;top:-48px;z-index:10000;
+  padding:10px 16px;border-radius:8px;
+  background:var(--cyan);color:#000;font-weight:700;font-size:0.85rem;
+  transition:top 0.2s;
+}
+.skip-link:focus{top:16px;outline:2px solid var(--text-primary);outline-offset:2px}
+:focus-visible{
+  outline:2px solid var(--cyan);
+  outline-offset:3px;
+}
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible){outline:none}
 
 /* 
    SECTION BASE
@@ -1622,8 +1637,10 @@ footer{
 <!-- NOISE OVERLAY -->
 <div class="noise-overlay" aria-hidden="true"></div>
 
+<a class="skip-link" href="#main-content">Skip to content</a>
+
 <!-- PRELOADER -->
-<div id="preloader" role="status" aria-label="Loading portfolio">
+<div id="preloader" role="status" aria-label="Loading portfolio" aria-live="polite">
   <div class="preloader-logo">MAB</div>
   <div class="preloader-bar-wrap"><div class="preloader-bar" id="preloader-bar"></div></div>
   <div class="preloader-pct" id="preloader-pct">0%</div>
@@ -1695,7 +1712,7 @@ footer{
       <i class="fa fa-moon" id="theme-icon"></i>
     </button>
     <a href="#contact" class="btn-hire">Hire Me</a>
-    <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu" aria-expanded="false">
+    <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-menu">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -1821,7 +1838,7 @@ footer{
   <div class="container">
     <span class="section-label reveal">02  What I Do</span>
     <h2 class="section-title reveal" id="services-title">Services & <span>Expertise</span></h2>
-    <p class="section-subtitle reveal">Hover to explore my skill categories and see what I bring to every project.</p>
+    <p class="section-subtitle reveal" id="services-subtitle">Tap or hover a service to explore what I bring to every project.</p>
     
     <!-- Interactive Tabs -->
     <div class="services-tabs reveal">
@@ -1863,7 +1880,7 @@ footer{
   <div class="container">
     <span class="section-label reveal">04  Tech Stack</span>
     <h2 class="section-title reveal" id="skills3d-title">Skills <span>Universe</span></h2>
-    <p class="section-subtitle reveal">Interactive 3D visualization of my technical skills  hover to inspect, drag to explore.</p>
+    <p class="section-subtitle reveal">Interactive 3D visualization of my technical skills — hover or tap nodes to inspect.</p>
     <div class="skills3d-layout">
       <div id="skills-canvas-wrap" class="reveal from-left" aria-label="3D skills visualization">
         <canvas id="skills-canvas"></canvas>
@@ -1967,19 +1984,19 @@ footer{
         <div class="form-inline-row">
           <div class="form-field">
             <label for="cf-name">Your Name</label>
-            <input type="text" id="cf-name" name="name" placeholder="Muhammad Ali" autocomplete="name" aria-required="true"/>
-            <span class="ferr" id="err-name">Name is required.</span>
+            <input type="text" id="cf-name" name="name" placeholder="Muhammad Ali" autocomplete="name" aria-required="true" aria-describedby="err-name"/>
+            <span class="ferr" id="err-name" role="alert">Name is required.</span>
           </div>
           <div class="form-field">
             <label for="cf-email">Email Address</label>
-            <input type="email" id="cf-email" name="email" placeholder="you@example.com" autocomplete="email" aria-required="true"/>
-            <span class="ferr" id="err-email">Enter a valid email.</span>
+            <input type="email" id="cf-email" name="email" placeholder="you@example.com" autocomplete="email" aria-required="true" aria-describedby="err-email"/>
+            <span class="ferr" id="err-email" role="alert">Enter a valid email.</span>
           </div>
         </div>
         <div class="form-field">
           <label for="cf-message">Message</label>
-          <textarea id="cf-message" name="message" placeholder="Tell me about your project, idea, or just say hi..." aria-required="true"></textarea>
-          <span class="ferr" id="err-message">Message must be at least 20 characters.</span>
+          <textarea id="cf-message" name="message" placeholder="Tell me about your project, idea, or just say hi..." aria-required="true" aria-describedby="err-message"></textarea>
+          <span class="ferr" id="err-message" role="alert">Message must be at least 20 characters.</span>
         </div>
         <div class="form-sent-msg" id="form-success" role="alert">
           <i class="fa fa-check-circle"></i>
@@ -2568,60 +2585,82 @@ class TextScramble {
 }
 
 /* 
-   PRELOADER
+   PRELOADER — short gate tied to fonts + a hard cap (not a fake long load)
  */
 (function() {
   const bar = document.getElementById('preloader-bar');
   const pct = document.getElementById('preloader-pct');
   const loader = document.getElementById('preloader');
+  const started = performance.now();
+  const MIN_MS = 450;
+  const MAX_MS = 1800;
   let p = 0;
-  
-  // Hide hero elements initially to prevent FOUC when preloader lifts
+  let finished = false;
+
   gsap.set(".hero-name", { y: 40, opacity: 0 });
   gsap.set(".hero-typewriter", { y: 20, opacity: 0 });
   gsap.set(".hero-tagline", { y: 20, opacity: 0 });
   gsap.set(".hero-cta a", { y: 20, opacity: 0 });
   gsap.set(".hero-socials a", { y: 20, opacity: 0 });
   gsap.set("#navbar", { y: -40, opacity: 0 });
-  
+
   const iv = setInterval(() => {
-    p += Math.random() * 20 + 5;
-    if (p >= 100) { p = 100; clearInterval(iv); }
+    if (finished) return;
+    p = Math.min(92, p + Math.random() * 12 + 4);
     bar.style.width = p + '%';
     pct.textContent = Math.floor(p) + '%';
-    if (p >= 100) {
-      setTimeout(() => {
-        // Slide preloader up smoothly
-        gsap.to(loader, {
-          yPercent: -100,
-          duration: 1.0,
-          ease: "power4.inOut",
-          onComplete: () => loader.style.display = 'none'
-        });
-        
-        // Staggered Entrance Animation for Hero
-        const tl = gsap.timeline({ delay: 0.4 });
-        tl.to(".hero-name", { y: 0, opacity: 1, duration: 1, ease: "power3.out" })
-          .to(".hero-typewriter", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, "-=0.6")
-          .to(".hero-tagline", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, "-=0.6")
-          .to(".hero-cta a", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.1 }, "-=0.6")
-          .to(".hero-socials a", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.1 }, "-=0.6")
-          .to("#navbar", { y: 0, opacity: 1, duration: 1, ease: "power3.out" }, "-=1");
+  }, 70);
 
-        document.body.classList.remove('loading');
-        
-        // Trigger Scramble on hero name
-        const el1 = document.querySelector('.hero-name .line1');
-        const el2 = document.querySelector('.hero-name .line2');
-        if (el1 && el2) {
-          const fx1 = new TextScramble(el1);
-          const fx2 = new TextScramble(el2);
-          setTimeout(() => fx1.setText('Muhammad'), 400);
-          setTimeout(() => fx2.setText('Abdullah'), 550);
-        }
-      }, 300);
-    }
-  }, 80);
+  function finishPreloader() {
+    if (finished) return;
+    finished = true;
+    clearInterval(iv);
+    p = 100;
+    bar.style.width = '100%';
+    pct.textContent = '100%';
+
+    setTimeout(() => {
+      gsap.to(loader, {
+        yPercent: -100,
+        duration: 0.85,
+        ease: "power4.inOut",
+        onComplete: () => { loader.style.display = 'none'; }
+      });
+
+      const tl = gsap.timeline({ delay: 0.25 });
+      tl.to(".hero-name", { y: 0, opacity: 1, duration: 1, ease: "power3.out" })
+        .to(".hero-typewriter", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, "-=0.6")
+        .to(".hero-tagline", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, "-=0.6")
+        .to(".hero-cta a", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.1 }, "-=0.6")
+        .to(".hero-socials a", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.1 }, "-=0.6")
+        .to("#navbar", { y: 0, opacity: 1, duration: 1, ease: "power3.out" }, "-=1");
+
+      document.body.classList.remove('loading');
+
+      const el1 = document.querySelector('.hero-name .line1');
+      const el2 = document.querySelector('.hero-name .line2');
+      if (el1 && el2) {
+        const fx1 = new TextScramble(el1);
+        const fx2 = new TextScramble(el2);
+        setTimeout(() => fx1.setText('Muhammad'), 400);
+        setTimeout(() => fx2.setText('Abdullah'), 550);
+      }
+    }, 120);
+  }
+
+  const ready = Promise.race([
+    (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve(),
+    new Promise(resolve => setTimeout(resolve, MAX_MS))
+  ]);
+
+  ready.then(() => {
+    const elapsed = performance.now() - started;
+    const wait = Math.max(0, MIN_MS - elapsed);
+    setTimeout(finishPreloader, wait);
+  });
+
+  // Absolute failsafe
+  setTimeout(finishPreloader, MAX_MS + 200);
 })();
 
 /* 
@@ -2693,8 +2732,10 @@ let scrollTicking = false;
 window.addEventListener('scroll', () => {
   if (!scrollTicking) {
     window.requestAnimationFrame(() => {
-      const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-      progressBar.style.transform = `scaleX(${pct})`;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = max > 0 ? window.scrollY / max : 0;
+      progressBar.style.transform = `scaleX(${ratio})`;
+      progressBar.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
       scrollTicking = false;
     });
     scrollTicking = true;
@@ -2705,7 +2746,7 @@ window.addEventListener('scroll', () => {
    NAVBAR SCROLL + ACTIVE SECTION
  */
 const navbar = document.getElementById('navbar');
-const navLinks = document.querySelectorAll('.nav-links a');
+const navLinks = document.querySelectorAll('.nav-links a, .mobile-menu a:not(.hire-btn)');
 const sections = document.querySelectorAll('section[id]');
 let navTicking = false;
 window.addEventListener('scroll', () => {
@@ -2714,8 +2755,10 @@ window.addEventListener('scroll', () => {
       navbar.classList.toggle('scrolled', window.scrollY > 50);
       let cur = '';
       sections.forEach(s => { if (window.scrollY >= s.offsetTop - 200) cur = s.id; });
+      if (window.scrollY < 120) cur = 'hero';
       navLinks.forEach(a => {
-        a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+        const href = a.getAttribute('href');
+        a.classList.toggle('active', href === '#' + cur);
       });
       navTicking = false;
     });
@@ -2733,10 +2776,12 @@ function setMobileMenuOpen(open) {
   hamburger.classList.toggle('open', open);
   mobileMenu.classList.toggle('open', open);
   hamburger.setAttribute('aria-expanded', String(open));
-  document.body.style.overflow = open ? 'hidden' : '';
-  if (typeof lenis !== 'undefined') {
-    if (open) lenis.stop();
-    else lenis.start();
+  if (open) {
+    document.body.style.overflow = 'hidden';
+    if (typeof lenis !== 'undefined') lenis.stop();
+  } else if (typeof modalScrollLocked !== 'number' || modalScrollLocked === 0) {
+    document.body.style.overflow = '';
+    if (typeof lenis !== 'undefined') lenis.start();
   }
 }
 
@@ -2745,11 +2790,6 @@ hamburger.addEventListener('click', () => {
 });
 mobileMenu.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => setMobileMenuOpen(false));
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
-    setMobileMenuOpen(false);
-  }
 });
 
 /* 
@@ -2875,9 +2915,11 @@ document.querySelectorAll('.service-tab').forEach(tab => {
     
     const category = tab.dataset.category;
     let firstVisible = null;
+    let visibleCount = 0;
     allServiceCards.forEach(({el, data}) => {
       if (category === 'all' || data.category === category) {
         el.classList.remove('hidden');
+        visibleCount++;
         // display:none can make ScrollTrigger reverse cards to opacity 0 — restore visibility
         if (typeof gsap !== 'undefined') {
           gsap.set(el, { opacity: 1, y: 0, skewY: 0, scale: 1 });
@@ -2890,6 +2932,24 @@ document.querySelectorAll('.service-tab').forEach(tab => {
         el.classList.add('hidden');
       }
     });
+
+    let emptyMsg = document.getElementById('services-empty');
+    if (visibleCount === 0) {
+      if (!emptyMsg) {
+        emptyMsg = document.createElement('p');
+        emptyMsg.id = 'services-empty';
+        emptyMsg.style.cssText = 'grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:24px 0';
+        emptyMsg.textContent = 'No services in this category yet.';
+        sg.appendChild(emptyMsg);
+      }
+      document.getElementById('detail-title').textContent = 'No services found';
+      document.getElementById('detail-desc').textContent = 'Try another category or view all services.';
+      document.getElementById('detail-stack').innerHTML = '';
+      document.getElementById('detail-meter').innerHTML = '';
+    } else if (emptyMsg) {
+      emptyMsg.remove();
+    }
+
     if (firstVisible) showServiceDetail(firstVisible.data, firstVisible.el);
     if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
   });
@@ -3042,28 +3102,88 @@ if (!fb || !pg) {
   projectsFilterReady = true;
 }
 
-/* Lightbox */
+/* Lightbox + modal helpers */
+let modalScrollLocked = 0;
+let lastFocusedEl = null;
+
+function lockPageScroll() {
+  modalScrollLocked += 1;
+  if (modalScrollLocked === 1) {
+    document.body.style.overflow = 'hidden';
+    if (typeof lenis !== 'undefined') lenis.stop();
+  }
+}
+
+function unlockPageScroll() {
+  modalScrollLocked = Math.max(0, modalScrollLocked - 1);
+  if (modalScrollLocked === 0) {
+    if (mobileMenu?.classList?.contains('open')) return;
+    document.body.style.overflow = '';
+    if (typeof lenis !== 'undefined') lenis.start();
+  }
+}
+
+function getFocusable(root) {
+  return [...root.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])')]
+    .filter(el => !el.hasAttribute('disabled') && el.offsetParent !== null);
+}
+
+function trapFocus(e, root) {
+  if (e.key !== 'Tab') return;
+  const focusable = getFocusable(root);
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
 function openLightbox(id) {
   const p = PROJECTS.find(x=>x.id===id);
   if (!p) return;
   const lb = document.getElementById('lightbox');
   const lbContent = document.getElementById('lb-content');
+  lastFocusedEl = document.activeElement;
   const ghBtn = p.gh&&p.gh!=='#' ? `<a href="${p.gh}" class="project-link gh" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>` : '';
   const dmBtn = p.demo&&p.demo!=='#' ? `<a href="${p.demo}" class="project-link demo" target="_blank" rel="noopener noreferrer"><i class="fa fa-external-link-alt"></i> Live Demo</a>` : '';
   lbContent.innerHTML = `
     <div class="lb-thumb" style="background:${p.grad||'var(--bg-secondary)'};border-radius:12px;padding:28px;display:flex;justify-content:center;margin-bottom:20px;">${p.svg||''}</div>
-    <h2 class="lb-title">${p.title}</h2>
+    <h2 class="lb-title" id="lb-title">${p.title}</h2>
     <p class="lb-desc">${p.long}</p>
     <div class="lb-tags">${p.tech.map(t=>`<span class="project-tag">${t}</span>`).join('')}</div>
     <div class="lb-links">${ghBtn}${dmBtn}</div>`;
   if (typeof bindMagneticButtons === 'function') bindMagneticButtons(lbContent);
+  lb.setAttribute('aria-labelledby', 'lb-title');
   lb.classList.add('open');
-  lb.querySelector('.lightbox-card').setAttribute('tabindex','-1');
-  lb.querySelector('.lightbox-card').focus();
+  lockPageScroll();
+  const card = lb.querySelector('.lightbox-card');
+  card.setAttribute('tabindex','-1');
+  card.focus();
 }
-document.getElementById('lb-close').addEventListener('click', () => document.getElementById('lightbox').classList.remove('open'));
-document.getElementById('lightbox').addEventListener('click', e => { if (e.target===document.getElementById('lightbox')) document.getElementById('lightbox').classList.remove('open'); });
-document.addEventListener('keydown', e => { if (e.key==='Escape') document.getElementById('lightbox').classList.remove('open'); });
+
+function closeLightbox() {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('open')) return;
+  lb.classList.remove('open');
+  unlockPageScroll();
+  if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') lastFocusedEl.focus();
+  lastFocusedEl = null;
+}
+
+document.getElementById('lb-close').addEventListener('click', closeLightbox);
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox')) closeLightbox();
+});
+document.getElementById('lightbox').addEventListener('keydown', e => {
+  if (document.getElementById('lightbox').classList.contains('open')) {
+    trapFocus(e, document.getElementById('lightbox'));
+  }
+});
 
 /* 
    SKILLS LIST
@@ -3150,7 +3270,11 @@ document.getElementById('contact-form').addEventListener('submit', async functio
   const errBox  = document.getElementById('form-error');
 
   // Clear previous state
-  ['cf-name','cf-email','cf-message'].forEach(id => document.getElementById(id).classList.remove('err'));
+  ['cf-name','cf-email','cf-message'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('err');
+    el.removeAttribute('aria-invalid');
+  });
   ['err-name','err-email','err-message'].forEach(id => document.getElementById(id).classList.remove('show'));
   success.classList.remove('show');
   errBox.style.display = 'none';
@@ -3158,15 +3282,22 @@ document.getElementById('contact-form').addEventListener('submit', async functio
   // Client-side validation
   let valid = true;
   if (!name.value.trim()) {
-    name.classList.add('err'); document.getElementById('err-name').classList.add('show'); valid = false;
+    name.classList.add('err'); name.setAttribute('aria-invalid', 'true');
+    document.getElementById('err-name').classList.add('show'); valid = false;
   }
   if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-    email.classList.add('err'); document.getElementById('err-email').classList.add('show'); valid = false;
+    email.classList.add('err'); email.setAttribute('aria-invalid', 'true');
+    document.getElementById('err-email').classList.add('show'); valid = false;
   }
   if (!msg.value.trim() || msg.value.trim().length < 20) {
-    msg.classList.add('err'); document.getElementById('err-message').classList.add('show'); valid = false;
+    msg.classList.add('err'); msg.setAttribute('aria-invalid', 'true');
+    document.getElementById('err-message').classList.add('show'); valid = false;
   }
-  if (!valid) return;
+  if (!valid) {
+    const firstErr = this.querySelector('[aria-invalid="true"]');
+    if (firstErr) firstErr.focus();
+    return;
+  }
 
   // Send via Web3Forms
   btn.disabled = true;
@@ -3299,16 +3430,34 @@ document.getElementById('contact-form').addEventListener('submit', async functio
     }, 900);
   }
 
+  function setChatbotOpen(open) {
+    chatbotPanel.classList.toggle('open', open);
+    chatbotToggle.setAttribute('aria-expanded', String(open));
+    if (open) {
+      lastFocusedEl = document.activeElement;
+      chatbotInput.focus();
+    } else if (lastFocusedEl && chatbotPanel.contains(lastFocusedEl) === false) {
+      /* restore only if we didn't already restore from another modal */
+    }
+    if (!open && lastFocusedEl === chatbotToggle) chatbotToggle.focus();
+  }
+
+  chatbotToggle.setAttribute('aria-expanded', 'false');
+  chatbotToggle.setAttribute('aria-controls', 'chatbot-panel');
+  chatbotPanel.id = chatbotPanel.id || 'chatbot-panel';
+
   chatbotToggle.addEventListener('click', () => {
-    chatbotPanel.classList.toggle('open');
-    if (chatbotPanel.classList.contains('open')) chatbotInput.focus();
+    setChatbotOpen(!chatbotPanel.classList.contains('open'));
   });
-  chatbotClose.addEventListener('click', () => chatbotPanel.classList.remove('open'));
+  chatbotClose.addEventListener('click', () => {
+    setChatbotOpen(false);
+    chatbotToggle.focus();
+  });
   document.addEventListener('click', event => {
     if (chatbotPanel.classList.contains('open') &&
         !chatbotPanel.contains(event.target) &&
         !chatbotToggle.contains(event.target)) {
-      chatbotPanel.classList.remove('open');
+      setChatbotOpen(false);
     }
   });
   chatbotSubmit.addEventListener('click', sendChat);
@@ -3326,11 +3475,55 @@ document.getElementById('contact-form').addEventListener('submit', async functio
   });
 })();
 
+/* Unified Escape handling for overlays */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('lightbox')?.classList.contains('open')) {
+    closeLightbox();
+    return;
+  }
+  if (document.getElementById('cert-lightbox')?.classList.contains('open')) {
+    closeCertLightbox();
+    return;
+  }
+  const chatbotPanel = document.getElementById('chatbot-panel');
+  if (chatbotPanel?.classList.contains('open')) {
+    chatbotPanel.classList.remove('open');
+    document.getElementById('chatbot-toggle')?.setAttribute('aria-expanded', 'false');
+    document.getElementById('chatbot-toggle')?.focus();
+    return;
+  }
+  if (mobileMenu?.classList.contains('open')) {
+    setMobileMenuOpen(false);
+    hamburger?.focus();
+  }
+});
+
+/* 
+   Pause heavy RAF/WebGL loops when offscreen or tab hidden
+ */
+function createRenderGate(element) {
+  let inView = true;
+  let pageVisible = document.visibilityState !== 'hidden';
+  if (element && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+    }, { rootMargin: '10% 0px', threshold: 0.01 });
+    io.observe(element);
+  }
+  document.addEventListener('visibilitychange', () => {
+    pageVisible = document.visibilityState !== 'hidden';
+  });
+  return () => inView && pageVisible;
+}
+
 /* 
    THREE.JS  HERO 3D ICOSAHEDRON
  */
 (function() {
   const canvas = document.getElementById('hero-canvas');
+  if (!canvas || typeof THREE === 'undefined') return;
+  const shouldRender = createRenderGate(document.getElementById('hero') || canvas);
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   const scene = new THREE.Scene();
@@ -3390,7 +3583,7 @@ document.getElementById('contact-form').addEventListener('submit', async functio
 
   function animate() {
     requestAnimationFrame(animate);
-    const t = Date.now() * 0.001;
+    if (!shouldRender()) return;
     wire.rotation.x += 0.003;
     wire.rotation.y += 0.004;
     solid.rotation.x = wire.rotation.x;
@@ -3413,6 +3606,8 @@ document.getElementById('contact-form').addEventListener('submit', async functio
  */
 (function() {
   const canvas = document.getElementById('starfield-canvas');
+  if (!canvas || typeof THREE === 'undefined') return;
+  const shouldRender = createRenderGate(document.getElementById('hero') || canvas);
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   const scene = new THREE.Scene();
@@ -3438,6 +3633,7 @@ document.getElementById('contact-form').addEventListener('submit', async functio
 
   function animate() {
     requestAnimationFrame(animate);
+    if (!shouldRender()) return;
     stars.rotation.y += 0.0003;
     stars.rotation.x += 0.0001;
     renderer.render(scene, camera);
@@ -3452,6 +3648,8 @@ document.getElementById('contact-form').addEventListener('submit', async functio
   const wrap = document.getElementById('skills-canvas-wrap');
   const canvas = document.getElementById('skills-canvas');
   const tooltip = document.getElementById('skills-tooltip');
+  if (!wrap || !canvas || typeof THREE === 'undefined') return;
+  const shouldRender = createRenderGate(wrap);
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -3549,6 +3747,7 @@ document.getElementById('contact-form').addEventListener('submit', async functio
 
   function animate() {
     requestAnimationFrame(animate);
+    if (!shouldRender()) return;
     if (autoRotate) {
       pivot.rotation.y += 0.005;
       pivot.rotation.x += 0.002;
@@ -3674,18 +3873,30 @@ CERTS_DATA.forEach((cert, i) => {
 
 function openCertLightbox(i) {
   const cert = CERTS_DATA[i];
+  const lb = document.getElementById('cert-lightbox');
+  lastFocusedEl = document.activeElement;
   document.getElementById('cert-lb-title').textContent = cert.title;
   document.getElementById('cert-lb-iframe').src = cert.file;
-  document.getElementById('cert-lightbox').classList.add('open');
+  lb.classList.add('open');
+  lockPageScroll();
+  document.getElementById('cert-lb-close').focus();
 }
-document.getElementById('cert-lb-close').addEventListener('click', () => {
-  document.getElementById('cert-lightbox').classList.remove('open');
+function closeCertLightbox() {
+  const lb = document.getElementById('cert-lightbox');
+  if (!lb.classList.contains('open')) return;
+  lb.classList.remove('open');
   document.getElementById('cert-lb-iframe').src = '';
-});
+  unlockPageScroll();
+  if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') lastFocusedEl.focus();
+  lastFocusedEl = null;
+}
+document.getElementById('cert-lb-close').addEventListener('click', closeCertLightbox);
 document.getElementById('cert-lightbox').addEventListener('click', e => {
-  if (e.target === document.getElementById('cert-lightbox')) {
-    document.getElementById('cert-lightbox').classList.remove('open');
-    document.getElementById('cert-lb-iframe').src = '';
+  if (e.target === document.getElementById('cert-lightbox')) closeCertLightbox();
+});
+document.getElementById('cert-lightbox').addEventListener('keydown', e => {
+  if (document.getElementById('cert-lightbox').classList.contains('open')) {
+    trapFocus(e, document.getElementById('cert-lightbox'));
   }
 });
 
