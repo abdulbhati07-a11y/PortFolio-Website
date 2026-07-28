@@ -271,13 +271,41 @@ body.cursor-click #cursor-dot{transform:translate3d(-50%,-50%,0) scale(0.6)}
   background:var(--cyan);color:#000;font-weight:700;font-size:0.85rem;
   transition:top 0.2s;
 }
-.skip-link:focus{top:16px;outline:2px solid var(--text-primary);outline-offset:2px}
+.skip-link:focus,.skip-link:focus-visible{
+  top:16px;outline:2px solid var(--text-primary);outline-offset:2px;
+}
 :focus-visible{
   outline:2px solid var(--cyan);
   outline-offset:3px;
 }
 button:focus:not(:focus-visible),
 a:focus:not(:focus-visible){outline:none}
+.form-field input:focus-visible,
+.form-field textarea:focus-visible,
+.btn-send:focus-visible,
+.filter-btn:focus-visible,
+.service-tab:focus-visible,
+.service-card:focus-visible{
+  outline:2px solid var(--cyan);
+  outline-offset:3px;
+  box-shadow:0 0 0 4px rgba(0,217,255,0.15);
+}
+.form-field .ferr[aria-hidden="true"]{display:none}
+
+@media (prefers-reduced-motion: reduce) {
+  html{scroll-behavior:auto}
+  *,*::before,*::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
+  body::before{animation:none !important}
+  .reveal,.timeline-item{opacity:1 !important;transform:none !important}
+  .typewriter-cursor{animation:none !important;opacity:1}
+  #preloader{transition:none !important}
+  .project-overlay{transition:none !important}
+}
+
 
 /* 
    SECTION BASE
@@ -1880,7 +1908,7 @@ footer{
   <div class="container">
     <span class="section-label reveal">04  Tech Stack</span>
     <h2 class="section-title reveal" id="skills3d-title">Skills <span>Universe</span></h2>
-    <p class="section-subtitle reveal">Interactive 3D visualization of my technical skills — hover or tap nodes to inspect.</p>
+    <p class="section-subtitle reveal">Interactive 3D skills globe — drag to rotate, tap a node for details.</p>
     <div class="skills3d-layout">
       <div id="skills-canvas-wrap" class="reveal from-left" aria-label="3D skills visualization">
         <canvas id="skills-canvas"></canvas>
@@ -1985,18 +2013,18 @@ footer{
           <div class="form-field">
             <label for="cf-name">Your Name</label>
             <input type="text" id="cf-name" name="name" placeholder="Muhammad Ali" autocomplete="name" aria-required="true" aria-describedby="err-name"/>
-            <span class="ferr" id="err-name" role="alert">Name is required.</span>
+            <span class="ferr" id="err-name" role="alert" aria-hidden="true">Name is required.</span>
           </div>
           <div class="form-field">
             <label for="cf-email">Email Address</label>
             <input type="email" id="cf-email" name="email" placeholder="you@example.com" autocomplete="email" aria-required="true" aria-describedby="err-email"/>
-            <span class="ferr" id="err-email" role="alert">Enter a valid email.</span>
+            <span class="ferr" id="err-email" role="alert" aria-hidden="true">Enter a valid email.</span>
           </div>
         </div>
         <div class="form-field">
           <label for="cf-message">Message</label>
           <textarea id="cf-message" name="message" placeholder="Tell me about your project, idea, or just say hi..." aria-required="true" aria-describedby="err-message"></textarea>
-          <span class="ferr" id="err-message" role="alert">Message must be at least 20 characters.</span>
+          <span class="ferr" id="err-message" role="alert" aria-hidden="true">Message must be at least 20 characters.</span>
         </div>
         <div class="form-sent-msg" id="form-success" role="alert">
           <i class="fa fa-check-circle"></i>
@@ -2512,9 +2540,11 @@ const TIMELINE_DATA = [
 ];
 
 /* 
-   LENIS SMOOTH SCROLL SETUP
+   REDUCED MOTION + LENIS
  */
-const lenis = new Lenis({
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const lenis = prefersReducedMotion ? null : new Lenis({
   duration: 1.2,
   easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
   direction: 'vertical',
@@ -2537,6 +2567,10 @@ class TextScramble {
     this.update = this.update.bind(this);
   }
   setText(newText) {
+    if (prefersReducedMotion) {
+      this.el.textContent = newText;
+      return Promise.resolve();
+    }
     const oldText = this.el.innerText;
     const length = Math.max(oldText.length, newText.length);
     const promise = new Promise((resolve) => this.resolve = resolve);
@@ -2619,6 +2653,30 @@ class TextScramble {
     bar.style.width = '100%';
     pct.textContent = '100%';
 
+    const revealHero = () => {
+      document.body.classList.remove('loading');
+      const el1 = document.querySelector('.hero-name .line1');
+      const el2 = document.querySelector('.hero-name .line2');
+      if (el1 && el2) {
+        if (prefersReducedMotion) {
+          el1.textContent = 'Muhammad';
+          el2.textContent = 'Abdullah';
+        } else {
+          const fx1 = new TextScramble(el1);
+          const fx2 = new TextScramble(el2);
+          setTimeout(() => fx1.setText('Muhammad'), 400);
+          setTimeout(() => fx2.setText('Abdullah'), 550);
+        }
+      }
+    };
+
+    if (prefersReducedMotion) {
+      gsap.set([".hero-name",".hero-typewriter",".hero-tagline",".hero-cta a",".hero-socials a","#navbar"], { y: 0, opacity: 1 });
+      loader.style.display = 'none';
+      revealHero();
+      return;
+    }
+
     setTimeout(() => {
       gsap.to(loader, {
         yPercent: -100,
@@ -2635,16 +2693,7 @@ class TextScramble {
         .to(".hero-socials a", { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.1 }, "-=0.6")
         .to("#navbar", { y: 0, opacity: 1, duration: 1, ease: "power3.out" }, "-=1");
 
-      document.body.classList.remove('loading');
-
-      const el1 = document.querySelector('.hero-name .line1');
-      const el2 = document.querySelector('.hero-name .line2');
-      if (el1 && el2) {
-        const fx1 = new TextScramble(el1);
-        const fx2 = new TextScramble(el2);
-        setTimeout(() => fx1.setText('Muhammad'), 400);
-        setTimeout(() => fx2.setText('Abdullah'), 550);
-      }
+      revealHero();
     }, 120);
   }
 
@@ -2778,10 +2827,10 @@ function setMobileMenuOpen(open) {
   hamburger.setAttribute('aria-expanded', String(open));
   if (open) {
     document.body.style.overflow = 'hidden';
-    if (typeof lenis !== 'undefined') lenis.stop();
+    if (lenis) lenis.stop();
   } else if (typeof modalScrollLocked !== 'number' || modalScrollLocked === 0) {
     document.body.style.overflow = '';
-    if (typeof lenis !== 'undefined') lenis.start();
+    if (lenis) lenis.start();
   }
 }
 
@@ -2802,7 +2851,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     const tgt = document.querySelector(href);
     if (!tgt) return;
     e.preventDefault();
-    lenis.scrollTo(tgt, { offset: -72, duration: 1.2 });
+    if (lenis) lenis.scrollTo(tgt, { offset: -72, duration: 1.2 });
+    else tgt.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
   });
 });
 
@@ -2817,6 +2867,12 @@ const roles = ['AI/ML Developer','Full Stack Engineer','Data Science Enthusiast'
 let rIdx=0, cIdx=0, deleting=false;
 const tw = document.getElementById('typewriter');
 function type() {
+  if (prefersReducedMotion) {
+    tw.textContent = roles[rIdx];
+    rIdx = (rIdx + 1) % roles.length;
+    setTimeout(type, 4000);
+    return;
+  }
   const cur = roles[rIdx];
   tw.textContent = deleting ? cur.substring(0, cIdx--) : cur.substring(0, cIdx++);
   let delay = deleting ? 45 : 80;
@@ -3002,26 +3058,27 @@ if (!fb || !pg) {
     const cards = pg.querySelectorAll('.project-card');
     if (!cards.length) return;
 
-    // Filter clicks happen while the section is on-screen — animate in immediately
-    // (initial page load still uses ScrollTrigger below).
-    if (typeof gsap !== 'undefined') {
-      gsap.utils.toArray(cards).forEach((card, i) => {
-        gsap.fromTo(card,
-          { opacity: 0, y: 36, skewY: 1.5, scale: 0.97 },
-          {
-            opacity: 1, y: 0, skewY: 0, scale: 1,
-            duration: 0.65,
-            delay: i * 0.05,
-            ease: 'power3.out'
-          }
-        );
-      });
-    } else {
+    if (prefersReducedMotion || typeof gsap === 'undefined') {
       cards.forEach(card => {
         card.classList.add('visible');
         card.style.opacity = '1';
+        card.style.transform = 'none';
       });
+      return;
     }
+
+    // Filter clicks happen while the section is on-screen — animate in immediately
+    gsap.utils.toArray(cards).forEach((card, i) => {
+      gsap.fromTo(card,
+        { opacity: 0, y: 36, skewY: 1.5, scale: 0.97 },
+        {
+          opacity: 1, y: 0, skewY: 0, scale: 1,
+          duration: 0.65,
+          delay: i * 0.05,
+          ease: 'power3.out'
+        }
+      );
+    });
   }
 
   function renderProjects() {
@@ -3110,7 +3167,7 @@ function lockPageScroll() {
   modalScrollLocked += 1;
   if (modalScrollLocked === 1) {
     document.body.style.overflow = 'hidden';
-    if (typeof lenis !== 'undefined') lenis.stop();
+    if (lenis) lenis.stop();
   }
 }
 
@@ -3119,7 +3176,7 @@ function unlockPageScroll() {
   if (modalScrollLocked === 0) {
     if (mobileMenu?.classList?.contains('open')) return;
     document.body.style.overflow = '';
-    if (typeof lenis !== 'undefined') lenis.start();
+    if (lenis) lenis.start();
   }
 }
 
@@ -3275,7 +3332,11 @@ document.getElementById('contact-form').addEventListener('submit', async functio
     el.classList.remove('err');
     el.removeAttribute('aria-invalid');
   });
-  ['err-name','err-email','err-message'].forEach(id => document.getElementById(id).classList.remove('show'));
+  ['err-name','err-email','err-message'].forEach(id => {
+    const err = document.getElementById(id);
+    err.classList.remove('show');
+    err.setAttribute('aria-hidden', 'true');
+  });
   success.classList.remove('show');
   errBox.style.display = 'none';
 
@@ -3283,15 +3344,21 @@ document.getElementById('contact-form').addEventListener('submit', async functio
   let valid = true;
   if (!name.value.trim()) {
     name.classList.add('err'); name.setAttribute('aria-invalid', 'true');
-    document.getElementById('err-name').classList.add('show'); valid = false;
+    const err = document.getElementById('err-name');
+    err.classList.add('show'); err.setAttribute('aria-hidden', 'false');
+    valid = false;
   }
   if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
     email.classList.add('err'); email.setAttribute('aria-invalid', 'true');
-    document.getElementById('err-email').classList.add('show'); valid = false;
+    const err = document.getElementById('err-email');
+    err.classList.add('show'); err.setAttribute('aria-hidden', 'false');
+    valid = false;
   }
   if (!msg.value.trim() || msg.value.trim().length < 20) {
     msg.classList.add('err'); msg.setAttribute('aria-invalid', 'true');
-    document.getElementById('err-message').classList.add('show'); valid = false;
+    const err = document.getElementById('err-message');
+    err.classList.add('show'); err.setAttribute('aria-hidden', 'false');
+    valid = false;
   }
   if (!valid) {
     const firstErr = this.querySelector('[aria-invalid="true"]');
@@ -3584,18 +3651,20 @@ function createRenderGate(element) {
   function animate() {
     requestAnimationFrame(animate);
     if (!shouldRender()) return;
-    wire.rotation.x += 0.003;
-    wire.rotation.y += 0.004;
-    solid.rotation.x = wire.rotation.x;
-    solid.rotation.y = wire.rotation.y;
-    ring.rotation.z += 0.006;
-    ring2.rotation.y += 0.004;
-    ring2.rotation.x += 0.002;
-    // Mouse parallax
-    wire.rotation.x += (mouseY * 0.3 - wire.rotation.x) * 0.02;
-    wire.rotation.y += (mouseX * 0.3 - wire.rotation.y) * 0.02;
-    solid.rotation.x = wire.rotation.x;
-    solid.rotation.y = wire.rotation.y;
+    if (!prefersReducedMotion) {
+      wire.rotation.x += 0.003;
+      wire.rotation.y += 0.004;
+      solid.rotation.x = wire.rotation.x;
+      solid.rotation.y = wire.rotation.y;
+      ring.rotation.z += 0.006;
+      ring2.rotation.y += 0.004;
+      ring2.rotation.x += 0.002;
+      // Mouse parallax
+      wire.rotation.x += (mouseY * 0.3 - wire.rotation.x) * 0.02;
+      wire.rotation.y += (mouseX * 0.3 - wire.rotation.y) * 0.02;
+      solid.rotation.x = wire.rotation.x;
+      solid.rotation.y = wire.rotation.y;
+    }
     renderer.render(scene, camera);
   }
   animate();
@@ -3634,8 +3703,10 @@ function createRenderGate(element) {
   function animate() {
     requestAnimationFrame(animate);
     if (!shouldRender()) return;
-    stars.rotation.y += 0.0003;
-    stars.rotation.x += 0.0001;
+    if (!prefersReducedMotion) {
+      stars.rotation.y += 0.0003;
+      stars.rotation.x += 0.0001;
+    }
     renderer.render(scene, camera);
   }
   animate();
@@ -3711,31 +3782,86 @@ function createRenderGate(element) {
   const dl = new THREE.DirectionalLight(0x00d9ff, 1.5); dl.position.set(5,5,5); scene.add(dl);
   const pl = new THREE.PointLight(0xa855f7, 1.0, 20); pl.position.set(-5,-5,2); scene.add(pl);
 
-  let isHovered = false, autoRotate = true;
+  let autoRotate = !prefersReducedMotion;
   let mouseX2 = 0, mouseY2 = 0;
   const raycaster = new THREE.Raycaster();
   const mouse2D = new THREE.Vector2();
+  let touchDragging = false;
+  let lastTouchX = 0, lastTouchY = 0;
+  let touchMoved = false;
+  let resumeRotateTimer = null;
 
-  wrap.addEventListener('mousemove', e => {
+  function pointerToLocal(clientX, clientY) {
     const rect = wrap.getBoundingClientRect();
-    mouse2D.x = ((e.clientX - rect.left) / wrap.clientWidth) * 2 - 1;
-    mouse2D.y = -((e.clientY - rect.top) / wrap.clientHeight) * 2 + 1;
+    mouse2D.x = ((clientX - rect.left) / wrap.clientWidth) * 2 - 1;
+    mouse2D.y = -((clientY - rect.top) / wrap.clientHeight) * 2 + 1;
     mouseX2 = mouse2D.x;
     mouseY2 = mouse2D.y;
+    return rect;
+  }
+
+  function showSkillTooltip(clientX, clientY, rect) {
     raycaster.setFromCamera(mouse2D, camera);
     const hits = raycaster.intersectObjects(orbits);
     if (hits.length) {
       const skill = hits[0].object.userData.skill;
       tooltip.textContent = `${skill.name}  ${skill.level}%`;
-      tooltip.style.left = (e.clientX - rect.left + 14) + 'px';
-      tooltip.style.top = (e.clientY - rect.top - 14) + 'px';
+      tooltip.style.left = (clientX - rect.left + 14) + 'px';
+      tooltip.style.top = (clientY - rect.top - 14) + 'px';
       tooltip.classList.add('show');
-    } else {
-      tooltip.classList.remove('show');
+      return true;
     }
+    tooltip.classList.remove('show');
+    return false;
+  }
+
+  wrap.style.touchAction = 'none';
+
+  wrap.addEventListener('mousemove', e => {
+    const rect = pointerToLocal(e.clientX, e.clientY);
+    showSkillTooltip(e.clientX, e.clientY, rect);
   });
-  wrap.addEventListener('mouseenter', () => { autoRotate = false; });
-  wrap.addEventListener('mouseleave', () => { autoRotate = true; tooltip.classList.remove('show'); });
+  wrap.addEventListener('mouseenter', () => { if (!prefersReducedMotion) autoRotate = false; });
+  wrap.addEventListener('mouseleave', () => {
+    if (!prefersReducedMotion) autoRotate = true;
+    tooltip.classList.remove('show');
+  });
+
+  wrap.addEventListener('touchstart', e => {
+    if (!e.touches[0]) return;
+    const t = e.touches[0];
+    lastTouchX = t.clientX;
+    lastTouchY = t.clientY;
+    touchMoved = false;
+    touchDragging = true;
+    autoRotate = false;
+    if (resumeRotateTimer) clearTimeout(resumeRotateTimer);
+  }, { passive: true });
+
+  wrap.addEventListener('touchmove', e => {
+    if (!touchDragging || !e.touches[0]) return;
+    const t = e.touches[0];
+    const dx = t.clientX - lastTouchX;
+    const dy = t.clientY - lastTouchY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) touchMoved = true;
+    pivot.rotation.y += dx * 0.006;
+    pivot.rotation.x += dy * 0.006;
+    lastTouchX = t.clientX;
+    lastTouchY = t.clientY;
+    e.preventDefault();
+  }, { passive: false });
+
+  wrap.addEventListener('touchend', e => {
+    touchDragging = false;
+    const t = e.changedTouches[0];
+    if (t && !touchMoved) {
+      const rect = pointerToLocal(t.clientX, t.clientY);
+      showSkillTooltip(t.clientX, t.clientY, rect);
+    }
+    if (!prefersReducedMotion) {
+      resumeRotateTimer = setTimeout(() => { autoRotate = true; }, 1800);
+    }
+  }, { passive: true });
 
   function resize2() {
     renderer.setSize(wrap.clientWidth, wrap.clientHeight);
@@ -3751,7 +3877,7 @@ function createRenderGate(element) {
     if (autoRotate) {
       pivot.rotation.y += 0.005;
       pivot.rotation.x += 0.002;
-    } else {
+    } else if (!touchDragging) {
       pivot.rotation.y += mouseX2 * 0.03;
       pivot.rotation.x += mouseY2 * 0.015;
     }
@@ -3967,7 +4093,7 @@ function pruneMagneticButtons() {
 }
 
 function bindMagneticButtons(root = document) {
-  if (window.matchMedia('(pointer: coarse)').matches) return;
+  if (prefersReducedMotion || window.matchMedia('(pointer: coarse)').matches) return;
   const selector = '.btn-primary, .btn-outline, .btn-hire, .filter-btn, .overlay-btn, .project-link';
   root.querySelectorAll(selector).forEach(btn => {
     if (btn.dataset.magneticBound === '1') return;
@@ -3988,13 +4114,18 @@ document.addEventListener('DOMContentLoaded', () => {
 gsap.registerPlugin(ScrollTrigger);
 
 // Keep Lenis + ScrollTrigger on the same clock (prevents jittery scrub/parallax)
-lenis.on('scroll', ScrollTrigger.update);
-gsap.ticker.add((time) => {
-  lenis.raf(time * 1000);
-});
-gsap.ticker.lagSmoothing(0);
+if (lenis) {
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time) => {
+    lenis.raf(time * 1000);
+  });
+  gsap.ticker.lagSmoothing(0);
+}
 
 // 1. Staggered Skew Reveals for Cards
+if (prefersReducedMotion) {
+  gsap.set('.project-card, .cert-card, .service-card, .timeline-item, .reveal', { opacity: 1, x: 0, y: 0, skewY: 0, scale: 1 });
+} else {
 // Use "none" on leave — reverse was hiding cards when scrolling away or when
 // service filters set display:none (ScrollTrigger treated them as left).
 gsap.utils.toArray('.project-card, .cert-card, .service-card, .timeline-item').forEach(card => {
@@ -4033,10 +4164,11 @@ gsap.utils.toArray('.reveal:not(.project-card):not(.cert-card):not(.service-card
     }
   );
 });
+}
 
 // 3. Parallax Background
 const starfieldCanvas = document.getElementById('starfield-canvas');
-if (starfieldCanvas) {
+if (starfieldCanvas && !prefersReducedMotion) {
   gsap.to(starfieldCanvas, {
     yPercent: 35,
     ease: "none",
@@ -4049,7 +4181,7 @@ if (starfieldCanvas) {
   });
 }
 const heroCanvas = document.getElementById('hero-canvas');
-if (heroCanvas) {
+if (heroCanvas && !prefersReducedMotion) {
   gsap.to(heroCanvas, {
     yPercent: 15,
     ease: "none",
