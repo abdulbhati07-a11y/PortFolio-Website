@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { m, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { m, AnimatePresence, useScroll, useSpring, useReducedMotion } from 'framer-motion';
 import { FaSun, FaMoon } from 'react-icons/fa';
 import { DEVELOPER_INFO } from '../utils/constants';
 import { useTheme } from '../hooks/useTheme';
@@ -22,6 +22,7 @@ const Navigation = ({ scrollTo }) => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
   const { theme, toggleTheme } = useTheme();
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -68,8 +69,8 @@ const Navigation = ({ scrollTo }) => {
         transition={{ duration: 0.8 }}
         className={`fixed top-0 w-full z-[100] transition-all duration-500 ${
           scrolled
-            ? 'bg-primary/80 backdrop-blur-2xl border-b border-glass/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.4)]'
-            : 'bg-transparent backdrop-blur-xl border-b border-glass/[0.03]'
+            ? 'bg-primary/80 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.4)]'
+            : 'bg-transparent backdrop-blur-xl'
         }`}
       >
         <div className="max-w-screen-2xl mx-auto h-20 px-4 md:px-8 lg:px-16 2xl:px-0 flex items-center justify-between">
@@ -92,8 +93,16 @@ const Navigation = ({ scrollTo }) => {
           {/* Desktop nav */}
           <nav
             aria-label="Primary"
-            className="hidden md:flex items-center gap-1 bg-glass/[0.04] rounded-full px-2 py-1.5 backdrop-blur-md h-12"
+            className="relative hidden md:flex items-center gap-1 bg-glass/[0.04] rounded-full px-2 py-1.5 backdrop-blur-md h-12 border border-glass/[0.08] overflow-hidden"
           >
+            {/* Subtle drifting glow blob, clipped to the pill outline */}
+            <m.span
+              aria-hidden="true"
+              className="absolute w-20 h-20 rounded-full blur-2xl pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.28), transparent 70%)' }}
+              animate={shouldReduceMotion ? { left: '40%', top: '-30%' } : { left: ['-8%', '82%', '-8%'], top: ['-35%', '55%', '-35%'] }}
+              transition={shouldReduceMotion ? {} : { duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+            />
             {links.map((link) => (
               <button
                 key={link.id}
