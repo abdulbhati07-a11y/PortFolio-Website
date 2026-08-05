@@ -292,6 +292,14 @@ const Hero = ({ scrollTo }) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
+            {/* Soft cyan aura behind the character */}
+            <m.div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(72vw,420px)] h-[min(72vw,420px)] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(0,212,255,0.16),transparent_68%)] blur-2xl"
+              animate={shouldReduceMotion ? {} : { scale: [1, 1.07, 1], opacity: [0.75, 1, 0.75] }}
+              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+              aria-hidden="true"
+            />
+
             {/* Entrance: bouncy spring, then wave-greet rock, then idle float.
                 The whole group drifts opposite the cursor (spring parallax). */}
             <m.div
@@ -324,10 +332,14 @@ const Hero = ({ scrollTo }) => {
                   </span>
                 </m.div>
 
-                {/* Idle float loop */}
+                {/* Idle float loop — gentle bob with a slow ±2° sway */}
                 <m.div
-                  animate={shouldReduceMotion ? {} : { y: [0, -12, 0] }}
-                  transition={{ delay: 3.2, duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+                  animate={shouldReduceMotion ? {} : { y: [0, -5, 0], rotate: [0, 1.8, 0, -1.8, 0] }}
+                  transition={{
+                    y: { delay: 3.2, duration: 4.5, repeat: Infinity, ease: 'easeInOut' },
+                    rotate: { delay: 3.2, duration: 9, repeat: Infinity, ease: 'easeInOut' },
+                  }}
+                  style={{ transformOrigin: '50% 85%' }}
                 >
                   {/* Two-layer character: static body + independently waving hand.
                       Both PNGs share the same canvas, so inset-0 self-aligns them. */}
@@ -354,6 +366,38 @@ const Hero = ({ scrollTo }) => {
                         repeatDelay: 4.5,
                       }}
                     />
+                    {/* Blink — skin-toned eyelids slide over the eyes every ~6s.
+                        Positions are % of the character canvas, so they track
+                        the image at any rendered size. */}
+                    {!shouldReduceMotion && (
+                      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+                        {[
+                          { left: '47.0%', top: '16.8%' },
+                          { left: '52.1%', top: '16.6%' },
+                        ].map((pos, i) => (
+                          <m.span
+                            key={i}
+                            className="blink-lid absolute w-[3.4%] h-[3.1%] rounded-[50%]"
+                            style={{
+                              ...pos,
+                              background: 'linear-gradient(to bottom, #eeb083, #e29a70)',
+                              transformOrigin: 'center top',
+                              filter: 'blur(0.4px)',
+                            }}
+                            initial={{ scaleY: 0 }}
+                            animate={{ scaleY: [0, 1, 1, 0] }}
+                            transition={{
+                              delay: 2.6,
+                              duration: 0.26,
+                              times: [0, 0.4, 0.6, 1],
+                              repeat: Infinity,
+                              repeatDelay: 5.8,
+                              ease: 'easeInOut',
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </m.div>
 

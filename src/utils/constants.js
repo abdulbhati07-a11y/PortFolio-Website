@@ -1,3 +1,10 @@
+import {
+  SiPython, SiCplusplus, SiJavascript, SiFlask, SiReact, SiNumpy, SiPandas,
+  SiTensorflow, SiPytorch, SiGit, SiDocker, SiJupyter, SiThreedotjs,
+  SiExpress, SiBootstrap, SiHtml5,
+} from 'react-icons/si';
+import { FaCss3Alt, FaDatabase } from 'react-icons/fa';
+
 export const DEVELOPER_INFO = {
   name: "Muhammad Abdullah Bhatti",
   nickname: "Abdullah",
@@ -279,6 +286,162 @@ export const SKILLS = {
     { name: "Docker", level: 70, type: "Intermediate", icon: "🐳" }
   ]
 };
+
+// ── Interactive tech constellation (TechGraph.jsx) ──────────────────────────
+// Real, shipped stack mapped to official brand icons. `pos` is a curated
+// normalized coordinate (0–1) scaled to the graph's 4:3 viewBox — hand-placed
+// for a clean, intentional composition (no runtime layout sim). `connections`
+// are treated as undirected; TechGraph builds a symmetric adjacency so hover
+// highlighting and edge de-duplication work regardless of listing direction.
+// `color` is the official brand color used only as the hover/active accent —
+// nodes render monochrome by default so the graph stays theme-adaptive and
+// sophisticated (Linear/Vercel style), then bloom into brand color on focus.
+export const TECH_STACK = [
+  {
+    id: "python", name: "Python", icon: SiPython, color: "#3776AB",
+    proficiency: 90, type: "Advanced", category: "language",
+    projects: ["AI YouTube Summarizer", "Drink Water Reminder", "QR Code Generator"],
+    useCase: "AI/ML pipelines, backend logic, and automation.",
+    connections: ["flask", "numpy", "pandas", "tensorflow", "pytorch", "jupyter", "sql"],
+    pos: { x: 0.20, y: 0.37 },
+  },
+  {
+    id: "cpp", name: "C++", icon: SiCplusplus, color: "#00599C",
+    proficiency: 85, type: "Advanced", category: "language",
+    projects: ["Algorithm Visualizer"],
+    useCase: "Systems programming, data structures, OpenGL rendering.",
+    connections: ["git"],
+    pos: { x: 0.12, y: 0.17 },
+  },
+  {
+    id: "javascript", name: "JavaScript", icon: SiJavascript, color: "#F7DF1E",
+    proficiency: 80, type: "Advanced", category: "language",
+    projects: ["Pet Sitting Web", "Laundry Service Web", "Birthday Wishing Web"],
+    useCase: "Interactive frontends and DOM-driven animation.",
+    connections: ["react", "html5", "css3", "express", "bootstrap"],
+    pos: { x: 0.32, y: 0.13 },
+  },
+  {
+    id: "sql", name: "SQL", icon: FaDatabase, color: "#4479A1",
+    proficiency: 85, type: "Advanced", category: "language",
+    projects: [],
+    useCase: "Schema design, complex queries, and data management.",
+    connections: ["python", "flask"],
+    pos: { x: 0.10, y: 0.57 },
+  },
+  {
+    id: "flask", name: "Flask", icon: SiFlask, color: "#6B7280",
+    proficiency: 85, type: "Advanced", category: "framework",
+    projects: ["AI YouTube Summarizer"],
+    useCase: "RESTful APIs and server-rendered Python web apps.",
+    connections: ["python", "sql", "docker"],
+    pos: { x: 0.41, y: 0.33 },
+  },
+  {
+    id: "react", name: "React", icon: SiReact, color: "#61DAFB",
+    proficiency: 80, type: "Advanced", category: "framework",
+    projects: ["Protein Folding Explorer"],
+    useCase: "Component-driven, animated single-page interfaces.",
+    connections: ["javascript", "threejs", "html5", "css3", "bootstrap", "express"],
+    pos: { x: 0.57, y: 0.14 },
+  },
+  {
+    id: "express", name: "Express", icon: SiExpress, color: "#6EA8FE",
+    proficiency: 78, type: "Intermediate", category: "framework",
+    projects: ["Protein Folding Explorer"],
+    useCase: "Node.js API layers and prediction service endpoints.",
+    connections: ["javascript", "react", "docker"],
+    pos: { x: 0.65, y: 0.33 },
+  },
+  {
+    id: "numpy", name: "NumPy", icon: SiNumpy, color: "#4DABCF",
+    proficiency: 85, type: "Advanced", category: "framework",
+    projects: ["Protein Folding Explorer", "AI YouTube Summarizer"],
+    useCase: "Vectorized numerical computing for ML workloads.",
+    connections: ["python", "pandas", "tensorflow", "pytorch", "jupyter"],
+    pos: { x: 0.35, y: 0.53 },
+  },
+  {
+    id: "pandas", name: "Pandas", icon: SiPandas, color: "#9C27B0",
+    proficiency: 85, type: "Advanced", category: "framework",
+    projects: ["Protein Folding Explorer", "AI YouTube Summarizer"],
+    useCase: "Data cleaning, wrangling, and exploratory analysis.",
+    connections: ["python", "numpy", "jupyter"],
+    pos: { x: 0.50, y: 0.54 },
+  },
+  {
+    id: "tensorflow", name: "TensorFlow", icon: SiTensorflow, color: "#FF6F00",
+    proficiency: 75, type: "Intermediate", category: "framework",
+    projects: ["Protein Folding Explorer"],
+    useCase: "Building and training deep-learning models.",
+    connections: ["python", "numpy", "pytorch", "jupyter"],
+    pos: { x: 0.25, y: 0.74 },
+  },
+  {
+    id: "pytorch", name: "PyTorch", icon: SiPytorch, color: "#EE4C2C",
+    proficiency: 75, type: "Intermediate", category: "framework",
+    projects: ["Protein Folding Explorer"],
+    useCase: "Research-style, dynamic neural network experimentation.",
+    connections: ["python", "numpy", "tensorflow"],
+    pos: { x: 0.43, y: 0.75 },
+  },
+  {
+    id: "threejs", name: "Three.js", icon: SiThreedotjs, color: "#6EA8FE",
+    proficiency: 72, type: "Intermediate", category: "framework",
+    projects: ["Protein Folding Explorer"],
+    useCase: "WebGL 3D scenes and molecular visualization.",
+    connections: ["react", "javascript"],
+    pos: { x: 0.81, y: 0.17 },
+  },
+  {
+    id: "html5", name: "HTML5", icon: SiHtml5, color: "#E34F26",
+    proficiency: 85, type: "Advanced", category: "framework",
+    projects: ["Pet Sitting Web", "Laundry Service Web", "Birthday Wishing Web"],
+    useCase: "Semantic, accessible document structure.",
+    connections: ["javascript", "css3", "react", "bootstrap"],
+    pos: { x: 0.85, y: 0.37 },
+  },
+  {
+    id: "css3", name: "CSS3", icon: FaCss3Alt, color: "#1572B6",
+    proficiency: 85, type: "Advanced", category: "framework",
+    projects: ["Pet Sitting Web", "Laundry Service Web", "Birthday Wishing Web"],
+    useCase: "Responsive layouts, animation, and design systems.",
+    connections: ["html5", "javascript", "react", "bootstrap"],
+    pos: { x: 0.72, y: 0.53 },
+  },
+  {
+    id: "bootstrap", name: "Bootstrap", icon: SiBootstrap, color: "#7952B3",
+    proficiency: 80, type: "Advanced", category: "framework",
+    projects: ["Laundry Service Web"],
+    useCase: "Rapid, grid-based responsive UI development.",
+    connections: ["css3", "html5", "javascript", "react"],
+    pos: { x: 0.89, y: 0.56 },
+  },
+  {
+    id: "jupyter", name: "Jupyter", icon: SiJupyter, color: "#F37626",
+    proficiency: 85, type: "Advanced", category: "tool",
+    projects: [],
+    useCase: "Interactive notebooks for data science & prototyping.",
+    connections: ["python", "pandas", "tensorflow", "numpy"],
+    pos: { x: 0.62, y: 0.73 },
+  },
+  {
+    id: "git", name: "Git", icon: SiGit, color: "#F05032",
+    proficiency: 90, type: "Advanced", category: "tool",
+    projects: [],
+    useCase: "Version control and collaboration on every project.",
+    connections: ["cpp", "python", "javascript", "docker"],
+    pos: { x: 0.83, y: 0.73 },
+  },
+  {
+    id: "docker", name: "Docker", icon: SiDocker, color: "#2496ED",
+    proficiency: 70, type: "Intermediate", category: "tool",
+    projects: ["Protein Folding Explorer"],
+    useCase: "Containerized deploys with CI/CD and Kubernetes.",
+    connections: ["flask", "express", "git"],
+    pos: { x: 0.70, y: 0.89 },
+  },
+];
 
 export const TIMELINE = [
   {

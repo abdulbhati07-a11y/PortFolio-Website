@@ -17,6 +17,7 @@ import CustomCursor from './components/CustomCursor';
 import ScrollProgress from './components/ui/ScrollProgress';
 import Skeleton from './components/Skeleton';
 import ChatAssistant from './components/ChatAssistant';
+import Logo from './components/ui/Logo';
 
 const Projects = lazy(() => import('./components/Projects'));
 const GalaxyBackground = lazy(() => import('./components/GalaxyBackground'));
@@ -99,9 +100,7 @@ const LoadingScreen = ({ onComplete }) => {
         transition={{ duration: 0.3, ease: EASE_OUT_EXPO }}
       >
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-accent-cyan flex items-center justify-center text-slate-900 font-mono font-bold text-2xl shadow-[0_0_40px_rgba(0,217,255,0.4)] animate-pulse-glow">
-            AB
-          </div>
+          <Logo size={72} glow />
           <div className="font-mono text-text-secondary text-xs tracking-[0.4em] uppercase">
             Portfolio
           </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { m } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope, FaHeart, FaArrowUp } from 'react-icons/fa';
 import { DEVELOPER_INFO } from '../utils/constants';
+import Logo from './ui/Logo';
 
 const navLinks = [
   { id: 'about', label: 'About' },
@@ -30,9 +31,7 @@ const Footer = ({ scrollTo }) => {
           {/* Brand */}
           <div className="flex flex-col gap-4 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-accent-cyan flex items-center justify-center text-slate-900 font-mono font-bold text-sm shadow-[0_0_15px_rgba(0,217,255,0.3)]">
-                AB
-              </div>
+              <Logo size={32} glow />
               <span className="font-mono font-bold text-text-primary text-sm tracking-tight">{DEVELOPER_INFO.name}</span>
             </div>
             <p className="font-sans text-text-secondary text-sm leading-relaxed font-light max-w-xs mx-auto md:mx-0">

@@ -3,7 +3,7 @@ import { m, useReducedMotion, useInView } from 'framer-motion';
 import { SKILLS } from '../utils/constants';
 import SectionHeading from './ui/SectionHeading';
 import Reveal from './ui/Reveal';
-import SkillSphere from './SkillSphere';
+import TechGraph from './TechGraph';
 
 const SPHERE_SKILLS = ['Python', 'C++', 'Data Science', 'AI/ML', 'Full Stack', 'Web Projects', 'SQL', 'React', 'Flask'];
 
@@ -32,7 +32,7 @@ const SkillCard = ({ skill, index }) => {
   return (
     <m.div
       ref={cardRef}
-      className="glass-card glass-card-hover p-4 sm:p-5 rounded-3xl group flex flex-col gap-3 justify-between h-full hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)]"
+      className="glass-card glass-card-hover !bg-secondary backdrop-blur-none p-4 sm:p-5 rounded-3xl group flex flex-col gap-3 justify-between h-full hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)]"
       initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
       animate={shouldReduceMotion || isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ delay: index * 0.05, duration: 0.5 }}
@@ -97,7 +97,7 @@ const RadialBadge = ({ skill, index }) => {
   return (
     <m.div
       ref={cardRef}
-      className="glass-card glass-card-hover rounded-3xl p-5 flex flex-col items-center gap-3 hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)] group"
+      className="glass-card glass-card-hover !bg-secondary backdrop-blur-none rounded-3xl p-5 flex flex-col items-center gap-3 hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)] group"
       initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
       animate={shouldReduceMotion || isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ delay: index * 0.05, duration: 0.5 }}
@@ -159,18 +159,20 @@ const Skills = ({ onSkillClick }) => {
         className="mb-16"
       />
 
-      {/* Interactive 3D constellation + keyboard-accessible competency list */}
+      {/* Interactive tech constellation + keyboard-accessible competency list */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 items-stretch">
         <Reveal>
-          <div data-cursor="Drag" className="h-full">
-            <SkillSphere skills={SPHERE_SKILLS} onSkillClick={onSkillClick} />
+          <div className="h-full">
+            <TechGraph onSkillClick={onSkillClick} />
           </div>
         </Reveal>
         <Reveal delay={0.15}>
-          <div className="glass-card rounded-3xl p-6 sm:p-8 h-full flex flex-col justify-center gap-4">
+          <div className="glass-card !bg-secondary backdrop-blur-none rounded-3xl p-6 sm:p-8 h-full flex flex-col justify-center gap-4">
             <h3 className="font-display text-lg font-bold text-text-primary tracking-tight">Core Competencies</h3>
             <p className="font-sans text-text-secondary text-sm font-light leading-relaxed">
-              Each competency maps to real, shipped work. Choose one to jump straight to the projects that prove it.
+              The graph maps my real, shipped stack — each technology links to the tools it works with.
+              Hover to trace connections, proficiency, and use cases; click one to jump straight to the
+              projects that prove it.
             </p>
             <div className="flex flex-wrap gap-2" role="group" aria-label="Filter projects by competency">
               {SPHERE_SKILLS.map((skill) => (

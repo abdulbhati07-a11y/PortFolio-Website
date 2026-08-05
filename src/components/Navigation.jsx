@@ -3,6 +3,7 @@ import { m, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { FaSun, FaMoon } from 'react-icons/fa';
 import { DEVELOPER_INFO } from '../utils/constants';
 import { useTheme } from '../hooks/useTheme';
+import Logo from './ui/Logo';
 
 const links = [
   { id: 'about', label: 'About' },
@@ -78,9 +79,7 @@ const Navigation = ({ scrollTo }) => {
             onClick={() => scrollTo('#hero')}
             aria-label="Back to top"
           >
-            <div className="w-8 h-8 rounded-lg bg-accent-cyan flex items-center justify-center text-slate-900 font-mono font-bold text-xs shadow-[0_0_15px_rgba(0,217,255,0.4)]">
-              MAB
-            </div>
+            <Logo size={36} glow className="transition-transform duration-300 group-hover:scale-110" />
             <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-glass/5 text-[11px] text-text-secondary font-medium tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-accent-emerald shadow-[0_0_8px_rgba(74,222,128,0.8)] animate-pulse" />
               Available for opportunities
