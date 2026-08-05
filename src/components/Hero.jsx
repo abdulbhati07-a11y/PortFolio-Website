@@ -1,95 +1,25 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Sphere, Box, Octahedron, Tetrahedron, Icosahedron } from '@react-three/drei';
-import { m, AnimatePresence, useReducedMotion, useInView } from 'framer-motion';
-import { FaGithub, FaLinkedin, FaEnvelope, FaArrowDown } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  m,
+  useReducedMotion,
+  useMotionValue,
+  useSpring,
+  useScroll,
+  useTransform,
+} from 'framer-motion';
+import { FaGithub, FaLinkedin, FaEnvelope, FaArrowDown, FaDownload } from 'react-icons/fa';
 import { DEVELOPER_INFO, STATS } from '../utils/constants';
-
-/* ─── 3D Floating Shape ──────────────────────────────────────────────── */
-const FloatingShape = ({ position, rotationSpeed, scale, color, type }) => {
-  const meshRef = useRef();
-  useFrame((state, delta) => {
-    if (!meshRef.current) return;
-    
-    // Continuous rotation
-    meshRef.current.rotation.x += rotationSpeed.x * delta;
-    meshRef.current.rotation.y += rotationSpeed.y * delta;
-    
-    // Orbital movement targets
-    const targetX = Math.sin(state.clock.elapsedTime * rotationSpeed.orbit) * position[0];
-    const targetZ = Math.cos(state.clock.elapsedTime * rotationSpeed.orbit) * position[2];
-    const targetY = position[1]; // Maintain intended Y height
-    
-    // Mouse parallax offset (disabled if reduced motion)
-    const parallaxFactor = rotationSpeed.orbit === 0 ? 0 : scale * 1.5;
-    const parallaxX = state.pointer.x * parallaxFactor * (position[0] > 0 ? 1 : -1);
-    const parallaxY = state.pointer.y * parallaxFactor;
-    
-    // Smoothly interpolate to the final position
-    meshRef.current.position.x += ((targetX + parallaxX) - meshRef.current.position.x) * delta * 3;
-    meshRef.current.position.y += ((targetY + parallaxY) - meshRef.current.position.y) * delta * 3;
-    meshRef.current.position.z += (targetZ - meshRef.current.position.z) * delta * 3;
-  });
-
-  const material = (
-    <meshStandardMaterial
-      color={color}
-      emissive={color}
-      emissiveIntensity={0.4}
-      wireframe={false}
-      transparent
-      opacity={0.7}
-    />
-  );
-
-  const shapes = {
-    box: <Box ref={meshRef} args={[1, 1, 1]} scale={scale}>{material}</Box>,
-    octa: <Octahedron ref={meshRef} args={[1, 0]} scale={scale}>{material}</Octahedron>,
-    tetra: <Tetrahedron ref={meshRef} args={[1, 0]} scale={scale}>{material}</Tetrahedron>,
-    icosa: <Icosahedron ref={meshRef} args={[1, 0]} scale={scale}>{material}</Icosahedron>,
-  };
-  return shapes[type] || <Sphere ref={meshRef} args={[0.5, 32, 32]} scale={scale}>{material}</Sphere>;
-};
-
-/* ─── Particle System ─────────────────────────────────────────────────── */
-const ParticleSystem = () => {
-  const particlesRef = useRef();
-  const positions = new Float32Array(600).map(() => (Math.random() - 0.5) * 25);
-
-  useFrame((state, delta) => {
-    if (particlesRef.current) {
-      // Base slow rotation
-      particlesRef.current.rotation.y = state.clock.elapsedTime * 0.04;
-      particlesRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.02) * 0.1;
-
-      // Mouse Parallax for particles
-      const parallaxX = state.pointer.x * 2.5;
-      const parallaxY = state.pointer.y * 2.5;
-      
-      // Smoothly interpolate position
-      particlesRef.current.position.x += (parallaxX - particlesRef.current.position.x) * delta * 2;
-      particlesRef.current.position.y += (parallaxY - particlesRef.current.position.y) * delta * 2;
-    }
-  });
-
-  return (
-    <points ref={particlesRef}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={200} array={positions} itemSize={3} />
-      </bufferGeometry>
-      <pointsMaterial size={0.04} color="#00D9FF" transparent opacity={0.5} />
-    </points>
-  );
-};
+import Magnetic from './ui/Magnetic';
 
 /* ─── Typewriter Hook ─────────────────────────────────────────────────── */
-const useTypewriter = (words, speed = 80, pause = 2000) => {
+const useTypewriter = (words, speed = 80, pause = 2000, disabled = false) => {
   const [index, setIndex] = useState(0);
   const [subIndex, setSubIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
-  const [text, setText] = useState('');
+  const [text, setText] = useState(disabled ? words[0] : '');
 
   useEffect(() => {
+    if (disabled) return;
     if (subIndex === words[index].length + 1 && !deleting) {
       const timeout = setTimeout(() => setDeleting(true), pause);
       return () => clearTimeout(timeout);
@@ -104,224 +34,397 @@ const useTypewriter = (words, speed = 80, pause = 2000) => {
       setText(words[index].substring(0, subIndex));
     }, deleting ? speed / 2 : speed);
     return () => clearTimeout(timeout);
-  }, [subIndex, index, deleting, words, speed, pause]);
+  }, [subIndex, index, deleting, words, speed, pause, disabled]);
 
-  return text;
+  const idle = disabled || (!deleting && subIndex === words[index].length + 1);
+  return { text, idle };
 };
 
 /* ─── Stat Counter ────────────────────────────────────────────────────── */
-const StatCounter = ({ stat, delay, isInView }) => {
+const StatCounter = ({ stat, delay }) => {
   const [count, setCount] = useState(0);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (!isInView) return;
+    if (shouldReduceMotion) {
+      setCount(stat.value);
+      return;
+    }
+    let rafId;
+    const duration = 1800;
+    let start;
     const timeout = setTimeout(() => {
-      const duration = 1800;
-      const steps = 60;
-      const increment = stat.value / steps;
-      let current = 0;
-      const interval = setInterval(() => {
-        current += increment;
-        if (current >= stat.value) {
-          setCount(stat.value);
-          clearInterval(interval);
-        } else {
-          setCount(current);
-        }
-      }, duration / steps);
-      return () => clearInterval(interval);
+      const tick = (now) => {
+        if (start === undefined) start = now;
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setCount(stat.value * eased);
+        if (progress < 1) rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
     }, delay);
-    return () => clearTimeout(timeout);
-  }, [stat.value, delay, isInView]);
+    return () => {
+      clearTimeout(timeout);
+      cancelAnimationFrame(rafId);
+    };
+  }, [stat.value, delay, shouldReduceMotion]);
 
   return (
     <m.div
       className="flex flex-col items-center gap-1"
       variants={{
         hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+        visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
       }}
     >
       <span className="font-mono text-xl sm:text-2xl md:text-3xl font-bold text-white">
         {stat.decimals > 0 ? count.toFixed(1) : Math.floor(count)}
         <span className="text-accent-cyan">{stat.suffix}</span>
       </span>
-      <span className="font-sans text-xs text-text-secondary tracking-widest uppercase">{stat.label}</span>
+      <span className="font-sans text-xs text-white/60 tracking-widest uppercase">{stat.label}</span>
     </m.div>
   );
 };
 
-/* ─── Hero Component ──────────────────────────────────────────────────── */
-const Hero = ({ setActiveTab }) => {
-  const typedRole = useTypewriter(DEVELOPER_INFO.roles, 75, 2200);
+/* ─── Feature Card ────────────────────────────────────────────────────── */
+const FeatureCard = ({ icon, title, description, delay, onClick, cta }) => {
   const shouldReduceMotion = useReducedMotion();
-  
-  const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "0px" });
+  return (
+    <m.button
+      type="button"
+      onClick={onClick}
+      className="rounded-2xl p-5 flex flex-col gap-2 text-left group hover:-translate-y-1 transition-all duration-300 backdrop-blur-xl bg-accent-blue/20 border border-accent-cyan/15 shadow-[0_8px_32px_rgba(0,0,0,0.2)] hover:border-accent-cyan/40 hover:shadow-[0_12px_40px_rgba(0,212,255,0.15)]"
+      initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <div className="flex items-center justify-between w-full">
+        <h3 className="font-display text-sm font-bold text-white uppercase tracking-wider">{title}</h3>
+        <span className="w-9 h-9 rounded-full flex items-center justify-center text-lg bg-accent-amber/20 border-[1.5px] border-accent-amber/50">
+          {icon}
+        </span>
+      </div>
+      <p className="font-sans text-xs text-white/60 leading-relaxed">{description}</p>
+      <span className="font-mono text-[11px] text-accent-cyan mt-1 inline-flex items-center gap-1">
+        <span className="link-underline">{cta}</span>
+        <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+      </span>
+    </m.button>
+  );
+};
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { 
-        duration: 0.6, 
-        ease: "easeOut",
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      } 
-    }
+/* ─── Hero Component ──────────────────────────────────────────────────── */
+const Hero = ({ scrollTo }) => {
+  const shouldReduceMotion = useReducedMotion();
+  const { text: typedRole, idle: typewriterIdle } = useTypewriter(DEVELOPER_INFO.roles, 75, 2200, shouldReduceMotion);
+  const sectionRef = useRef(null);
+
+  const nameParts = DEVELOPER_INFO.name.split(' ');
+  const namePlain = nameParts.slice(0, -1).join(' ');
+  const nameAccent = nameParts[nameParts.length - 1];
+
+  /* Cursor parallax — the character drifts a few px opposite the mouse */
+  const parallaxX = useMotionValue(0);
+  const parallaxY = useMotionValue(0);
+  const springX = useSpring(parallaxX, { stiffness: 55, damping: 16 });
+  const springY = useSpring(parallaxY, { stiffness: 55, damping: 16 });
+  const handleMouseMove = (e) => {
+    if (shouldReduceMotion) return;
+    parallaxX.set((e.clientX / window.innerWidth - 0.5) * -18);
+    parallaxY.set((e.clientY / window.innerHeight - 0.5) * -12);
   };
 
+  /* Scroll-linked exit — hero recedes softly as you scroll toward About */
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  });
+  const exitOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0.15]);
+  const exitScale = useTransform(scrollYProgress, [0, 0.75], [1, 0.96]);
+  const exitY = useTransform(scrollYProgress, [0, 0.75], [0, -40]);
+  const exitStyle = shouldReduceMotion ? {} : { opacity: exitOpacity, scale: exitScale, y: exitY };
+
+  const containerVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } },
+  };
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
   };
 
   return (
-    <m.section
+    <section
+      id="hero"
       ref={sectionRef}
-      className="relative w-full min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden px-0"
-      variants={containerVariants}
-      initial={shouldReduceMotion ? { opacity: 1, y: 0 } : "hidden"}
-      animate={shouldReduceMotion ? { opacity: 1, y: 0 } : (isInView ? "visible" : "hidden")}
+      aria-label="Introduction"
+      onMouseMove={handleMouseMove}
+      className="relative w-full min-h-screen flex flex-col justify-center overflow-hidden"
     >
-      {/* Grid background */}
-      <div className="absolute inset-0 grid-pattern opacity-50 z-0 pointer-events-none" />
+      {/* ─── Main two-column layout ─── */}
+      <m.div
+        className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 md:pt-28 md:pb-16"
+        style={exitStyle}
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-4 items-center">
 
-      {/* 3D Canvas */}
-      <div className="absolute inset-0 z-0">
-        <Canvas camera={{ position: [0, 0, 8], fov: 60 }}>
-          <ambientLight intensity={0.2} />
-          <directionalLight position={[10, 10, 5]} intensity={0.5} />
-          <pointLight position={[-10, -10, -5]} intensity={0.5} color="#00D9FF" />
-          <pointLight position={[10, -5, 5]} intensity={0.3} color="#A855F7" />
-          <FloatingShape position={[3, 2, 0]} rotationSpeed={shouldReduceMotion ? { x: 0, y: 0, orbit: 0 } : { x: 0.1, y: 0.2, orbit: 0.05 }} scale={1.2} color="#00D9FF" type="icosa" />
-          <FloatingShape position={[-3, -1, 2]} rotationSpeed={shouldReduceMotion ? { x: 0, y: 0, orbit: 0 } : { x: 0.2, y: 0.1, orbit: -0.08 }} scale={0.8} color="#A855F7" type="octa" />
-          <FloatingShape position={[2, -2, -2]} rotationSpeed={shouldReduceMotion ? { x: 0, y: 0, orbit: 0 } : { x: 0.1, y: 0.3, orbit: 0.1 }} scale={1.0} color="#1E293B" type="tetra" />
-          <FloatingShape position={[-2, 2, -1]} rotationSpeed={shouldReduceMotion ? { x: 0, y: 0, orbit: 0 } : { x: 0.2, y: 0.2, orbit: -0.05 }} scale={0.9} color="#0F172A" type="box" />
-          {!shouldReduceMotion && <ParticleSystem />}
-        </Canvas>
-      </div>
-
-      {/* Radial glow gradients */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent-cyan/5 rounded-full blur-3xl pointer-events-none z-0" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-purple/5 rounded-full blur-3xl pointer-events-none z-0" />
-
-      {/* Main content */}
-      <div className="z-10 text-center max-w-5xl w-full px-4 sm:px-6 mt-[-3%]">
-
-        {/* Name */}
-        <m.h1
-          className="font-sans text-[2.2rem] xs:text-5xl sm:text-6xl md:text-7xl lg:text-[82px] font-bold text-white mb-3 md:mb-4 tracking-tighter leading-[1.05]"
-          variants={itemVariants}
-        >
-          {DEVELOPER_INFO.name.split(' ').slice(0, 2).join(' ')}
-          <br />
-          <span className="text-gradient">{DEVELOPER_INFO.name.split(' ').slice(2).join(' ')}</span>
-        </m.h1>
-
-        {/* Typewriter role */}
-        <m.div
-          className="font-mono text-base xs:text-lg sm:text-xl md:text-2xl font-medium text-accent-cyan mb-4 md:mb-6 tracking-wide h-7 md:h-8 flex items-center justify-center gap-1"
-          variants={itemVariants}
-        >
-          <span>&gt;</span>
-          <span>{typedRole}</span>
-          <span className="w-[2px] h-5 md:h-6 bg-accent-cyan animate-pulse ml-0.5 rounded-full" />
-        </m.div>
-
-        {/* Tagline */}
-        <m.p
-          className="font-sans text-sm xs:text-base sm:text-lg md:text-xl text-text-secondary/80 mb-6 md:mb-10 mx-auto max-w-2xl leading-relaxed font-light px-2"
-          variants={itemVariants}
-        >
-          {DEVELOPER_INFO.tagline}
-        </m.p>
-
-        {/* CTA Buttons */}
-        <m.div
-          className="flex flex-col xs:flex-row flex-wrap gap-3 justify-center mb-8 md:mb-12 pointer-events-auto"
-          variants={itemVariants}
-        >
-          <m.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => setActiveTab('projects')}
-            className="btn-primary text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4"
+          {/* ─── LEFT COLUMN: Text content ─── */}
+          <m.div
+            className="flex flex-col gap-4 md:gap-5 text-center lg:text-left order-2 lg:order-1"
+            variants={containerVariants}
+            initial={shouldReduceMotion ? 'visible' : 'hidden'}
+            animate="visible"
           >
-            Explore Projects
-          </m.button>
-          <m.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => setActiveTab('contact')}
-            className="btn-secondary text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4"
-          >
-            Get In Touch
-          </m.button>
-          <m.a
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            href={DEVELOPER_INFO.resume}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-secondary text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4"
-          >
-            View Resume
-          </m.a>
-        </m.div>
+            {/* Availability pill */}
+            {DEVELOPER_INFO.available && (
+              <m.div className="flex justify-center lg:justify-start" variants={itemVariants}>
+                <span className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-accent-green/10 border border-accent-green/30 font-mono text-[11px] tracking-wider uppercase text-accent-green">
+                  <span className="relative flex h-2 w-2" aria-hidden="true">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-green opacity-60" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-green" />
+                  </span>
+                  Available for work · building {DEVELOPER_INFO.currentlyBuilding}
+                </span>
+              </m.div>
+            )}
 
-        {/* Social links */}
-        <m.div
-          className="flex items-center justify-center gap-4 sm:gap-6 mb-10 md:mb-16 pointer-events-auto"
-          variants={itemVariants}
-        >
-          {[
-            { icon: FaGithub, link: DEVELOPER_INFO.github, label: 'GitHub' },
-            { icon: FaLinkedin, link: DEVELOPER_INFO.linkedin, label: 'LinkedIn' },
-            { icon: FaEnvelope, link: `mailto:${DEVELOPER_INFO.email}`, label: 'Email' },
-          ].map(({ icon: Icon, link, label }) => (
-            <m.a
-              key={label}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              href={link}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={label}
-              className="w-11 h-11 sm:w-11 sm:h-11 rounded-full border border-white/10 flex items-center justify-center text-text-secondary hover:text-white hover:border-accent-cyan hover:shadow-[0_0_15px_rgba(0,217,255,0.3)] hover:bg-accent-cyan/10 transition-all duration-300"
+            {/* Subtitle */}
+            <m.p
+              className="font-mono text-xs sm:text-sm tracking-[0.25em] uppercase text-white/50"
+              variants={itemVariants}
             >
-              <Icon size={18} />
-            </m.a>
-          ))}
-        </m.div>
+              Designer &amp; Developer
+            </m.p>
 
-        {/* Stats */}
+            {/* Name */}
+            <m.h1
+              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight"
+              variants={itemVariants}
+              aria-label={DEVELOPER_INFO.name}
+            >
+              {namePlain}
+              <br className="hidden sm:block" />
+              <span className="text-accent-cyan [text-shadow:0_0_30px_rgba(0,212,255,0.3)]">{nameAccent}</span>
+            </m.h1>
+
+            {/* Tagline */}
+            <m.p
+              className="font-sans text-sm sm:text-base text-white/50 max-w-md mx-auto lg:mx-0 font-light leading-relaxed uppercase tracking-wider"
+              variants={itemVariants}
+            >
+              {DEVELOPER_INFO.tagline}
+            </m.p>
+
+            {/* Typewriter role */}
+            <m.div
+              className="font-mono text-sm sm:text-base text-white/70 tracking-wide h-6 flex items-center justify-center lg:justify-start gap-1"
+              variants={itemVariants}
+            >
+              <span aria-hidden="true" className="text-accent-cyan">&gt;</span>
+              <span className="sr-only">{DEVELOPER_INFO.roles.join(', ')}</span>
+              <span aria-hidden="true">{typedRole}</span>
+              {!shouldReduceMotion && (
+                <span
+                  className={`w-[2px] h-4 bg-accent-cyan ml-0.5 rounded-full ${typewriterIdle ? 'animate-pulse' : ''}`}
+                  aria-hidden="true"
+                />
+              )}
+            </m.div>
+
+            {/* CTAs */}
+            <m.div
+              className="flex flex-col sm:flex-row items-center lg:items-start gap-4 mt-2"
+              variants={itemVariants}
+            >
+              <Magnetic>
+                <button
+                  onClick={() => scrollTo('#contact')}
+                  className="btn-primary !py-3 text-sm"
+                >
+                  Contact Me
+                </button>
+              </Magnetic>
+              <Magnetic strength={0.4}>
+                <a
+                  href={DEVELOPER_INFO.resume}
+                  download
+                  className="px-7 py-3 rounded-full font-sans font-bold text-sm uppercase tracking-wider inline-flex items-center gap-2 text-white/70 border border-white/20 hover:border-accent-cyan hover:text-accent-cyan hover:shadow-[0_0_20px_rgba(0,212,255,0.25)] transition-all duration-300 active:scale-95"
+                >
+                  <FaDownload size={12} aria-hidden="true" />
+                  Resume
+                </a>
+              </Magnetic>
+              <button
+                onClick={() => scrollTo('#about')}
+                className="group font-sans text-sm font-medium text-white/60 hover:text-white transition-colors inline-flex items-center gap-1.5 sm:self-center"
+              >
+                <span className="link-underline">About Me</span>
+                <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+              </button>
+            </m.div>
+
+            {/* Social links */}
+            <m.div className="flex items-center justify-center lg:justify-start gap-4 mt-2" variants={itemVariants}>
+              {[
+                { icon: FaGithub, link: DEVELOPER_INFO.github, label: 'GitHub' },
+                { icon: FaLinkedin, link: DEVELOPER_INFO.linkedin, label: 'LinkedIn' },
+                { icon: FaEnvelope, link: `mailto:${DEVELOPER_INFO.email}`, label: 'Email' },
+              ].map(({ icon: Icon, link, label }) => (
+                <Magnetic key={label} strength={0.5}>
+                  <a
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-accent-cyan hover:shadow-[0_0_15px_rgba(0,212,255,0.3)] hover:bg-accent-cyan/10 transition-all duration-300"
+                  >
+                    <Icon size={16} />
+                  </a>
+                </Magnetic>
+              ))}
+            </m.div>
+          </m.div>
+
+          {/* ─── RIGHT COLUMN: Greeting Character ─── */}
+          <m.div
+            className="relative order-1 lg:order-2 flex items-center justify-center min-h-[350px] sm:min-h-[420px] md:min-h-[500px] lg:min-h-[560px]"
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {/* Entrance: bouncy spring, then wave-greet rock, then idle float.
+                The whole group drifts opposite the cursor (spring parallax). */}
+            <m.div
+              className="relative z-10"
+              style={shouldReduceMotion ? {} : { x: springX, y: springY }}
+            >
+              <m.div
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 60, scale: 0.85 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: 0.7, duration: 0.9, type: 'spring', bounce: 0.45 }}
+              >
+                {/* Speech bubble with waving hand */}
+                <m.div
+                  className="absolute -top-4 -left-2 sm:-top-6 sm:left-0 z-20 flex items-center gap-1.5 px-4 py-2 rounded-2xl rounded-bl-sm backdrop-blur-xl select-none bg-accent-blue/25 border border-accent-cyan/35 shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(0,212,255,0.15)]"
+                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: 1.5, type: 'spring', bounce: 0.6, duration: 0.7 }}
+                  aria-hidden="true"
+                >
+                  <m.span
+                    className="text-lg inline-block"
+                    style={{ transformOrigin: '70% 70%' }}
+                    animate={shouldReduceMotion ? {} : { rotate: [0, 22, -12, 22, -12, 16, 0] }}
+                    transition={{ delay: 1.4, duration: 1.6, ease: 'easeInOut', repeat: Infinity, repeatDelay: 4.5 }}
+                  >
+                    👋
+                  </m.span>
+                  <span className="font-sans text-sm font-semibold text-white whitespace-nowrap">
+                    Hi, I am {DEVELOPER_INFO.nickname}!
+                  </span>
+                </m.div>
+
+                {/* Idle float loop */}
+                <m.div
+                  animate={shouldReduceMotion ? {} : { y: [0, -12, 0] }}
+                  transition={{ delay: 3.2, duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  {/* Two-layer character: static body + independently waving hand.
+                      Both PNGs share the same canvas, so inset-0 self-aligns them. */}
+                  <div
+                    className="relative"
+                    style={{ filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.45))' }}
+                  >
+                    <img
+                      src="/assets/greeting-body.png"
+                      alt="Developer character waving hello"
+                      className="w-auto max-h-[320px] sm:max-h-[380px] md:max-h-[440px] lg:max-h-[500px] object-contain"
+                    />
+                    <m.img
+                      src="/assets/greeting-hand.png"
+                      alt=""
+                      aria-hidden="true"
+                      className="absolute inset-0 w-full h-full object-contain [transform-origin:33.2%_33.2%]"
+                      animate={shouldReduceMotion ? {} : { rotate: [0, 14, -10, 14, -10, 8, 0] }}
+                      transition={{
+                        delay: 1.4,
+                        duration: 1.6,
+                        ease: 'easeInOut',
+                        repeat: Infinity,
+                        repeatDelay: 4.5,
+                      }}
+                    />
+                  </div>
+                </m.div>
+
+                {/* Soft ground glow so the float reads as hovering */}
+                <m.div
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-6 rounded-[50%] blur-xl bg-accent-cyan/25"
+                  animate={shouldReduceMotion ? {} : { scaleX: [1, 0.82, 1], opacity: [0.6, 0.35, 0.6] }}
+                  transition={{ delay: 3.2, duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+                  aria-hidden="true"
+                />
+              </m.div>
+            </m.div>
+          </m.div>
+        </div>
+
+        {/* ─── Feature Cards Row ─── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 md:mt-12 max-w-4xl mx-auto lg:mx-0">
+          <FeatureCard
+            icon="🎨"
+            title="Design Principles"
+            description="Crafting clean, user-centric interfaces with focus on aesthetics and usability."
+            delay={1.0}
+            cta="How I work"
+            onClick={() => scrollTo('#about')}
+          />
+          <FeatureCard
+            icon="⚙️"
+            title="Development"
+            description="Building robust full-stack applications with Python, Flask, React and modern tools."
+            delay={1.15}
+            cta="See projects"
+            onClick={() => scrollTo('#projects')}
+          />
+          <FeatureCard
+            icon="🤖"
+            title="AI/ML Solutions"
+            description="Creating intelligent systems powered by machine learning and data science."
+            delay={1.3}
+            cta="My skills"
+            onClick={() => scrollTo('#skills')}
+          />
+        </div>
+
+        {/* ─── Stats ─── */}
         <m.div
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-2xl mx-auto"
-          variants={itemVariants}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-2xl mx-auto lg:mx-0 mt-10 md:mt-14"
+          variants={containerVariants}
+          initial={shouldReduceMotion ? 'visible' : 'hidden'}
+          animate="visible"
         >
           {STATS.map((stat, i) => (
-            <StatCounter key={stat.label} stat={stat} delay={i * 150} isInView={isInView || shouldReduceMotion} />
+            <StatCounter key={stat.label} stat={stat} delay={800 + i * 150} />
           ))}
         </m.div>
-      </div>
+      </m.div>
 
-      {/* Scroll indicator */}
-      <m.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none"
-        variants={itemVariants}
+      {/* Scroll cue */}
+      <button
+        onClick={() => scrollTo('#about')}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden [@media(min-height:720px)]:flex flex-col items-center gap-2 text-white/40 hover:text-accent-cyan transition-colors z-20"
+        aria-label="Scroll to About section"
       >
-        <span className="font-mono text-[10px] tracking-[0.3em] text-text-secondary uppercase">Scroll</span>
+        <span className="font-mono text-[10px] tracking-[0.3em] uppercase">Scroll</span>
         <m.div
-          animate={{ y: [0, 8, 0] }}
+          animate={shouldReduceMotion ? {} : { y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <FaArrowDown size={14} className="text-text-secondary" />
+          <FaArrowDown size={14} />
         </m.div>
-      </m.div>
-    </m.section>
+      </button>
+    </section>
   );
 };
 

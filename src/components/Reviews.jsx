@@ -14,7 +14,7 @@ const REVIEWS = [
 const ReviewCard = ({ review }) => (
   <div className="glass-card w-[280px] p-6 flex flex-col gap-4 mx-3 flex-shrink-0 snap-center">
     <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-cyan/20 to-accent-purple/20 border border-white/10 flex items-center justify-center text-white font-mono font-bold text-sm">
+      <div className="w-10 h-10 rounded-full bg-accent-cyan/20 border border-white/10 flex items-center justify-center text-white font-mono font-bold text-sm">
         {review.avatar}
       </div>
       <div>
@@ -52,7 +52,7 @@ const Reviews = () => {
           <div className="w-12 h-px bg-white/[0.06]" />
         </div>
         <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
-          What People <span className="text-gradient">Say</span>
+          What People <span className="text-accent-cyan">Say</span>
         </h2>
       </div>
 
@@ -79,8 +79,8 @@ const Reviews = () => {
         </div>
 
         {/* Fades */}
-        <div className="absolute inset-y-0 left-0 w-12 md:w-32 bg-gradient-to-r from-primary to-transparent z-10 pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-12 md:w-32 bg-gradient-to-l from-primary to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-12 md:w-32 bg-primary z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-12 md:w-32 bg-primary z-10 pointer-events-none" />
       </div>
     </m.section>
   );

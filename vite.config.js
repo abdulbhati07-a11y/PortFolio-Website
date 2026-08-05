@@ -1,17 +1,20 @@
 import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-// Portfolio is now a standalone HTML file (no React build step needed).
-// Vite will serve index.html (which IS the portfolio) with HMR for fast refresh.
 export default defineConfig({
-  // No React plugin — portfolio.html uses vanilla JS + CDN Three.js
-  plugins: [],
+  plugins: [react()],
   server: {
-    open: true, // auto-open browser on npm run dev
+    open: true,
   },
   build: {
-    // If you ever want to build the React app again, restore index.html.bak
     rollupOptions: {
-      input: 'index.html',
+      output: {
+        // Keep the heavy 3D stack out of the main bundle so first paint stays fast.
+        manualChunks: {
+          three: ['three', '@react-three/fiber', '@react-three/drei'],
+          motion: ['framer-motion', 'gsap'],
+        },
+      },
     },
   },
 })
