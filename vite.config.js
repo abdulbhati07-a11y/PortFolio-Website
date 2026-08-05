@@ -9,9 +9,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // Keep the heavy 3D stack out of the main bundle so first paint stays fast.
+        // Keep the heavy animation stack out of the main bundle so first paint stays fast.
         manualChunks: {
-          three: ['three', '@react-three/fiber', '@react-three/drei'],
           motion: ['framer-motion', 'gsap'],
         },
       },

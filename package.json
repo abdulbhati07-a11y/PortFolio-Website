@@ -11,16 +11,13 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
-    "@react-three/drei": "^9.105.6",
-    "@react-three/fiber": "^8.16.2",
     "@studio-freight/lenis": "^1.0.42",
     "framer-motion": "^11.1.7",
     "gsap": "^3.12.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet-async": "^3.0.0",
-    "react-icons": "^5.2.1",
-    "three": "^0.164.0"
+    "react-icons": "^5.2.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

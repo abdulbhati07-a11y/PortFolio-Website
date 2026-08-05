@@ -20,8 +20,6 @@ import ChatAssistant from './components/ChatAssistant';
 import Logo from './components/ui/Logo';
 
 const Projects = lazy(() => import('./components/Projects'));
-const GalaxyBackground = lazy(() => import('./components/GalaxyBackground'));
-const StarfieldBackground = lazy(() => import('./components/StarfieldBackground'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -126,9 +124,7 @@ const LoadingScreen = ({ onComplete }) => {
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeFilter, setActiveFilter] = useState(null);
-  const [galaxyReady, setGalaxyReady] = useState(false);
   const lenisRef = useRef(null);
-  const scrollProgress = useRef(0); // 0..1, fed to the galaxy for parallax
 
   // Smooth scrolling + GSAP ScrollTrigger, bridged through one rAF loop.
   // (Skipped entirely for reduced-motion users.)
@@ -144,9 +140,7 @@ function App() {
     });
     lenisRef.current = lenis;
 
-    // Track normalized scroll progress for the galaxy parallax.
-    lenis.on('scroll', ({ scroll, limit }) => {
-      scrollProgress.current = limit > 0 ? scroll / limit : 0;
+    lenis.on('scroll', () => {
       ScrollTrigger.update();
     });
 
@@ -161,18 +155,6 @@ function App() {
       lenisRef.current = null;
     };
   }, []);
-
-  // Mount the galaxy once idle so it never blocks first paint.
-  useEffect(() => {
-    if (!isLoaded || prefersReducedMotion()) return;
-    const idle = window.requestIdleCallback
-      ? window.requestIdleCallback(() => setGalaxyReady(true), { timeout: 2000 })
-      : setTimeout(() => setGalaxyReady(true), 800);
-    return () => {
-      if (window.cancelIdleCallback && typeof idle === 'number') window.cancelIdleCallback(idle);
-      else clearTimeout(idle);
-    };
-  }, [isLoaded]);
 
   // GSAP ScrollTrigger reveals for section dividers, set up after content mounts.
   useEffect(() => {
