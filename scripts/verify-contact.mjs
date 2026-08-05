@@ -1,0 +1,14 @@
+import puppeteer from 'puppeteer';
+const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+const page = await browser.newPage();
+await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+await page.evaluateOnNewDocument(() => localStorage.setItem('theme', 'light'));
+await page.goto('http://localhost:4173/', { waitUntil: 'networkidle2', timeout: 60000 });
+await new Promise((r) => setTimeout(r, 2500));
+const el = await page.$('#contact');
+await el.scrollIntoView();
+await new Promise((r) => setTimeout(r, 800));
+await el.screenshot({ path: 'scratch-light-contact.jpg', type: 'jpeg', quality: 85 });
+console.log('shot contact');
+await browser.close();

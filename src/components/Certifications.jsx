@@ -27,7 +27,7 @@ const CertCard = ({ cert, index }) => (
               className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
               loading="lazy"
             />
-            <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full border border-accent-emerald/40 text-accent-emerald bg-white/85 backdrop-blur-sm">
+            <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full text-accent-emerald bg-white/85 backdrop-blur-sm">
               <FaCheckCircle size={9} aria-hidden="true" /> Verified
             </span>
           </div>
@@ -36,7 +36,7 @@ const CertCard = ({ cert, index }) => (
             <div className="w-14 h-14 rounded-2xl bg-glass/[0.04] border border-glass/10 flex items-center justify-center text-3xl" aria-hidden="true">
               {cert.icon}
             </div>
-            <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full border border-accent-emerald/30 text-accent-emerald bg-accent-emerald/10">
+            <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full text-accent-emerald bg-accent-emerald/10">
               <FaCheckCircle size={9} aria-hidden="true" /> Verified
             </span>
           </div>
@@ -89,7 +89,7 @@ const Certifications = () => (
       className="mb-16"
     />
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
       {CERTIFICATES.map((cert, i) => (
         <CertCard key={cert.id} cert={cert} index={i} />
       ))}

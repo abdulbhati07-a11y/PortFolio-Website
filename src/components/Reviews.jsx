@@ -12,13 +12,13 @@ const REVIEWS = [
 ];
 
 const ReviewCard = ({ review }) => (
-  <div className="glass-card w-[280px] p-6 flex flex-col gap-4 mx-3 flex-shrink-0 snap-center">
+  <div className="glass-card rounded-3xl w-[280px] p-6 flex flex-col gap-4 mx-3 flex-shrink-0 snap-center">
     <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-full bg-accent-cyan/20 border border-white/10 flex items-center justify-center text-white font-mono font-bold text-sm">
+      <div className="w-10 h-10 rounded-full bg-accent-cyan/20 flex items-center justify-center text-text-primary font-mono font-bold text-sm">
         {review.avatar}
       </div>
       <div>
-        <h4 className="font-sans font-bold text-white text-sm">{review.name}</h4>
+        <h4 className="font-sans font-bold text-text-primary text-sm">{review.name}</h4>
         <p className="font-mono text-accent-cyan text-[10px] tracking-wider uppercase">{review.role}</p>
       </div>
     </div>
@@ -28,7 +28,7 @@ const ReviewCard = ({ review }) => (
       ))}
     </div>
     <p className="font-sans text-text-secondary text-sm leading-relaxed font-light">
-      "{review.text}"
+      &ldquo;{review.text}&rdquo;
     </p>
   </div>
 );
@@ -49,9 +49,9 @@ const Reviews = () => {
       <div className="max-w-screen-2xl mx-auto px-4 md:px-8 lg:px-16 2xl:px-0 mb-12">
         <div className="flex items-center gap-3 mb-4">
           <span className="font-mono text-accent-cyan text-sm tracking-widest">Client Feedback</span>
-          <div className="w-12 h-px bg-white/[0.06]" />
+          <div className="w-12 h-px bg-glass/[0.1]" />
         </div>
-        <h2 className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tighter">
+        <h2 className="font-sans text-4xl md:text-5xl font-bold text-text-primary tracking-tighter">
           What People <span className="text-accent-cyan">Say</span>
         </h2>
       </div>

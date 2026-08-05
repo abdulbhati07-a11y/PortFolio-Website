@@ -15,7 +15,7 @@ const LinkCard = ({ icon: Icon, title, handle, link, color, download }) => (
     target={download ? undefined : '_blank'}
     rel={download ? undefined : 'noopener noreferrer'}
     whileHover={{ y: -4 }}
-    className="glass-card glass-card-hover p-6 rounded-2xl flex flex-col items-center text-center cursor-pointer group transition-all duration-500 relative overflow-hidden"
+    className="glass-card glass-card-hover p-6 rounded-3xl flex flex-col items-center text-center cursor-pointer group transition-all duration-500 relative overflow-hidden"
   >
     <div className="absolute inset-0 bg-glass/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
@@ -318,7 +318,7 @@ const Contact = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-lg bg-accent-emerald/10 border border-accent-emerald/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-9 h-9 rounded-lg bg-accent-emerald/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <FaGithub size={14} className="text-accent-emerald" aria-hidden="true" />
                 </div>
                 <div>
@@ -330,7 +330,7 @@ const Contact = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-lg bg-accent-emerald/10 border border-accent-emerald/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-9 h-9 rounded-lg bg-accent-emerald/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <FaLinkedin size={14} className="text-accent-emerald" aria-hidden="true" />
                 </div>
                 <div>

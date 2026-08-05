@@ -16,6 +16,7 @@ import SEO from './components/SEO';
 import CustomCursor from './components/CustomCursor';
 import ScrollProgress from './components/ui/ScrollProgress';
 import Skeleton from './components/Skeleton';
+import ChatAssistant from './components/ChatAssistant';
 
 const Projects = lazy(() => import('./components/Projects'));
 const GalaxyBackground = lazy(() => import('./components/GalaxyBackground'));
@@ -267,6 +268,8 @@ function App() {
           </main>
 
           <Footer scrollTo={scrollTo} />
+
+          <ChatAssistant scrollTo={scrollTo} />
         </div>
       )}
     </LazyMotion>

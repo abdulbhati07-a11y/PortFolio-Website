@@ -15,7 +15,7 @@ const ArticleCard = ({ article, index }) => {
     : {};
 
   return (
-    <Reveal delay={index * 0.08}>
+    <Reveal delay={index * 0.08} className={index === 0 ? 'md:col-span-2' : ''}>
       <Wrapper
         {...wrapperProps}
         className={`glass-card glass-card-hover rounded-3xl p-5 sm:p-6 md:p-8 flex flex-col group transition-all duration-500 overflow-hidden relative h-full ${
@@ -57,7 +57,7 @@ const ArticleCard = ({ article, index }) => {
                 <FaExternalLinkAlt size={12} aria-hidden="true" />
               </div>
             ) : (
-              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-accent-emerald/30 text-accent-emerald bg-accent-emerald/10">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full text-accent-emerald bg-accent-emerald/10">
                 <FaPenNib size={9} aria-hidden="true" /> In progress
               </span>
             )}
@@ -84,7 +84,7 @@ const Blog = () => {
         className="mb-16"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {ARTICLES.map((article, i) => (
           <ArticleCard key={article.id} article={article} index={i} />
         ))}

@@ -153,9 +153,12 @@
     line-height: 1.7;
   }
 
+  /* Bento tile: borderless rounded card defined by a layered background —
+     a soft diagonal accent wash over the glass base — and depth shadows,
+     rather than an outline. Radius comes from the call site (rounded-3xl). */
   .glass-card {
-    @apply bg-secondary/70 dark:bg-secondary/50 backdrop-blur-xl transition-colors duration-500 border border-accent-emerald/30;
-    /* Soft ambient shadow without the white inner edge */
+    @apply bg-secondary/70 dark:bg-secondary/50 backdrop-blur-xl transition-all duration-500;
+    background-image: linear-gradient(155deg, rgba(0, 212, 255, 0.05) 0%, transparent 40%);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
   }
   .dark .glass-card {
@@ -165,10 +168,11 @@
     @apply hover:bg-secondary/90 dark:hover:bg-secondary/60 hover:-translate-y-1;
   }
   .glass-card-hover:hover {
-    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.15);
+    background-image: linear-gradient(155deg, rgba(0, 212, 255, 0.09) 0%, transparent 55%);
+    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.15), 0 8px 48px -12px rgba(0, 212, 255, 0.12);
   }
   .dark .glass-card-hover:hover {
-    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.4), 0 8px 48px -12px rgba(0, 212, 255, 0.15);
   }
   /* Soft, colored ambient shadow under key elements (instead of flat black) */
   .ambient-shadow {
@@ -219,7 +223,7 @@
     @apply px-8 py-4 bg-accent-emerald text-[#0a1628] border-2 border-accent-emerald font-sans font-bold uppercase tracking-wider rounded-full transition-all duration-300 hover:bg-transparent hover:text-accent-emerald shadow-[0_4px_20px_rgba(255,193,7,0.3)] hover:shadow-[0_4px_25px_rgba(255,193,7,0.5)] active:scale-95 inline-flex items-center justify-center gap-2;
   }
   .btn-secondary {
-    @apply px-8 py-4 bg-transparent text-white font-sans font-medium rounded-full border border-white/20 hover:border-accent-cyan hover:text-accent-cyan transition-all duration-300 active:scale-95 inline-flex items-center justify-center gap-2;
+    @apply px-8 py-4 bg-transparent text-text-primary font-sans font-medium rounded-full border border-glass/20 hover:border-accent-cyan hover:text-accent-cyan transition-all duration-300 active:scale-95 inline-flex items-center justify-center gap-2;
   }
 
 }
@@ -254,4 +258,28 @@
 
 .hero-blob svg {
   animation: blob-morph 12s ease-in-out infinite;
+}
+
+/* Hero fit-to-viewport zoom.
+   On shorter desktop screens the hero (intro + feature cards + stats) is a
+   touch too tall for the first view. Rather than crush the spacing for every
+   device, we scale the whole section down slightly — only on wide screens
+   that are also short. `zoom` reflows layout, so unlike transform:scale it
+   leaves no dead whitespace and the section still reports its true height.
+   Mobile (<1024px) and tall monitors keep the full-size layout. */
+@media (min-width: 1024px) and (max-height: 860px) {
+  #hero {
+    zoom: 0.9;
+  }
+}
+@media (min-width: 1024px) and (max-height: 780px) {
+  #hero {
+    zoom: 0.82;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-blob svg {
+    animation: none;
+  }
 }

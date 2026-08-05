@@ -189,8 +189,12 @@ const ProjectCard = ({ project, index, onOpen }) => {
     rotateY.set(0);
   };
 
+  // Bento rhythm: every fifth card stretches to two columns, giving the grid
+  // an intentional 2+1 / 1+1+1 cadence instead of a uniform matrix.
+  const bentoSpan = index % 5 === 0 ? 'md:col-span-2' : '';
+
   return (
-    <div style={{ perspective: 1000 }} className="h-full">
+    <div style={{ perspective: 1000 }} className={`h-full ${bentoSpan}`}>
       <m.article
         ref={cardRef}
         onMouseMove={handleMouseMove}
@@ -365,7 +369,7 @@ const Projects = ({ activeFilter, clearFilter }) => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="glass-card rounded-2xl p-6 md:p-8 mb-8 border-l-4 border-l-accent-cyan overflow-hidden"
+              className="glass-card rounded-3xl p-6 md:p-8 mb-8 border-l-4 border-l-accent-cyan overflow-hidden"
             >
               <h3 className="text-text-primary font-display text-lg font-semibold mb-2 tracking-tight">
                 My Expertise in {activeFilter}
@@ -413,7 +417,7 @@ const Projects = ({ activeFilter, clearFilter }) => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
             {filteredProjects.map((project, index) => (
               <ProjectCard key={project.id} project={project} index={index} onOpen={handleOpen} />
             ))}

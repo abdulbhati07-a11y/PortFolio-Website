@@ -100,7 +100,7 @@ const About = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {PRINCIPLES.map((principle, i) => (
             <Reveal key={principle.title} delay={i * 0.08}>
-              <div className="glass-card glass-card-hover rounded-2xl p-6 h-full group hover:-translate-y-1 transition-transform duration-500">
+              <div className="glass-card glass-card-hover rounded-3xl p-6 h-full group hover:-translate-y-1 transition-transform duration-500">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-2xl" aria-hidden="true">{principle.icon}</span>
                   <h4 className="font-display text-base font-bold text-text-primary tracking-tight group-hover:text-accent-cyan transition-colors">

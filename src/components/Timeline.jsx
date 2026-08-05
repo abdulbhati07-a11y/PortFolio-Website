@@ -42,20 +42,20 @@ const TimelineItem = ({ item, isEven, shouldReduceMotion }) => {
 
       {/* Content card */}
       <div className="w-full pl-16 md:pl-0 md:w-5/12">
-        <div className="glass-card glass-card-hover rounded-2xl p-4 sm:p-6 md:p-8 transition-all duration-300 group">
+        <div className="glass-card glass-card-hover rounded-3xl p-4 sm:p-6 md:p-8 transition-all duration-300 group">
           <div className="flex items-start justify-between mb-3 gap-4 flex-wrap">
             <h3 className="font-display text-base sm:text-xl font-bold text-text-primary tracking-tight group-hover:text-accent-cyan transition-colors">
               {item.title}
             </h3>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <span className="md:hidden font-mono text-[10px] text-text-secondary border border-glass/10 px-2 py-1 rounded-full">
+              <span className="md:hidden font-mono text-[10px] text-text-secondary bg-glass/5 px-2 py-1 rounded-full">
                 {item.year}
               </span>
               <span
-                className={`font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full border ${
+                className={`font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full ${
                   item.subtitle === 'Current'
-                    ? 'border-accent-emerald/30 text-accent-emerald bg-accent-emerald/10'
-                    : 'border-glass/10 text-text-secondary'
+                    ? 'text-accent-emerald bg-accent-emerald/10'
+                    : 'text-text-secondary bg-glass/5'
                 }`}
               >
                 {item.subtitle}

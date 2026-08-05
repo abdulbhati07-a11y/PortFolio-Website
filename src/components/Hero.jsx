@@ -77,11 +77,11 @@ const StatCounter = ({ stat, delay }) => {
         visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
       }}
     >
-      <span className="font-mono text-xl sm:text-2xl md:text-3xl font-bold text-white">
+      <span className="font-mono text-xl sm:text-2xl md:text-3xl font-bold text-text-primary">
         {stat.decimals > 0 ? count.toFixed(1) : Math.floor(count)}
         <span className="text-accent-cyan">{stat.suffix}</span>
       </span>
-      <span className="font-sans text-xs text-white/60 tracking-widest uppercase">{stat.label}</span>
+      <span className="font-sans text-xs text-text-secondary tracking-widest uppercase">{stat.label}</span>
     </m.div>
   );
 };
@@ -93,18 +93,18 @@ const FeatureCard = ({ icon, title, description, delay, onClick, cta }) => {
     <m.button
       type="button"
       onClick={onClick}
-      className="rounded-2xl p-5 flex flex-col gap-2 text-left group hover:-translate-y-1 transition-all duration-300 backdrop-blur-xl bg-accent-blue/20 border border-accent-cyan/15 shadow-[0_8px_32px_rgba(0,0,0,0.2)] hover:border-accent-cyan/40 hover:shadow-[0_12px_40px_rgba(0,212,255,0.15)]"
+      className="glass-card glass-card-hover rounded-3xl p-4 flex flex-col gap-2 text-left group"
       initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="flex items-center justify-between w-full">
-        <h3 className="font-display text-sm font-bold text-white uppercase tracking-wider">{title}</h3>
-        <span className="w-9 h-9 rounded-full flex items-center justify-center text-lg bg-accent-amber/20 border-[1.5px] border-accent-amber/50">
+        <h3 className="font-display text-sm font-bold text-text-primary uppercase tracking-wider">{title}</h3>
+        <span className="w-9 h-9 rounded-full flex items-center justify-center text-lg bg-accent-amber/20">
           {icon}
         </span>
       </div>
-      <p className="font-sans text-xs text-white/60 leading-relaxed">{description}</p>
+      <p className="font-sans text-xs text-text-secondary leading-relaxed">{description}</p>
       <span className="font-mono text-[11px] text-accent-cyan mt-1 inline-flex items-center gap-1">
         <span className="link-underline">{cta}</span>
         <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
@@ -159,18 +159,18 @@ const Hero = ({ scrollTo }) => {
       ref={sectionRef}
       aria-label="Introduction"
       onMouseMove={handleMouseMove}
-      className="relative w-full min-h-screen flex flex-col justify-center overflow-hidden"
+      className="relative w-full flex flex-col justify-start overflow-hidden"
     >
       {/* ─── Main two-column layout ─── */}
       <m.div
-        className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 md:pt-28 md:pb-16"
+        className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-1 pb-6 md:pt-2 md:pb-8"
         style={exitStyle}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-4 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-4 items-center">
 
           {/* ─── LEFT COLUMN: Text content ─── */}
           <m.div
-            className="flex flex-col gap-4 md:gap-5 text-center lg:text-left order-2 lg:order-1"
+            className="flex flex-col gap-3 text-center lg:text-left order-2 lg:order-1"
             variants={containerVariants}
             initial={shouldReduceMotion ? 'visible' : 'hidden'}
             animate="visible"
@@ -190,7 +190,7 @@ const Hero = ({ scrollTo }) => {
 
             {/* Subtitle */}
             <m.p
-              className="font-mono text-xs sm:text-sm tracking-[0.25em] uppercase text-white/50"
+              className="font-mono text-xs sm:text-sm tracking-[0.25em] uppercase text-text-tertiary"
               variants={itemVariants}
             >
               Designer &amp; Developer
@@ -198,7 +198,7 @@ const Hero = ({ scrollTo }) => {
 
             {/* Name */}
             <m.h1
-              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight"
+              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-6xl font-bold text-text-primary leading-[1.02] tracking-tight"
               variants={itemVariants}
               aria-label={DEVELOPER_INFO.name}
             >
@@ -209,7 +209,7 @@ const Hero = ({ scrollTo }) => {
 
             {/* Tagline */}
             <m.p
-              className="font-sans text-sm sm:text-base text-white/50 max-w-md mx-auto lg:mx-0 font-light leading-relaxed uppercase tracking-wider"
+              className="font-sans text-sm sm:text-base text-text-tertiary max-w-md mx-auto lg:mx-0 font-light leading-relaxed uppercase tracking-wider"
               variants={itemVariants}
             >
               {DEVELOPER_INFO.tagline}
@@ -217,7 +217,7 @@ const Hero = ({ scrollTo }) => {
 
             {/* Typewriter role */}
             <m.div
-              className="font-mono text-sm sm:text-base text-white/70 tracking-wide h-6 flex items-center justify-center lg:justify-start gap-1"
+              className="font-mono text-sm sm:text-base text-text-secondary tracking-wide h-6 flex items-center justify-center lg:justify-start gap-1"
               variants={itemVariants}
             >
               <span aria-hidden="true" className="text-accent-cyan">&gt;</span>
@@ -233,7 +233,7 @@ const Hero = ({ scrollTo }) => {
 
             {/* CTAs */}
             <m.div
-              className="flex flex-col sm:flex-row items-center lg:items-start gap-4 mt-2"
+              className="flex flex-col sm:flex-row items-center lg:items-start gap-4 mt-1"
               variants={itemVariants}
             >
               <Magnetic>
@@ -248,7 +248,7 @@ const Hero = ({ scrollTo }) => {
                 <a
                   href={DEVELOPER_INFO.resume}
                   download
-                  className="px-7 py-3 rounded-full font-sans font-bold text-sm uppercase tracking-wider inline-flex items-center gap-2 text-white/70 border border-white/20 hover:border-accent-cyan hover:text-accent-cyan hover:shadow-[0_0_20px_rgba(0,212,255,0.25)] transition-all duration-300 active:scale-95"
+                  className="px-7 py-3 rounded-full font-sans font-bold text-sm uppercase tracking-wider inline-flex items-center gap-2 text-text-secondary border border-glass/20 hover:border-accent-cyan hover:text-accent-cyan hover:shadow-[0_0_20px_rgba(0,212,255,0.25)] transition-all duration-300 active:scale-95"
                 >
                   <FaDownload size={12} aria-hidden="true" />
                   Resume
@@ -256,7 +256,7 @@ const Hero = ({ scrollTo }) => {
               </Magnetic>
               <button
                 onClick={() => scrollTo('#about')}
-                className="group font-sans text-sm font-medium text-white/60 hover:text-white transition-colors inline-flex items-center gap-1.5 sm:self-center"
+                className="group font-sans text-sm font-medium text-text-secondary hover:text-text-primary transition-colors inline-flex items-center gap-1.5 sm:self-center"
               >
                 <span className="link-underline">About Me</span>
                 <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
@@ -276,7 +276,7 @@ const Hero = ({ scrollTo }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-accent-cyan hover:shadow-[0_0_15px_rgba(0,212,255,0.3)] hover:bg-accent-cyan/10 transition-all duration-300"
+                    className="w-10 h-10 rounded-full border border-glass/10 flex items-center justify-center text-text-secondary hover:text-accent-cyan hover:border-accent-cyan hover:shadow-[0_0_15px_rgba(0,212,255,0.3)] hover:bg-accent-cyan/10 transition-all duration-300"
                   >
                     <Icon size={16} />
                   </a>
@@ -287,7 +287,7 @@ const Hero = ({ scrollTo }) => {
 
           {/* ─── RIGHT COLUMN: Greeting Character ─── */}
           <m.div
-            className="relative order-1 lg:order-2 flex items-center justify-center min-h-[350px] sm:min-h-[420px] md:min-h-[500px] lg:min-h-[560px]"
+            className="relative order-1 lg:order-2 flex items-center justify-center min-h-[260px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[370px]"
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -305,7 +305,7 @@ const Hero = ({ scrollTo }) => {
               >
                 {/* Speech bubble with waving hand */}
                 <m.div
-                  className="absolute -top-4 -left-2 sm:-top-6 sm:left-0 z-20 flex items-center gap-1.5 px-4 py-2 rounded-2xl rounded-bl-sm backdrop-blur-xl select-none bg-accent-blue/25 border border-accent-cyan/35 shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(0,212,255,0.15)]"
+                  className="absolute top-2 -left-2 sm:top-4 sm:left-0 z-20 flex items-center gap-1.5 px-4 py-2 rounded-2xl rounded-bl-sm backdrop-blur-xl select-none bg-[#0d1f3c]/90 border border-accent-cyan/35 shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(0,212,255,0.15)]"
                   initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ delay: 1.5, type: 'spring', bounce: 0.6, duration: 0.7 }}
@@ -370,7 +370,7 @@ const Hero = ({ scrollTo }) => {
         </div>
 
         {/* ─── Feature Cards Row ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 md:mt-12 max-w-4xl mx-auto lg:mx-0">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3 max-w-4xl mx-auto lg:mx-0">
           <FeatureCard
             icon="🎨"
             title="Design Principles"
@@ -399,7 +399,7 @@ const Hero = ({ scrollTo }) => {
 
         {/* ─── Stats ─── */}
         <m.div
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-2xl mx-auto lg:mx-0 mt-10 md:mt-14"
+          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-2xl mx-auto lg:mx-0 mt-3 md:mt-4"
           variants={containerVariants}
           initial={shouldReduceMotion ? 'visible' : 'hidden'}
           animate="visible"
@@ -413,7 +413,7 @@ const Hero = ({ scrollTo }) => {
       {/* Scroll cue */}
       <button
         onClick={() => scrollTo('#about')}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden [@media(min-height:720px)]:flex flex-col items-center gap-2 text-white/40 hover:text-accent-cyan transition-colors z-20"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 hidden [@media(min-height:960px)]:flex flex-col items-center gap-2 text-text-tertiary hover:text-accent-cyan transition-colors z-20"
         aria-label="Scroll to About section"
       >
         <span className="font-mono text-[10px] tracking-[0.3em] uppercase">Scroll</span>

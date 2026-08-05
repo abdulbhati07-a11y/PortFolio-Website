@@ -81,7 +81,7 @@ const Navigation = ({ scrollTo }) => {
             <div className="w-8 h-8 rounded-lg bg-accent-cyan flex items-center justify-center text-slate-900 font-mono font-bold text-xs shadow-[0_0_15px_rgba(0,217,255,0.4)]">
               MAB
             </div>
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full border border-glass/10 bg-glass/5 text-[11px] text-text-secondary font-medium tracking-wide">
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-glass/5 text-[11px] text-text-secondary font-medium tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-accent-emerald shadow-[0_0_8px_rgba(74,222,128,0.8)] animate-pulse" />
               Available for opportunities
             </div>
@@ -93,7 +93,7 @@ const Navigation = ({ scrollTo }) => {
           {/* Desktop nav */}
           <nav
             aria-label="Primary"
-            className="hidden md:flex items-center gap-1 bg-glass/[0.04] border border-glass/[0.06] rounded-full px-2 py-1.5 backdrop-blur-md h-12"
+            className="hidden md:flex items-center gap-1 bg-glass/[0.04] rounded-full px-2 py-1.5 backdrop-blur-md h-12"
           >
             {links.map((link) => (
               <button
@@ -129,7 +129,7 @@ const Navigation = ({ scrollTo }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={toggleTheme}
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-glass/5 hover:bg-glass/10 border border-glass/10 transition-colors text-text-secondary hover:text-accent-cyan"
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-glass/5 hover:bg-glass/10 transition-colors text-text-secondary hover:text-accent-cyan"
               aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             >
               {theme === 'dark' ? <FaSun size={16} /> : <FaMoon size={16} />}
@@ -148,7 +148,7 @@ const Navigation = ({ scrollTo }) => {
           <div className="md:hidden flex items-center gap-4">
             <button
               onClick={toggleTheme}
-              className="w-9 h-9 rounded-full flex items-center justify-center bg-glass/5 border border-glass/10 text-text-secondary"
+              className="w-9 h-9 rounded-full flex items-center justify-center bg-glass/5 text-text-secondary"
               aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             >
               {theme === 'dark' ? <FaSun size={14} /> : <FaMoon size={14} />}

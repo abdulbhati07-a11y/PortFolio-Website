@@ -32,7 +32,7 @@ const SkillCard = ({ skill, index }) => {
   return (
     <m.div
       ref={cardRef}
-      className="glass-card glass-card-hover p-4 sm:p-5 rounded-2xl group flex flex-col gap-3 justify-between h-full hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)]"
+      className="glass-card glass-card-hover p-4 sm:p-5 rounded-3xl group flex flex-col gap-3 justify-between h-full hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)]"
       initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
       animate={shouldReduceMotion || isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ delay: index * 0.05, duration: 0.5 }}
@@ -97,7 +97,7 @@ const RadialBadge = ({ skill, index }) => {
   return (
     <m.div
       ref={cardRef}
-      className="glass-card glass-card-hover rounded-2xl p-5 flex flex-col items-center gap-3 hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)] group"
+      className="glass-card glass-card-hover rounded-3xl p-5 flex flex-col items-center gap-3 hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)] group"
       initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
       animate={shouldReduceMotion || isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ delay: index * 0.05, duration: 0.5 }}
