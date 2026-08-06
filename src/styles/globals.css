@@ -216,8 +216,10 @@
   .text-gradient {
     @apply text-accent-cyan;
   }
+  /* Block-level, so auto width fills the row while still respecting any
+     mx-* margins the call site adds (w-full + margins would overflow). */
   .section-divider {
-    @apply w-full h-px bg-glass/10;
+    @apply h-px bg-glass/10;
   }
   .btn-primary {
     @apply px-8 py-4 bg-accent-emerald text-[#0a1628] border-2 border-accent-emerald font-sans font-bold uppercase tracking-wider rounded-full transition-all duration-300 hover:bg-transparent hover:text-accent-emerald shadow-[0_4px_20px_rgba(255,193,7,0.3)] hover:shadow-[0_4px_25px_rgba(255,193,7,0.5)] active:scale-95 inline-flex items-center justify-center gap-2;
