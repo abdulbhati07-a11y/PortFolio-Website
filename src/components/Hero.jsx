@@ -70,48 +70,55 @@ const StatCounter = ({ stat, delay }) => {
   }, [stat.value, delay, shouldReduceMotion]);
 
   return (
-    <m.div
-      className="flex flex-col items-center gap-1"
-      variants={{
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-      }}
-    >
+    <div className="flex flex-col items-center gap-1">
       <span className="font-mono text-xl sm:text-2xl md:text-3xl font-bold text-text-primary">
         {stat.decimals > 0 ? count.toFixed(1) : Math.floor(count)}
         <span className="text-accent-cyan">{stat.suffix}</span>
       </span>
-      <span className="font-sans text-xs text-text-secondary tracking-widest uppercase">{stat.label}</span>
-    </m.div>
+      <span className="font-sans text-[10px] sm:text-xs text-text-secondary tracking-widest uppercase text-center">
+        {stat.label}
+      </span>
+    </div>
   );
 };
 
-/* ─── Feature Card ────────────────────────────────────────────────────── */
-const FeatureCard = ({ icon, title, description, delay, onClick, cta }) => {
+/* ─── Feature Tile ────────────────────────────────────────────────────── */
+const FeatureCard = ({ icon, title, description, delay, onClick, cta, index }) => {
   const shouldReduceMotion = useReducedMotion();
   return (
     <m.button
       type="button"
       onClick={onClick}
-      className="glass-card glass-card-hover rounded-3xl p-4 flex flex-col gap-2 text-left group"
+      className="glass-card glass-card-hover rounded-3xl p-5 flex flex-col gap-2 text-left group h-full"
       initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="flex items-center justify-between w-full">
-        <h3 className="font-display text-sm font-bold text-text-primary uppercase tracking-wider">{title}</h3>
-        <span className="w-9 h-9 rounded-full flex items-center justify-center text-lg bg-accent-amber/20">
+        <span className="font-mono text-[11px] font-bold text-text-tertiary tracking-[0.3em]">
+          0{index}
+        </span>
+        <span className="w-9 h-9 rounded-full flex items-center justify-center text-lg bg-accent-cyan/10 border border-accent-cyan/20 group-hover:border-accent-cyan/40 group-hover:bg-accent-cyan/15 transition-colors duration-300">
           {icon}
         </span>
       </div>
+      <h3 className="font-display text-sm font-bold text-text-primary uppercase tracking-wider mt-1">{title}</h3>
       <p className="font-sans text-xs text-text-secondary leading-relaxed">{description}</p>
-      <span className="font-mono text-[11px] text-accent-cyan mt-1 inline-flex items-center gap-1">
+      <span className="font-mono text-[11px] text-accent-cyan mt-auto pt-1 inline-flex items-center gap-1">
         <span className="link-underline">{cta}</span>
         <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
       </span>
     </m.button>
   );
 };
+
+/* ─── Corner tick — framed-tile accent ────────────────────────────────── */
+const CornerTick = ({ className }) => (
+  <span
+    className={`absolute w-4 h-4 border-accent-cyan/30 pointer-events-none ${className}`}
+    aria-hidden="true"
+  />
+);
 
 /* ─── Hero Component ──────────────────────────────────────────────────── */
 const Hero = ({ scrollTo }) => {
@@ -152,6 +159,10 @@ const Hero = ({ scrollTo }) => {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
   };
+  const statsVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.1, delayChildren: 0.9 } },
+  };
 
   return (
     <section
@@ -161,32 +172,38 @@ const Hero = ({ scrollTo }) => {
       onMouseMove={handleMouseMove}
       className="relative w-full flex flex-col justify-start overflow-hidden"
     >
-      {/* ─── Main two-column layout ─── */}
       <m.div
-        className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-1 pb-6 md:pt-2 md:pb-8"
+        className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-8 flex flex-col gap-4"
         style={exitStyle}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-4 items-center">
+        {/* ─── TOP ROW: Intro tile + Character tile ─── */}
+        <div className="grid gap-4 lg:grid-cols-12 items-stretch">
 
-          {/* ─── LEFT COLUMN: Text content ─── */}
+          {/* ─── INTRO TILE ─── */}
           <m.div
-            className="flex flex-col gap-3 text-center lg:text-left order-2 lg:order-1"
+            className="glass-card rounded-3xl p-6 sm:p-8 lg:col-span-8 order-2 lg:order-1 flex flex-col gap-3 text-center lg:text-left"
             variants={containerVariants}
             initial={shouldReduceMotion ? 'visible' : 'hidden'}
             animate="visible"
           >
-            {/* Availability pill */}
-            {DEVELOPER_INFO.available && (
-              <m.div className="flex justify-center lg:justify-start" variants={itemVariants}>
-                <span className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-accent-green/10 border border-accent-green/30 font-mono text-[11px] tracking-wider uppercase text-accent-green">
+            {/* Section index + availability */}
+            <m.div
+              className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-between gap-3"
+              variants={itemVariants}
+            >
+              <span className="font-mono text-[11px] tracking-[0.35em] uppercase text-text-tertiary order-2 sm:order-1">
+                01 — Introduction
+              </span>
+              {DEVELOPER_INFO.available && (
+                <span className="order-1 sm:order-2 inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-accent-green/10 border border-accent-green/30 font-mono text-[11px] tracking-wider uppercase text-accent-green">
                   <span className="relative flex h-2 w-2" aria-hidden="true">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-green opacity-60" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-green" />
                   </span>
-                  Available for work · building {DEVELOPER_INFO.currentlyBuilding}
+                  Available for work
                 </span>
-              </m.div>
-            )}
+              )}
+            </m.div>
 
             {/* Subtitle */}
             <m.p
@@ -202,7 +219,7 @@ const Hero = ({ scrollTo }) => {
               variants={itemVariants}
               aria-label={DEVELOPER_INFO.name}
             >
-              {namePlain}
+              {namePlain}{' '}
               <br className="hidden sm:block" />
               <span className="text-accent-cyan [text-shadow:0_0_30px_rgba(0,212,255,0.3)]">{nameAccent}</span>
             </m.h1>
@@ -285,20 +302,29 @@ const Hero = ({ scrollTo }) => {
             </m.div>
           </m.div>
 
-          {/* ─── RIGHT COLUMN: Greeting Character ─── */}
+          {/* ─── CHARACTER TILE ─── */}
           <m.div
-            className="relative order-1 lg:order-2 flex items-center justify-center min-h-[260px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[370px]"
+            className="relative lg:col-span-4 order-1 lg:order-2 flex items-center justify-center min-h-[320px] sm:min-h-[360px] lg:min-h-[440px]"
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Soft cyan aura behind the character */}
-            <m.div
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(72vw,420px)] h-[min(72vw,420px)] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(0,212,255,0.16),transparent_68%)] blur-2xl"
-              animate={shouldReduceMotion ? {} : { scale: [1, 1.07, 1], opacity: [0.75, 1, 0.75] }}
-              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-              aria-hidden="true"
-            />
+            {/* Framed glass backdrop — clips the aura to the tile so the glow
+                stays contained while the character can rise out of the frame. */}
+            <div className="absolute inset-0 glass-card rounded-3xl overflow-hidden">
+              <m.div
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(0,212,255,0.16),transparent_66%)] blur-2xl"
+                animate={shouldReduceMotion ? {} : { scale: [1, 1.07, 1], opacity: [0.75, 1, 0.75] }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                aria-hidden="true"
+              />
+            </div>
+
+            {/* Corner ticks */}
+            <CornerTick className="top-3 left-3 border-t border-l rounded-tl-lg" />
+            <CornerTick className="top-3 right-3 border-t border-r rounded-tr-lg" />
+            <CornerTick className="bottom-3 left-3 border-b border-l rounded-bl-lg" />
+            <CornerTick className="bottom-3 right-3 border-b border-r rounded-br-lg" />
 
             {/* Entrance: bouncy spring, then wave-greet rock, then idle float.
                 The whole group drifts opposite the cursor (spring parallax). */}
@@ -313,7 +339,7 @@ const Hero = ({ scrollTo }) => {
               >
                 {/* Speech bubble with waving hand */}
                 <m.div
-                  className="absolute top-2 -left-2 sm:top-4 sm:left-0 z-20 flex items-center gap-1.5 px-4 py-2 rounded-2xl rounded-bl-sm backdrop-blur-xl select-none bg-[#0d1f3c]/90 border border-accent-cyan/35 shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(0,212,255,0.15)]"
+                  className="absolute top-2 left-0 sm:top-4 z-20 flex items-center gap-1.5 px-4 py-2 rounded-2xl rounded-bl-sm backdrop-blur-xl select-none bg-[#0d1f3c]/90 border border-accent-cyan/35 shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(0,212,255,0.15)]"
                   initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ delay: 1.5, type: 'spring', bounce: 0.6, duration: 0.7 }}
@@ -350,7 +376,7 @@ const Hero = ({ scrollTo }) => {
                     <img
                       src="/assets/greeting-body.png"
                       alt="Developer character waving hello"
-                      className="w-auto max-h-[320px] sm:max-h-[380px] md:max-h-[440px] lg:max-h-[500px] object-contain"
+                      className="w-auto max-h-[320px] sm:max-h-[380px] md:max-h-[440px] lg:max-h-[480px] object-contain"
                     />
                     <m.img
                       src="/assets/greeting-hand.png"
@@ -413,10 +439,11 @@ const Hero = ({ scrollTo }) => {
           </m.div>
         </div>
 
-        {/* ─── Feature Cards Row ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3 max-w-4xl mx-auto lg:mx-0">
+        {/* ─── FEATURE TILES ─── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <FeatureCard
             icon="🎨"
+            index={1}
             title="Design Principles"
             description="Crafting clean, user-centric interfaces with focus on aesthetics and usability."
             delay={1.0}
@@ -425,6 +452,7 @@ const Hero = ({ scrollTo }) => {
           />
           <FeatureCard
             icon="⚙️"
+            index={2}
             title="Development"
             description="Building robust full-stack applications with Python, Flask, React and modern tools."
             delay={1.15}
@@ -433,6 +461,7 @@ const Hero = ({ scrollTo }) => {
           />
           <FeatureCard
             icon="🤖"
+            index={3}
             title="AI/ML Solutions"
             description="Creating intelligent systems powered by machine learning and data science."
             delay={1.3}
@@ -441,15 +470,21 @@ const Hero = ({ scrollTo }) => {
           />
         </div>
 
-        {/* ─── Stats ─── */}
+        {/* ─── STAT TILES ─── */}
         <m.div
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-2xl mx-auto lg:mx-0 mt-3 md:mt-4"
-          variants={containerVariants}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+          variants={statsVariants}
           initial={shouldReduceMotion ? 'visible' : 'hidden'}
           animate="visible"
         >
           {STATS.map((stat, i) => (
-            <StatCounter key={stat.label} stat={stat} delay={800 + i * 150} />
+            <m.div
+              key={stat.label}
+              className="glass-card rounded-3xl p-4 sm:p-5 flex items-center justify-center"
+              variants={itemVariants}
+            >
+              <StatCounter stat={stat} delay={800 + i * 150} />
+            </m.div>
           ))}
         </m.div>
       </m.div>
