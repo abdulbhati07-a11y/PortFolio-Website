@@ -218,10 +218,14 @@ export const PROJECTS = [
     tech: ["HTML", "CSS", "JavaScript", "Animations", "Web Projects"],
     category: "Web Projects",
     featured: false,
-    links: { github: "https://github.com/abdulbhati07-a11y/Happy-Birthday-Interactive-web.git", demo: "#" },
+    links: {
+      github: "https://github.com/abdulbhati07-a11y/Happy-Birthday-Interactive-web.git",
+      demo: "https://happy-birthday-interactive-web.vercel.app/"
+    },
     gradient: "bg-accent-cyan/15",
     icon: "🎂",
     logo: "/assets/logos/birthday.svg",
+    screenshot: "/assets/screenshots/birthday.jpg",
     caseStudy: {
       challenge: "Make a personal web greeting feel like an experience, not a static page.",
       solution: "Choreographed a multi-scene presentation with particle effects, confetti, music controls, and smooth CSS transitions — all in vanilla JavaScript.",
