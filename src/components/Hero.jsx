@@ -11,7 +11,6 @@ import { FaGithub, FaLinkedin, FaEnvelope, FaArrowDown, FaDownload } from 'react
 import { DEVELOPER_INFO, STATS } from '../utils/constants';
 import Magnetic from './ui/Magnetic';
 
-/* ─── Typewriter Hook ─────────────────────────────────────────────────── */
 const useTypewriter = (words, speed = 80, pause = 2000, disabled = false) => {
   const [index, setIndex] = useState(0);
   const [subIndex, setSubIndex] = useState(0);
@@ -40,7 +39,7 @@ const useTypewriter = (words, speed = 80, pause = 2000, disabled = false) => {
   return { text, idle };
 };
 
-/* ─── Stat Counter ────────────────────────────────────────────────────── */
+
 const StatCounter = ({ stat, delay }) => {
   const [count, setCount] = useState(0);
   const shouldReduceMotion = useReducedMotion();
@@ -82,7 +81,7 @@ const StatCounter = ({ stat, delay }) => {
   );
 };
 
-/* ─── Feature Tile ────────────────────────────────────────────────────── */
+
 const FeatureCard = ({ icon, title, description, delay, onClick, cta, index }) => {
   const shouldReduceMotion = useReducedMotion();
   return (
@@ -112,7 +111,6 @@ const FeatureCard = ({ icon, title, description, delay, onClick, cta, index }) =
   );
 };
 
-/* ─── Corner tick — framed-tile accent ────────────────────────────────── */
 const CornerTick = ({ className }) => (
   <span
     className={`absolute w-4 h-4 border-accent-cyan/30 pointer-events-none ${className}`}
@@ -120,7 +118,6 @@ const CornerTick = ({ className }) => (
   />
 );
 
-/* ─── Hero Component ──────────────────────────────────────────────────── */
 const Hero = ({ scrollTo }) => {
   const shouldReduceMotion = useReducedMotion();
   const { text: typedRole, idle: typewriterIdle } = useTypewriter(DEVELOPER_INFO.roles, 75, 2200, shouldReduceMotion);
@@ -130,7 +127,6 @@ const Hero = ({ scrollTo }) => {
   const namePlain = nameParts.slice(0, -1).join(' ');
   const nameAccent = nameParts[nameParts.length - 1];
 
-  /* Cursor parallax — the character drifts a few px opposite the mouse */
   const parallaxX = useMotionValue(0);
   const parallaxY = useMotionValue(0);
   const springX = useSpring(parallaxX, { stiffness: 55, damping: 16 });
@@ -141,7 +137,6 @@ const Hero = ({ scrollTo }) => {
     parallaxY.set((e.clientY / window.innerHeight - 0.5) * -12);
   };
 
-  /* Scroll-linked exit — hero recedes softly as you scroll toward About */
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
