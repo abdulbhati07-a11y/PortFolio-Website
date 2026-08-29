@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { m, AnimatePresence, useInView, useReducedMotion, useMotionValue, useSpring } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { FaGithub, FaExternalLinkAlt, FaStar, FaTimes } from 'react-icons/fa';
 import { PROJECTS, COMPETENCY_DETAILS, PROJECT_CATEGORIES } from '../utils/constants';
 import SectionHeading from './ui/SectionHeading';
@@ -194,7 +196,7 @@ const ProjectCard = ({ project, index, onOpen }) => {
   const bentoSpan = index % 5 === 0 ? 'md:col-span-2' : '';
 
   return (
-    <div style={{ perspective: 1000 }} className={`h-full ${bentoSpan}`}>
+    <div style={{ perspective: 1000 }} className="h-full w-full">
       <m.article
         ref={cardRef}
         onMouseMove={handleMouseMove}
@@ -307,9 +309,14 @@ const ProjectCard = ({ project, index, onOpen }) => {
 };
 
 /* ─── Projects Section ────────────────────────────────────────────────── */
+
 const Projects = ({ activeFilter, clearFilter }) => {
+  
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [openProject, setOpenProject] = useState(null);
+  const containerRef = useRef(null);
+  const scrollWrapperRef = useRef(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const handleOpen = useCallback((project) => setOpenProject(project), []);
 
@@ -331,79 +338,116 @@ const Projects = ({ activeFilter, clearFilter }) => {
           p.tech.some((t) => t.toLowerCase().includes(categoryFilter.toLowerCase()))
       );
     }
-    // Featured first
     return [...list].sort((a, b) => (b.featured === true) - (a.featured === true));
   }, [activeFilter, categoryFilter]);
+
+  const isCinematic = !shouldReduceMotion && filteredProjects.length > 2;
+
+  useEffect(() => {
+    if (!isCinematic || !containerRef.current || !scrollWrapperRef.current) return;
+    
+    // Register scrolltrigger if not already
+    gsap.registerPlugin(ScrollTrigger);
+    
+    const wrapper = scrollWrapperRef.current;
+    
+    // Wait for next tick so DOM is ready
+    let ctx = gsap.context(() => {
+      // Calculate how far to move left: total width of content minus the viewport width
+      const getScrollAmount = () => -(wrapper.scrollWidth - window.innerWidth);
+      
+      const tween = gsap.to(wrapper, {
+        x: getScrollAmount,
+        ease: "none"
+      });
+
+      ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top top",
+        end: () => `+=${wrapper.scrollWidth - window.innerWidth}`,
+        pin: true,
+        animation: tween,
+        scrub: 0.5,
+        invalidateOnRefresh: true,
+      });
+    });
+    
+    return () => ctx.revert();
+  }, [isCinematic, filteredProjects]);
+
 
   return (
     <section
       id="projects"
       aria-label="Projects"
-      className="w-full max-w-screen-2xl mx-auto py-20 md:py-32"
+      className={`w-full ${isCinematic ? "relative overflow-hidden" : "py-20 md:py-32"}`}
+      ref={containerRef}
     >
-      <div className="px-4 md:px-8 lg:px-16 2xl:px-0">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-          <SectionHeading
-            index="03"
-            eyebrow="Proof of work"
-            title={activeFilter ? `${activeFilter}` : 'Selected'}
-            accent={activeFilter ? 'Work' : 'Projects'}
-            subtitle={activeFilter ? undefined : 'Each project is a small case study — the problem, the approach, and what it proves.'}
-          />
-          {activeFilter && (
-            <button
-              onClick={() => { clearFilter(); setCategoryFilter('All'); }}
-              className="text-sm font-sans font-medium text-text-secondary hover:text-text-primary border border-glass/10 hover:border-glass/30 px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-2 shrink-0"
-            >
-              Clear Filter <span className="text-accent-cyan" aria-hidden="true">✕</span>
-            </button>
+      <div className={`${isCinematic ? "h-screen flex flex-col justify-center w-full" : "max-w-screen-2xl mx-auto"}`}>
+        <div className="px-4 md:px-8 lg:px-16 2xl:px-0 max-w-screen-2xl mx-auto w-full">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+            <SectionHeading
+              index="03"
+              eyebrow="Proof of work"
+              title={activeFilter ? `${activeFilter}` : 'Selected'}
+              accent={activeFilter ? 'Work' : 'Projects'}
+              subtitle={activeFilter ? undefined : 'Each project is a small case study — the problem, the approach, and what it proves.'}
+            />
+            {activeFilter && (
+              <button
+                onClick={() => { clearFilter(); setCategoryFilter('All'); }}
+                className="text-sm font-sans font-medium text-text-secondary hover:text-text-primary border border-glass/10 hover:border-glass/30 px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-2 shrink-0"
+              >
+                Clear Filter <span className="text-accent-cyan" aria-hidden="true">✕</span>
+              </button>
+            )}
+          </div>
+
+          {/* Competency detail */}
+          <AnimatePresence>
+            {activeFilter && COMPETENCY_DETAILS[activeFilter] && (
+              <m.div
+                key="filter-details"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="glass-card rounded-3xl p-6 md:p-8 mb-8 border-l-4 border-l-accent-cyan overflow-hidden"
+              >
+                <h3 className="text-text-primary font-display text-lg font-semibold mb-2 tracking-tight">
+                  My Expertise in {activeFilter}
+                </h3>
+                <p className="text-text-secondary font-sans text-sm leading-relaxed font-light max-w-4xl">
+                  {COMPETENCY_DETAILS[activeFilter]}
+                </p>
+              </m.div>
+            )}
+          </AnimatePresence>
+
+          {/* Category tabs */}
+          {!activeFilter && (
+            <div className="flex flex-wrap gap-2 mb-8" role="group" aria-label="Filter projects by category">
+              {PROJECT_CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setCategoryFilter(cat)}
+                  aria-pressed={categoryFilter === cat}
+                  className={`px-5 py-2 rounded-full text-sm font-sans font-medium transition-all duration-300 ${
+                    categoryFilter === cat
+                      ? 'bg-accent-cyan text-slate-900 shadow-[0_0_20px_rgba(0,217,255,0.4)]'
+                      : 'border border-glass/10 text-text-secondary hover:border-glass/30 hover:text-text-primary'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
-        {/* Competency detail */}
-        <AnimatePresence>
-          {activeFilter && COMPETENCY_DETAILS[activeFilter] && (
-            <m.div
-              key="filter-details"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="glass-card rounded-3xl p-6 md:p-8 mb-8 border-l-4 border-l-accent-cyan overflow-hidden"
-            >
-              <h3 className="text-text-primary font-display text-lg font-semibold mb-2 tracking-tight">
-                My Expertise in {activeFilter}
-              </h3>
-              <p className="text-text-secondary font-sans text-sm leading-relaxed font-light max-w-4xl">
-                {COMPETENCY_DETAILS[activeFilter]}
-              </p>
-            </m.div>
-          )}
-        </AnimatePresence>
-
-        {/* Category tabs */}
-        {!activeFilter && (
-          <div className="flex flex-wrap gap-2 mb-12" role="group" aria-label="Filter projects by category">
-            {PROJECT_CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setCategoryFilter(cat)}
-                aria-pressed={categoryFilter === cat}
-                className={`px-5 py-2 rounded-full text-sm font-sans font-medium transition-all duration-300 ${
-                  categoryFilter === cat
-                    ? 'bg-accent-cyan text-slate-900 shadow-[0_0_20px_rgba(0,217,255,0.4)]'
-                    : 'border border-glass/10 text-text-secondary hover:border-glass/30 hover:text-text-primary'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Grid */}
+        {/* Cinematic Horizontal Scroll or Standard Grid */}
         {filteredProjects.length === 0 ? (
-          <div className="w-full py-24 flex flex-col items-center justify-center text-center glass-card rounded-3xl">
+          <div className="w-full max-w-screen-2xl mx-auto px-4 md:px-8 py-12 flex flex-col items-center justify-center text-center glass-card rounded-3xl">
             <div className="text-5xl mb-5" aria-hidden="true">🔍</div>
             <h3 className="text-text-primary font-display text-2xl font-bold mb-2">No projects found</h3>
             <p className="text-text-secondary text-sm mb-6">
@@ -416,8 +460,16 @@ const Projects = ({ activeFilter, clearFilter }) => {
               View All Projects
             </button>
           </div>
+        ) : isCinematic ? (
+          <div ref={scrollWrapperRef} className="flex gap-6 px-4 md:px-8 lg:px-16 pb-12 w-max will-change-transform">
+            {filteredProjects.map((project, index) => (
+              <div key={project.id} className="w-[85vw] sm:w-[400px] lg:w-[450px] shrink-0 h-full">
+                <ProjectCard project={project} index={index} onOpen={handleOpen} />
+              </div>
+            ))}
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch px-4 md:px-8 lg:px-16 2xl:px-0 max-w-screen-2xl mx-auto">
             {filteredProjects.map((project, index) => (
               <ProjectCard key={project.id} project={project} index={index} onOpen={handleOpen} />
             ))}
@@ -432,5 +484,6 @@ const Projects = ({ activeFilter, clearFilter }) => {
     </section>
   );
 };
+
 
 export default Projects;

@@ -17,6 +17,7 @@ import CustomCursor from './components/CustomCursor';
 import ScrollProgress from './components/ui/ScrollProgress';
 import Skeleton from './components/Skeleton';
 import ChatAssistant from './components/ChatAssistant';
+import SectionCharacter from './components/SectionCharacter';
 import Logo from './components/ui/Logo';
 
 const Projects = lazy(() => import('./components/Projects'));
@@ -251,6 +252,7 @@ function App() {
           <Footer scrollTo={scrollTo} />
 
           <ChatAssistant scrollTo={scrollTo} />
+          <SectionCharacter />
         </div>
       )}
     </LazyMotion>

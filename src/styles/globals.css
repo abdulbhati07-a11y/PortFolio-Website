@@ -40,7 +40,8 @@
   }
 
   body {
-    @apply bg-primary text-text-primary font-sans overflow-x-hidden antialiased;
+    @apply bg-primary text-text-primary font-sans antialiased;
+    overflow-x: clip;
     background-attachment: fixed;
     line-height: 1.65;
     -webkit-tap-highlight-color: transparent;
@@ -269,19 +270,25 @@
    that are also short. `zoom` reflows layout, so unlike transform:scale it
    leaves no dead whitespace and the section still reports its true height.
    Mobile (<1024px) and tall monitors keep the full-size layout. */
-@media (min-width: 1024px) and (max-height: 860px) {
+@media (min-width: 1024px) and (max-height: 900px) {
   #hero {
-    zoom: 0.9;
+    zoom: 0.85;
   }
 }
-@media (min-width: 1024px) and (max-height: 780px) {
+@media (min-width: 1024px) and (max-height: 800px) {
   #hero {
-    zoom: 0.82;
+    zoom: 0.75;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-blob svg {
     animation: none;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 700px) {
+  #hero {
+    zoom: 0.65;
   }
 }
