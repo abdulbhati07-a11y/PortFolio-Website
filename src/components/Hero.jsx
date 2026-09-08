@@ -243,7 +243,7 @@ const Hero = ({ scrollTo }) => {
          the whole viewport width, and fill the viewport height below the
          fixed 5rem nav. `overflow-hidden` contains the background + the tiny
          100vw scrollbar sliver (body already has overflow-x: clip). */
-      className="relative left-1/2 -translate-x-1/2 w-screen overflow-hidden flex items-center py-10 sm:py-12 lg:py-0 lg:min-h-[calc(100dvh-5rem)]"
+      className="relative left-1/2 -translate-x-1/2 w-screen overflow-hidden flex items-center py-10 sm:py-12 lg:py-0 lg:h-[calc(100dvh-5rem)]"
     >
       {/* Dark wash so the hero reads as a distinct zone against the global
           circuit background — light-mode keeps a very soft tint,
