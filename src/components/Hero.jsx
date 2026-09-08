@@ -35,7 +35,7 @@ import Magnetic from './ui/Magnetic';
 
 // Shared dark glass surface for every hero tile.
 const PANEL =
-  'relative rounded-[20px] border border-white/[0.07] bg-[#0a0e13]/95 ' +
+  'relative rounded-[20px] border border-white/[0.15] bg-[#0a0e13]/95 ' +
   'shadow-[0_14px_44px_-16px_rgba(0,0,0,0.75)]';
 
 const useTypewriter = (words, speed = 80, pause = 2000, disabled = false) => {
@@ -243,7 +243,7 @@ const Hero = ({ scrollTo }) => {
          the whole viewport width, and fill the viewport height below the
          fixed 5rem nav. `overflow-hidden` contains the background + the tiny
          100vw scrollbar sliver (body already has overflow-x: clip). */
-      className="relative left-1/2 -translate-x-1/2 w-screen overflow-hidden flex items-center py-10 sm:py-12 lg:py-0 lg:h-[calc(100dvh-5rem)]"
+      className="relative left-1/2 -translate-x-1/2 w-screen overflow-hidden flex items-center py-10 sm:py-12 lg:py-3 lg:items-stretch lg:h-[calc(100dvh-5rem)]"
     >
       {/* Dark wash so the hero reads as a distinct zone against the global
           circuit background — light-mode keeps a very soft tint,
@@ -254,14 +254,19 @@ const Hero = ({ scrollTo }) => {
       <div className="absolute inset-0 bg-sky-100/60 dark:bg-black/65 pointer-events-none" aria-hidden="true" />
 
       <m.div
-        className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:h-full"
         style={exitStyle}
       >
-        <div className="grid grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-3">
+        {/* 2-column grid: left col = INTRO + feature cards, right col = AVATAR + stats.
+             Row 1 takes remaining height (1fr); row 2 is auto-sized to content. */}
+        <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-2.5 sm:gap-3 lg:h-full">
 
-          {/* ─── INTRO (cols 1–8, row 1) ─── */}
+          {/* ── LEFT: INTRO + three feature cards stacked below ── */}
+          <div className="flex flex-col gap-2.5 sm:gap-3 lg:h-full">
+
+          {/* ─── INTRO ─── */}
           <m.div
-            className={`${PANEL} p-5 sm:p-6 lg:p-7 col-span-2 lg:col-span-8 lg:col-start-1 lg:row-start-1 flex flex-col justify-center gap-3 overflow-hidden group`}
+            className={`${PANEL} p-5 sm:p-6 lg:p-7 flex-1 flex flex-col justify-center gap-3 overflow-hidden group`}
             variants={containerVariants}
             initial={shouldReduceMotion ? 'visible' : 'hidden'}
             animate="visible"
@@ -380,12 +385,48 @@ const Hero = ({ scrollTo }) => {
             </m.div>
           </m.div>
 
-          {/* ─── AVATAR (cols 9–12, rows 1–2) ─── */}
+          {/* Feature cards — 3-up row below the intro */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+            <FeatureCard
+              icon="🎨"
+              index={1}
+              title="Design Principles"
+              description="Crafting clean, user-centric interfaces with focus on aesthetics."
+              delay={1.0}
+              cta="Read more"
+              onClick={() => scrollTo('#about')}
+            />
+            <FeatureCard
+              icon="⚙️"
+              index={2}
+              title="Development"
+              description="Robust full-stack apps with Python, React and modern tools."
+              delay={1.15}
+              cta="See projects"
+              onClick={() => scrollTo('#projects')}
+            />
+            <FeatureCard
+              icon="🤖"
+              index={3}
+              title="AI/ML Solutions"
+              description="Intelligent systems powered by ML and data science."
+              delay={1.3}
+              cta="Explore"
+              onClick={() => scrollTo('#skills')}
+            />
+          </div>
+
+          </div>{/* end left column */}
+
+          {/* ── RIGHT: AVATAR fills top, 2×2 stats sit below ── */}
+          <div className="flex flex-col gap-2.5 sm:gap-3 lg:h-full">
+
+          {/* ─── AVATAR ─── */}
           <m.div
             ref={characterCardRef}
             onMouseMove={handleCharacterMouseMove}
             onMouseLeave={handleCharacterMouseLeave}
-            className="col-span-2 lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:row-span-2 min-h-[320px] sm:min-h-[360px] lg:min-h-0 relative flex items-center justify-center [perspective:1000px] group"
+            className="flex-1 min-h-[320px] sm:min-h-[360px] lg:min-h-0 relative flex items-center justify-center [perspective:1000px] group"
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -542,54 +583,22 @@ const Hero = ({ scrollTo }) => {
             </m.div>
           </m.div>
 
-          {/* ─── 01 DESIGN (cols 1–4, row 2) ─── */}
-          <FeatureCard
-            className="col-span-2 sm:col-span-1 lg:col-span-4 lg:col-start-1 lg:row-start-2"
-            icon="🎨"
-            index={1}
-            title="Design Principles"
-            description="Crafting clean, user-centric interfaces with focus on aesthetics."
-            delay={1.0}
-            cta="Read more"
-            onClick={() => scrollTo('#about')}
-          />
+          {/* ─── STATS 2×2 grid ─── */}
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+            {STATS.map((stat, i) => (
+              <m.div
+                key={stat.label}
+                className={`${PANEL} p-2.5 sm:p-3 flex items-center justify-center overflow-hidden group transition-all duration-500 hover:-translate-y-1 hover:border-accent-cyan/30 hover:shadow-[0_14px_44px_-16px_rgba(0,212,255,0.16)]`}
+                variants={itemVariants}
+                initial={shouldReduceMotion ? 'visible' : 'hidden'}
+                animate="visible"
+              >
+                <StatCounter stat={stat} delay={800 + i * 150} />
+              </m.div>
+            ))}
+          </div>
 
-          {/* ─── 02 DEVELOPMENT (cols 5–8, row 2) ─── */}
-          <FeatureCard
-            className="col-span-2 sm:col-span-1 lg:col-span-4 lg:col-start-5 lg:row-start-2"
-            icon="⚙️"
-            index={2}
-            title="Development"
-            description="Robust full-stack apps with Python, React and modern tools."
-            delay={1.15}
-            cta="See projects"
-            onClick={() => scrollTo('#projects')}
-          />
-
-          {/* ─── 03 AI/ML SOLUTIONS (cols 1–4, row 3) ─── */}
-          <FeatureCard
-            className="col-span-2 lg:col-span-4 lg:col-start-1 lg:row-start-3"
-            icon="🤖"
-            index={3}
-            title="AI/ML Solutions"
-            description="Intelligent systems powered by ML and data science."
-            delay={1.3}
-            cta="Explore"
-            onClick={() => scrollTo('#skills')}
-          />
-
-          {/* ─── STATS (cols 5–12, row 3 — 2 cols each) ─── */}
-          {STATS.map((stat, i) => (
-            <m.div
-              key={stat.label}
-              className={`${PANEL} p-2.5 sm:p-3 flex items-center justify-center col-span-1 lg:col-span-2 lg:row-start-3 ${['lg:col-start-5', 'lg:col-start-7', 'lg:col-start-9', 'lg:col-start-11'][i]} overflow-hidden group transition-all duration-500 hover:-translate-y-1 hover:border-accent-cyan/30 hover:shadow-[0_14px_44px_-16px_rgba(0,212,255,0.16)]`}
-              variants={itemVariants}
-              initial={shouldReduceMotion ? 'visible' : 'hidden'}
-              animate="visible"
-            >
-              <StatCounter stat={stat} delay={800 + i * 150} />
-            </m.div>
-          ))}
+          </div>{/* end right column */}
 
         </div>
       </m.div>
