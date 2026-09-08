@@ -47,3 +47,8 @@ premium.html
 # Duplicate .cjs configs (the tracked .js versions are canonical)
 postcss.config.cjs
 tailwind.config.cjs
+
+# Local QA / debug artifacts — Puppeteer screenshots, dev-server logs, and
+# one-off debug probes. Generated while testing; never part of the app.
+scripts/qa-shots/
+scripts/debug-*.mjs
