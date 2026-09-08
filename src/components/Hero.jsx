@@ -26,8 +26,8 @@ import Magnetic from './ui/Magnetic';
      └────────────────┴──────┴──────┴────────┘
 
    Every tile is an always-dark glass "panel" (hardcoded palette) so the hero
-   reads identically in light and dark themes. Behind the panels sits a plain
-   dark wash (below) — the decorative circuit board was removed site-wide.
+   reads identically in light and dark themes. The animated circuit board
+   lives behind everything via <HeroBackground/>.
 
    NOTE: colours here are intentionally fixed (text-white, accent-cyan, …)
    rather than theme tokens, because the panels are dark in BOTH themes.
@@ -100,7 +100,7 @@ const StatCounter = ({ stat, delay }) => {
         {stat.decimals > 0 ? count.toFixed(1) : Math.floor(count)}
         <span className="text-accent-cyan">{stat.suffix}</span>
       </span>
-      <span className="font-sans text-[9px] sm:text-[10px] text-white/45 tracking-[0.15em] uppercase mt-1 leading-tight">
+      <span className="font-sans text-[8px] sm:text-[9px] text-white/45 tracking-[0.15em] uppercase mt-1 leading-tight">
         {stat.label}
       </span>
     </div>
@@ -132,10 +132,10 @@ const FeatureCard = ({ icon, title, description, delay, onClick, cta, index, cla
       <h3 className="font-display text-xs sm:text-sm font-bold text-white uppercase tracking-wider mt-2 relative z-10">
         {title}
       </h3>
-      <p className="font-sans text-[11px] sm:text-xs text-white/55 leading-relaxed relative z-10">
+      <p className="font-sans text-[10px] sm:text-[11px] text-white/55 leading-relaxed relative z-10">
         {description}
       </p>
-      <span className="font-mono text-[10px] text-accent-cyan mt-auto pt-1.5 inline-flex items-center gap-1 relative z-10">
+      <span className="font-mono text-[9px] text-accent-cyan mt-auto pt-1.5 inline-flex items-center gap-1 relative z-10">
         <span className="link-underline">{cta}</span>
         <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
       </span>
@@ -243,13 +243,14 @@ const Hero = ({ scrollTo }) => {
          the whole viewport width, and fill the viewport height below the
          fixed 5rem nav. `overflow-hidden` contains the background + the tiny
          100vw scrollbar sliver (body already has overflow-x: clip). */
-      className="relative left-1/2 -translate-x-1/2 w-screen overflow-hidden flex items-center py-10 sm:py-12 lg:py-0 lg:h-[calc(100dvh-5rem)]"
+      className="relative left-1/2 -translate-x-1/2 w-screen overflow-hidden flex items-center py-10 sm:py-12 lg:py-0 lg:min-h-[calc(100dvh-5rem)]"
     >
-      {/* Dark wash so the hero reads as a distinct zone — light-mode keeps a
-          very soft tint, dark-mode deepens to near-black. No base color here:
-          bg-primary from the body + SiteBackground ambience shows through. */}
-      {/* Light theme: soft sky-blue tint. Dark theme: near-black wash so
-          panels read clearly. */}
+      {/* Dark wash so the hero reads as a distinct zone against the global
+          circuit background — light-mode keeps a very soft tint,
+          dark-mode deepens to near-black. No base color here: bg-primary
+          from the body + SiteBackground shows through. */}
+      {/* Light theme: soft sky-blue wash that matches the circuit board accent.
+          Dark theme: near-black wash so panels read clearly. */}
       <div className="absolute inset-0 bg-sky-100/60 dark:bg-black/65 pointer-events-none" aria-hidden="true" />
 
       <m.div
@@ -399,10 +400,12 @@ const Hero = ({ scrollTo }) => {
               <CornerTick className="bottom-4 left-4 border-b-2 border-l-2 rounded-bl-lg" />
               <CornerTick className="bottom-4 right-4 border-b-2 border-r-2 rounded-br-lg" />
 
-              {/* Deep background glow — static, no pulse loop */}
-              <div
-                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,212,255,0.22),transparent_60%)] blur-2xl opacity-70"
-                style={{ transform: 'translateZ(-50px)' }}
+              {/* Deep background glow */}
+              <m.div
+                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,212,255,0.22),transparent_60%)] blur-2xl"
+                style={shouldReduceMotion ? {} : { translateZ: -50 }}
+                animate={shouldReduceMotion ? {} : { scale: [1, 1.1, 1], opacity: [0.6, 0.9, 0.6] }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
               />
 
               {/* Faint tech grid */}
@@ -437,7 +440,7 @@ const Hero = ({ scrollTo }) => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 4, scale: 0.96 }}
                       >
-                        <div className="relative px-4 py-3 rounded-2xl bg-[#0d1f3c] border border-accent-cyan/35 shadow-[0_8px_32px_rgba(0,0,0,0.35),0_0_16px_rgba(0,212,255,0.10)] flex flex-col items-center">
+                        <div className="relative px-4 py-3 rounded-2xl bg-[#0d1f3c] border border-accent-cyan/35 shadow-[0_8px_32px_rgba(0,0,0,0.35),0_0_20px_rgba(0,212,255,0.15)] flex flex-col items-center">
                           {charState.canSpeak && (
                             <button
                               onClick={toggleSpeak}
@@ -478,8 +481,11 @@ const Hero = ({ scrollTo }) => {
                   </AnimatePresence>
 
                   <m.div
-                    animate={shouldReduceMotion ? {} : { y: [0, -8, 0] }}
-                    transition={{ delay: 3.2, duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+                    animate={shouldReduceMotion ? {} : { y: [0, -8, 0], rotate: [0, 1.5, 0, -1.5, 0] }}
+                    transition={{
+                      y: { delay: 3.2, duration: 4.5, repeat: Infinity, ease: 'easeInOut' },
+                      rotate: { delay: 3.2, duration: 9, repeat: Infinity, ease: 'easeInOut' },
+                    }}
                     style={{ transformOrigin: '50% 85%' }}
                     className="relative z-10"
                   >
@@ -495,14 +501,40 @@ const Hero = ({ scrollTo }) => {
                         aria-hidden="true"
                         className="absolute inset-0 w-full h-full object-contain [transform-origin:33.2%_33.2%]"
                         animate={shouldReduceMotion ? {} : { rotate: [0, 14, -10, 14, -10, 8, 0] }}
-                        transition={{ duration: charState.isSpeaking ? 0.55 : 1.6, ease: 'easeInOut', repeat: Infinity, repeatDelay: charState.isSpeaking ? 0.4 : 10 }}
+                        transition={{ duration: charState.isSpeaking ? 0.55 : 1.6, ease: 'easeInOut', repeat: Infinity, repeatDelay: charState.isSpeaking ? 0.4 : 4.5 }}
                       />
+                      {!shouldReduceMotion && (
+                        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+                          {[
+                            { left: '47.0%', top: '16.8%' },
+                            { left: '52.1%', top: '16.6%' },
+                          ].map((pos, i) => (
+                            <m.span
+                              key={i}
+                              className="absolute w-[3.4%] h-[3.1%] rounded-[50%]"
+                              style={{
+                                ...pos,
+                                background: 'linear-gradient(to bottom, #eeb083, #e29a70)',
+                                transformOrigin: 'center top',
+                                filter: 'blur(0.4px)',
+                              }}
+                              initial={{ scaleY: 0 }}
+                              animate={{ scaleY: [0, 1, 1, 0] }}
+                              transition={{ delay: 2.6, duration: 0.26, times: [0, 0.4, 0.6, 1], repeat: Infinity, repeatDelay: 5.8, ease: 'easeInOut' }}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </m.div>
 
-                  {/* Holographic platform — static glow, no pulse loop */}
+                  {/* Holographic platform */}
                   <div className="mt-[-20px] relative z-0 flex justify-center w-[200px]">
-                    <div className="absolute w-full h-[30px] rounded-[50%] bg-accent-cyan/20 blur-md opacity-[0.55]" />
+                    <m.div
+                      className="absolute w-full h-[30px] rounded-[50%] bg-accent-cyan/20 blur-md"
+                      animate={shouldReduceMotion ? {} : { scaleX: [1, 0.85, 1], opacity: [0.7, 0.4, 0.7] }}
+                      transition={{ delay: 3.2, duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+                    />
                     <div className="absolute w-[80%] h-[15px] top-2 rounded-[50%] border-t border-accent-cyan/50 shadow-[0_0_15px_rgba(0,212,255,0.6)]" />
                   </div>
                 </m.div>
