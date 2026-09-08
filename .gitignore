@@ -34,3 +34,16 @@ Thumbs.db
 
 # Backup files created during this project
 index.html.bak
+
+# Standalone HTML experiments / generated head files (kept local, not part of the Vite app)
+index_head.html
+index_head_utf8.html
+original-design.html
+portfolio.html
+portfolio_head.html
+portfolio_head_utf8.html
+premium.html
+
+# Duplicate .cjs configs (the tracked .js versions are canonical)
+postcss.config.cjs
+tailwind.config.cjs
