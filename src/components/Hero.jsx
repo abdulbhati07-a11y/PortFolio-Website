@@ -241,8 +241,12 @@ const Hero = ({ scrollTo }) => {
       onMouseMove={handleMouseMove}
       /* Full-bleed: break out of the max-w-screen-2xl main container to span
          the whole viewport width, and fill the viewport height below the
-         fixed 5rem nav. `overflow-hidden` contains the background + the tiny
-         100vw scrollbar sliver (body already has overflow-x: clip). */
+         fixed 5rem nav. On tall screens this hard height lets the inner
+         h-full chain fill the bento exactly. On SHORT screens a
+         max-height media query in globals.css switches #hero to height:auto
+         so the content grows and the page scrolls a little instead of the
+         fixed cap squeezing the INTRO card and clipping its text top &
+         bottom. `overflow-hidden` contains the background + scrollbar sliver. */
       className="relative left-1/2 -translate-x-1/2 w-screen overflow-hidden flex items-center py-10 sm:py-12 lg:py-3 lg:items-stretch lg:h-[calc(100dvh-5rem)]"
     >
       {/* Dark wash so the hero reads as a distinct zone against the global
@@ -266,7 +270,7 @@ const Hero = ({ scrollTo }) => {
 
           {/* ─── INTRO ─── */}
           <m.div
-            className={`${PANEL} p-5 sm:p-6 lg:p-5 xl:p-7 flex-1 min-h-0 flex flex-col justify-center gap-3 overflow-hidden group`}
+            className={`${PANEL} p-5 sm:p-6 lg:p-5 xl:p-7 flex-1 lg:min-h-fit flex flex-col justify-center gap-3 overflow-hidden group`}
             variants={containerVariants}
             initial={shouldReduceMotion ? 'visible' : 'hidden'}
             animate="visible"

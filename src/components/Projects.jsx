@@ -1,7 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { m, AnimatePresence, useInView, useReducedMotion, useMotionValue, useSpring } from 'framer-motion';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { FaGithub, FaExternalLinkAlt, FaStar, FaTimes } from 'react-icons/fa';
 import { PROJECTS, COMPETENCY_DETAILS, PROJECT_CATEGORIES } from '../utils/constants';
 import SectionHeading from './ui/SectionHeading';
@@ -311,14 +309,47 @@ const ProjectCard = ({ project, index, onOpen }) => {
 /* ─── Projects Section ────────────────────────────────────────────────── */
 
 const Projects = ({ activeFilter, clearFilter }) => {
-  
+
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [openProject, setOpenProject] = useState(null);
-  const containerRef = useRef(null);
   const scrollWrapperRef = useRef(null);
   const shouldReduceMotion = useReducedMotion();
 
   const handleOpen = useCallback((project) => setOpenProject(project), []);
+
+  // Drag-to-scroll for the horizontal project track (mouse only — touch and
+  // trackpads use the browser's native horizontal scroll). This scrolls the
+  // row sideways WITHOUT ever hijacking the page's vertical scroll, so you can
+  // always keep scrolling down past the projects.
+  const dragState = useRef({ down: false, startX: 0, startLeft: 0, moved: 0 });
+
+  const onPointerDown = (e) => {
+    if (e.pointerType !== 'mouse') return;
+    const el = scrollWrapperRef.current;
+    if (!el) return;
+    dragState.current = { down: true, startX: e.clientX, startLeft: el.scrollLeft, moved: 0 };
+    el.setPointerCapture?.(e.pointerId);
+  };
+  const onPointerMove = (e) => {
+    const el = scrollWrapperRef.current;
+    if (!el || !dragState.current.down) return;
+    const dx = e.clientX - dragState.current.startX;
+    dragState.current.moved = Math.max(dragState.current.moved, Math.abs(dx));
+    el.scrollLeft = dragState.current.startLeft - dx;
+  };
+  const endDrag = (e) => {
+    dragState.current.down = false;
+    scrollWrapperRef.current?.releasePointerCapture?.(e.pointerId);
+  };
+  // Swallow the click that fires at the end of a drag so dragging never
+  // accidentally opens a case study.
+  const onClickCapture = (e) => {
+    if (dragState.current.moved > 6) {
+      e.stopPropagation();
+      e.preventDefault();
+      dragState.current.moved = 0;
+    }
+  };
 
   const filteredProjects = useMemo(() => {
     let list = PROJECTS;
@@ -341,49 +372,19 @@ const Projects = ({ activeFilter, clearFilter }) => {
     return [...list].sort((a, b) => (b.featured === true) - (a.featured === true));
   }, [activeFilter, categoryFilter]);
 
+  // Horizontal "cinematic" track once there are more than two projects. The
+  // row scrolls sideways natively (wheel/trackpad/drag/swipe) and NEVER pins
+  // or hijacks the page's vertical scroll — you can always keep scrolling down.
   const isCinematic = !shouldReduceMotion && filteredProjects.length > 2;
-
-  useEffect(() => {
-    if (!isCinematic || !containerRef.current || !scrollWrapperRef.current) return;
-    
-    // Register scrolltrigger if not already
-    gsap.registerPlugin(ScrollTrigger);
-    
-    const wrapper = scrollWrapperRef.current;
-    
-    // Wait for next tick so DOM is ready
-    let ctx = gsap.context(() => {
-      // Calculate how far to move left: total width of content minus the viewport width
-      const getScrollAmount = () => -(wrapper.scrollWidth - window.innerWidth);
-      
-      const tween = gsap.to(wrapper, {
-        x: getScrollAmount,
-        ease: "none"
-      });
-
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: "top top",
-        end: () => `+=${wrapper.scrollWidth - window.innerWidth}`,
-        pin: true,
-        animation: tween,
-        scrub: 0.5,
-        invalidateOnRefresh: true,
-      });
-    });
-    
-    return () => ctx.revert();
-  }, [isCinematic, filteredProjects]);
 
 
   return (
     <section
       id="projects"
       aria-label="Projects"
-      className={`w-full py-20 md:py-32 ${isCinematic ? "relative overflow-hidden" : ""}`}
-      ref={containerRef}
+      className="w-full py-20 md:py-32"
     >
-      <div className={`${isCinematic ? "h-screen flex flex-col justify-center w-full" : "max-w-screen-2xl mx-auto"}`}>
+      <div className="max-w-screen-2xl mx-auto">
         <div className="px-4 md:px-8 lg:px-16 2xl:px-0 max-w-screen-2xl mx-auto w-full">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
@@ -461,12 +462,40 @@ const Projects = ({ activeFilter, clearFilter }) => {
             </button>
           </div>
         ) : isCinematic ? (
-          <div ref={scrollWrapperRef} className="flex gap-6 px-4 md:px-8 lg:px-16 pb-12 w-max will-change-transform">
-            {filteredProjects.map((project, index) => (
-              <div key={project.id} className="w-[85vw] sm:w-[400px] lg:w-[450px] shrink-0 h-full">
-                <ProjectCard project={project} index={index} onOpen={handleOpen} />
-              </div>
-            ))}
+          <div className="relative">
+            {/* Prevent Lenis on TOUCH only (data-lenis-prevent-touch), so a
+                sideways swipe scrolls the row instead of the page. We
+                deliberately do NOT prevent the wheel: Lenis (vertical
+                gestureOrientation) keeps smoothing the page's vertical scroll
+                continuously as the cursor passes over this row — no
+                native↔smooth handoff, which was the "shake" — and it swallows
+                the horizontal component of a diagonal wheel so trackpad jitter
+                can't nudge the row into a snap-back twitch. A pure horizontal /
+                shift-wheel gesture still falls through to native and scrolls
+                the row sideways. */}
+            <div
+              ref={scrollWrapperRef}
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={endDrag}
+              onPointerLeave={endDrag}
+              onClickCapture={onClickCapture}
+              data-lenis-prevent-touch
+              role="region"
+              aria-label="Projects — scroll horizontally"
+              className="flex gap-6 items-stretch px-4 md:px-8 lg:px-16 pb-6 overflow-x-auto overflow-y-hidden snap-x snap-mandatory overscroll-x-contain cursor-grab active:cursor-grabbing [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {filteredProjects.map((project, index) => (
+                <div key={project.id} className="w-[85vw] sm:w-[400px] lg:w-[450px] shrink-0 snap-start">
+                  <ProjectCard project={project} index={index} onOpen={handleOpen} />
+                </div>
+              ))}
+            </div>
+            {/* Scroll affordance */}
+            <div className="mt-4 px-4 md:px-8 lg:px-16 flex items-center gap-2 text-text-tertiary font-mono text-[11px] uppercase tracking-wider select-none">
+              <span aria-hidden="true">Drag or scroll</span>
+              <span className="text-accent-cyan" aria-hidden="true">→</span>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch px-4 md:px-8 lg:px-16 2xl:px-0 max-w-screen-2xl mx-auto">

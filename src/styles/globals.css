@@ -95,6 +95,19 @@
     scroll-margin-top: 88px;
   }
 
+  /* Hero height is hard-capped to the viewport on tall screens (lg:h-[calc(100dvh-5rem)]
+     in Hero.jsx) so the bento fills edge-to-edge. On SHORT screens that cap
+     squeezes the flex-1 INTRO card below its content, and justify-center +
+     overflow-hidden then slice the text off top AND bottom. Below ~820px tall
+     we drop the cap so the hero grows to fit its content and the page scrolls
+     a little instead of clipping. (The INTRO card carries lg:min-h-fit so it
+     never compresses below its own content in this auto-height mode.) */
+  @media (min-width: 1024px) and (max-height: 820px) {
+    #hero {
+      height: auto;
+    }
+  }
+
   /* Hide the native cursor only where the custom cursor is active:
      fine pointer (mouse) and motion allowed. Touch + reduced-motion keep the
      native cursor since CustomCursor returns null there. */
