@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion';
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
+import SiteBackground from './components/SiteBackground';
 import About from './components/About';
 import Skills from './components/Skills';
 import Timeline from './components/Timeline';
@@ -216,7 +217,8 @@ function App() {
 
       {isLoaded && (
         <div className="min-h-screen flex flex-col relative">
-          {/* Background elements removed for solid look */}
+          {/* Global circuit board — fixed behind all sections, theme-aware */}
+          <SiteBackground />
           <a href="#main-content" className="skip-link">Skip to content</a>
           <div className="grain-overlay" aria-hidden="true" />
           <CustomCursor />

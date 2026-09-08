@@ -69,8 +69,8 @@ const Navigation = ({ scrollTo }) => {
         transition={{ duration: 0.8 }}
         className={`fixed top-0 w-full z-[100] transition-all duration-500 ${
           scrolled
-            ? 'bg-primary/80 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.4)]'
-            : 'bg-transparent backdrop-blur-xl'
+            ? 'bg-primary/95 shadow-[0_4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.4)]'
+            : 'bg-transparent'
         }`}
       >
         <div className="max-w-screen-2xl mx-auto h-20 px-4 md:px-8 lg:px-16 2xl:px-0 flex items-center justify-between">
@@ -182,7 +182,7 @@ const Navigation = ({ scrollTo }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ type: 'tween', duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-              className="absolute inset-x-0 top-20 bg-primary/95 backdrop-blur-2xl border-t border-glass/[0.06] flex flex-col md:hidden px-8 pt-8 pb-10 gap-2 shadow-[0_20px_60px_rgba(0,0,0,0.3)]"
+              className="absolute inset-x-0 top-20 bg-primary border-t border-glass/[0.06] flex flex-col md:hidden px-8 pt-8 pb-10 gap-2 shadow-[0_20px_60px_rgba(0,0,0,0.3)]"
             >
               {links.map((link, i) => (
                 <m.button

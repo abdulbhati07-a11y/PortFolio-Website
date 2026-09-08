@@ -14,6 +14,21 @@
     --skeleton-bg: #e0e0e0;
     --skeleton-highlight: #f5f5f5;
 
+    /* Circuit board — light theme: very light sky-blue on pale background */
+    --cb-grid-fine:    rgba(100, 160, 210, 0.10);
+    --cb-grid-coarse:  rgba(60, 140, 200, 0.08);
+    --cb-trace:        rgb(56, 152, 220);
+    --cb-trace-mid:    rgba(56, 152, 220, 0.22);
+    --cb-pulse:        rgba(40, 130, 210, 0.60);
+    --cb-node-fill:    rgba(30, 120, 200, 0.70);
+    --cb-node-glow:    rgba(56, 152, 220, 0.08);
+    --cb-ring:         rgba(56, 152, 220, 0.16);
+    --cb-ring-dot:     rgba(40, 120, 200, 0.55);
+    --cb-particle:     rgba(80, 155, 220, 0.45);
+    --cb-glow-top:     rgba(56, 152, 220, 0.06);
+    --cb-glow-corner:  rgba(40, 120, 190, 0.03);
+    --cb-vignette:     rgba(0, 0, 0, 0);
+
     /* Motion language */
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -33,6 +48,21 @@
     --glass-color: 0, 212, 255; /* cyan base for dark-mode glass */
     --skeleton-bg: #0d1f3c;
     --skeleton-highlight: #1a1a2e;
+
+    /* Circuit board — dark theme: cyan on near-black */
+    --cb-grid-fine:    rgba(120, 180, 200, 0.05);
+    --cb-grid-coarse:  rgba(0, 212, 255, 0.05);
+    --cb-trace:        #00d4ff;
+    --cb-trace-mid:    rgba(0, 212, 255, 0.35);
+    --cb-pulse:        #5ff2ff;
+    --cb-node-fill:    #4de8ff;
+    --cb-node-glow:    rgba(0, 212, 255, 0.06);
+    --cb-ring:         rgba(0, 212, 255, 0.28);
+    --cb-ring-dot:     #00d4ff;
+    --cb-particle:     #7af0ff;
+    --cb-glow-top:     rgba(0, 212, 255, 0.10);
+    --cb-glow-corner:  rgba(0, 180, 216, 0.08);
+    --cb-vignette:     rgba(4, 6, 8, 0.75);
   }
 
   html {
@@ -158,7 +188,7 @@
      a soft diagonal accent wash over the glass base — and depth shadows,
      rather than an outline. Radius comes from the call site (rounded-3xl). */
   .glass-card {
-    @apply bg-secondary/70 dark:bg-secondary/50 backdrop-blur-xl transition-all duration-500;
+    @apply bg-secondary/95 dark:bg-secondary/90 transition-all duration-500;
     background-image: linear-gradient(155deg, rgba(0, 212, 255, 0.05) 0%, transparent 40%);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
   }
@@ -166,7 +196,7 @@
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   }
   .glass-card-hover {
-    @apply hover:bg-secondary/90 dark:hover:bg-secondary/60 hover:-translate-y-1;
+    @apply hover:bg-secondary/100 dark:hover:bg-secondary/95 hover:-translate-y-1;
   }
   .glass-card-hover:hover {
     background-image: linear-gradient(155deg, rgba(0, 212, 255, 0.09) 0%, transparent 55%);
@@ -263,32 +293,14 @@
   animation: blob-morph 12s ease-in-out infinite;
 }
 
-/* Hero fit-to-viewport zoom.
-   On shorter desktop screens the hero (intro + feature cards + stats) is a
-   touch too tall for the first view. Rather than crush the spacing for every
-   device, we scale the whole section down slightly — only on wide screens
-   that are also short. `zoom` reflows layout, so unlike transform:scale it
-   leaves no dead whitespace and the section still reports its true height.
-   Mobile (<1024px) and tall monitors keep the full-size layout. */
-@media (min-width: 1024px) and (max-height: 900px) {
-  #hero {
-    zoom: 0.85;
-  }
-}
-@media (min-width: 1024px) and (max-height: 800px) {
-  #hero {
-    zoom: 0.75;
-  }
-}
+/* The hero now fills the viewport via a full-bleed section with
+   `min-height: calc(100dvh - 5rem)` and vertically-centered content, so the
+   old `#hero { zoom }` fit-to-height hack is no longer needed (and would
+   fight the edge-to-edge background). Content that is taller than the
+   viewport on very short screens simply extends the section gracefully. */
 
 @media (prefers-reduced-motion: reduce) {
   .hero-blob svg {
     animation: none;
-  }
-}
-
-@media (min-width: 1024px) and (max-height: 700px) {
-  #hero {
-    zoom: 0.65;
   }
 }

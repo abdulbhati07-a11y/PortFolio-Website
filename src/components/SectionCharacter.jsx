@@ -1,21 +1,18 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import { FaPlay, FaStop } from 'react-icons/fa';
 
 /* The friendly waving character follows the visitor down the page and
-   "narrates" whichever section is currently in view. Each section gets
-   its own short speech line, shown as a chat bubble AND spoken aloud
-   via the browser's Web Speech API (speechSynthesis) so the character
-   actually talks — no audio assets required.
+   shows a short line for whichever section is currently in view.
 
-   Audio behavior:
-   - Browsers block speechSynthesis until the user interacts with the
-     page. We unlock it on the very first click/scroll/keypress and
-     from then on the character speaks on every section change.
-   - A floating mute button lets the visitor turn audio off at any time.
-     The choice is remembered for the session.
-   - The hand-wave animation speeds up while the character is talking,
-     so you can tell at a glance whether audio is playing. */
+   Voice is STRICTLY on-demand. Nothing is ever spoken automatically —
+   the site stays silent unless the visitor clicks the little play button
+   on the character's speech bubble. Clicking speaks the current section's
+   line via the browser's Web Speech API (speechSynthesis); clicking again
+   (or scrolling to a new section) stops it. No audio assets required.
+
+   The hand-wave animation speeds up while speaking, so you can tell at a
+   glance that audio is playing. */
 
 const SECTION_SPEECHES = [
   {
@@ -89,18 +86,21 @@ const FALLBACK_SPEECH = {
   lines: ["Hey, I'm Abdullah! Glad you're here."],
 };
 
+const speechSupported = () =>
+  typeof window !== 'undefined' && 'speechSynthesis' in window;
+
 const SectionCharacter = () => {
   const shouldReduceMotion = useReducedMotion();
   const wrapperRef = useRef(null);
   const [activeId, setActiveId] = useState('hero');
   const [bubbleVisible, setBubbleVisible] = useState(true);
   const [lineIndex, setLineIndex] = useState(0);
-  const [audioUnlocked, setAudioUnlocked] = useState(false);
-  const [muted, setMuted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [canSpeak] = useState(speechSupported);
   const hideTimer = useRef(null);
   const lineTimer = useRef(null);
   const activeIdRef = useRef('hero');
+  const isSpeakingRef = useRef(false);
 
   // Auto-hide the bubble after 6s of idleness, but always re-show it
   // when the active section changes. Hover pauses the timer. Declared
@@ -109,44 +109,16 @@ const SectionCharacter = () => {
     clearTimeout(hideTimer.current);
     clearTimeout(lineTimer.current);
     hideTimer.current = setTimeout(() => {
+      // Never hide the bubble (and its Stop button) while audio is playing.
+      if (isSpeakingRef.current) {
+        scheduleAutoHide();
+        return;
+      }
       setBubbleVisible(false);
     }, 6000);
     lineTimer.current = setTimeout(() => {
       setLineIndex((i) => (i + 1) % 2);
     }, 3500);
-  }, []);
-
-  // Unlock speechSynthesis on first user interaction. Browsers refuse
-  // to speak until that happens, so we listen for the earliest one
-  // we can find and flip the flag once.
-  useEffect(() => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    const unlock = () => {
-      setAudioUnlocked(true);
-      // Warm the synth with a silent utterance so the first real
-      // speak() doesn't suffer a 1–2s cold-start.
-      try {
-        const u = new SpeechSynthesisUtterance('');
-        u.volume = 0;
-        window.speechSynthesis.speak(u);
-      } catch {
-        /* ignore */
-      }
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('keydown', unlock);
-      window.removeEventListener('scroll', unlock);
-      window.removeEventListener('touchstart', unlock);
-    };
-    window.addEventListener('pointerdown', unlock, { once: true });
-    window.addEventListener('keydown', unlock, { once: true });
-    window.addEventListener('scroll', unlock, { once: true, passive: true });
-    window.addEventListener('touchstart', unlock, { once: true });
-    return () => {
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('keydown', unlock);
-      window.removeEventListener('scroll', unlock);
-      window.removeEventListener('touchstart', unlock);
-    };
   }, []);
 
   // Track which section is dominating the viewport. IntersectionObserver
@@ -208,28 +180,20 @@ const SectionCharacter = () => {
     };
   }, [scheduleAutoHide]);
 
-  // Speak the current line whenever the active section changes —
-  // but only once audio is unlocked and not muted. This is split out
-  // so the speak effect can depend on the user-controlled flags.
-  //
-  // Voice selection: speechSynthesis.getVoices() returns an empty
-  // array on the first call in most browsers — the OS voice list
-  // populates asynchronously and fires `voiceschanged`. We pick the
-  // male English voice the first time voices become available, cache
-  // it in a ref, and reuse it for every utterance after that so the
-  // voice never changes mid-session.
+  // Voice selection: speechSynthesis.getVoices() returns an empty array on
+  // the first call in most browsers — the OS voice list populates
+  // asynchronously and fires `voiceschanged`. We pick a male-leaning
+  // English voice once voices are available, cache it in a ref, and reuse
+  // it for every utterance so the voice never changes mid-session.
   const chosenVoiceRef = useRef(null);
-  const [voiceDebug, setVoiceDebug] = useState('');
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    if (!speechSupported()) return;
     const synth = window.speechSynthesis;
 
-    // Hard-coded preferred male English voice names, in priority
-    // order. If your OS has one of these installed, we use it.
     const MALE_VOICE_HINTS = [
       'Google UK English Male',
-      'Google US English', // sometimes male
+      'Google US English',
       'Microsoft David',
       'Microsoft Mark',
       'Microsoft Guy',
@@ -243,30 +207,20 @@ const SectionCharacter = () => {
       'Richard',
       'Bruce',
       'Thomas',
-      // Web Speech API / Cloud voices
       'en-US-Standard-B',
       'en-US-Standard-D',
       'en-GB-Standard-B',
       'en-GB-Standard-D',
       'en-US-Journey-D',
-      // espeak / Linux voices
       'english-us+m1',
       'english-us+m2',
       'english-us+m3',
-      'english-us+m4',
-      'english-us+m5',
-      'english-us+m6',
-      'english-us+m7',
       'english+m1',
       'english+m2',
       'english+m3',
-      'english+m4',
-      'english+m5',
-      'english+m6',
-      'english+m7',
     ];
 
-    const pickMaleEnglishVoice = () => {
+    const pickVoice = () => {
       const voices = synth.getVoices();
       if (!voices || voices.length === 0) return null;
 
@@ -274,17 +228,9 @@ const SectionCharacter = () => {
         MALE_VOICE_HINTS.some((h) => (v.name || '').toLowerCase().includes(h.toLowerCase()));
       const isEnglish = (v) => /^en[-_]?/i.test(v.lang || '');
 
-      // 1) A name-listed male, any English locale.
-      let picked =
+      return (
         voices.find((v) => matchesHint(v) && isEnglish(v)) ||
-        // 2) A name-listed male, any locale.
         voices.find((v) => matchesHint(v)) ||
-        // 3) Any English voice whose name does NOT contain a known
-        //    female keyword (Samantha, Victoria, Karen, Ava, Zira,
-        //    Susan, Jenny, Aria, etc.). This is the load-bearing
-        //    fallback — on macOS Catalina+ "Daniel" often shows up
-        //    here even when its name doesn't match a hint exactly,
-        //    and "Samantha" is filtered out.
         voices.find(
           (v) =>
             isEnglish(v) &&
@@ -292,39 +238,30 @@ const SectionCharacter = () => {
               v.name || ''
             )
         ) ||
-        // 4) Last resort: any English voice.
         voices.find((v) => isEnglish(v)) ||
-        null;
-
-      if (picked) {
-        // eslint-disable-next-line no-console
-        console.log('[SectionCharacter] picked voice:', picked.name, picked.lang, 'from', voices.length, 'available');
-        setVoiceDebug(`${picked.name} (${picked.lang})`);
-      }
-      return picked;
+        null
+      );
     };
 
-    // Try immediately in case the browser already populated voices.
-    const immediate = pickMaleEnglishVoice();
+    const immediate = pickVoice();
     if (immediate) {
       chosenVoiceRef.current = immediate;
       return;
     }
 
-    // Otherwise wait for the async population.
     const onVoicesChanged = () => {
-      const v = pickMaleEnglishVoice();
+      const v = pickVoice();
       if (v) {
         chosenVoiceRef.current = v;
         synth.removeEventListener('voiceschanged', onVoicesChanged);
       }
     };
     synth.addEventListener('voiceschanged', onVoicesChanged);
-    // Some browsers (older Safari) never fire voiceschanged; poll
-    // a few times as a safety net.
+    // Some browsers (older Safari) never fire voiceschanged; poll a few
+    // times as a safety net.
     let attempts = 0;
     const poll = setInterval(() => {
-      const v = pickMaleEnglishVoice();
+      const v = pickVoice();
       if (v) {
         chosenVoiceRef.current = v;
         clearInterval(poll);
@@ -339,62 +276,69 @@ const SectionCharacter = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!audioUnlocked || muted) return;
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-
-    const section = SECTION_SPEECHES.find((s) => s.id === activeId) || FALLBACK_SPEECH;
-    const line = section.lines[0];
-
-    // Cancel anything currently being said so we don't queue up old
-    // lines on top of new ones during fast scrolling.
+  const stopSpeaking = useCallback(() => {
+    if (!speechSupported()) return;
     try {
       window.speechSynthesis.cancel();
     } catch {
       /* ignore */
     }
+    isSpeakingRef.current = false;
+    setIsSpeaking(false);
+  }, []);
 
-    const utterance = new SpeechSynthesisUtterance(line);
+  // Speak the CURRENT section's lines — only ever called from a click,
+  // which doubles as the user gesture browsers require to allow audio.
+  // Clicking while already speaking stops playback (toggle).
+  const speakCurrent = useCallback(() => {
+    if (!speechSupported()) return;
+    const synth = window.speechSynthesis;
+
+    if (isSpeakingRef.current || synth.speaking) {
+      stopSpeaking();
+      return;
+    }
+
+    const section =
+      SECTION_SPEECHES.find((s) => s.id === activeIdRef.current) || FALLBACK_SPEECH;
+    const text = section.lines.join('  ');
+
+    try {
+      synth.cancel();
+    } catch {
+      /* ignore */
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.02;
-    utterance.pitch = 0.6; // definitely lower pitch to force male sounding // lower pitch → reads as male
-    utterance.volume = 0.95;
-    if (chosenVoiceRef.current) {
-      utterance.voice = chosenVoiceRef.current;
-    } else {
-      // eslint-disable-next-line no-console
-      console.warn('[SectionCharacter] no voice selected — using browser default');
-    }
+    utterance.pitch = 0.9;
+    utterance.volume = 1;
+    if (chosenVoiceRef.current) utterance.voice = chosenVoiceRef.current;
 
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = (e) => {
-      // eslint-disable-next-line no-console
-      console.warn('[SectionCharacter] speech error', e);
+    utterance.onstart = () => {
+      isSpeakingRef.current = true;
+      setIsSpeaking(true);
+    };
+    utterance.onend = () => {
+      isSpeakingRef.current = false;
+      setIsSpeaking(false);
+    };
+    utterance.onerror = () => {
+      isSpeakingRef.current = false;
       setIsSpeaking(false);
     };
 
-    window.speechSynthesis.speak(utterance);
+    // Keep the bubble open while a line is being read.
+    clearTimeout(hideTimer.current);
+    setBubbleVisible(true);
+    synth.speak(utterance);
+  }, [stopSpeaking]);
 
-    return () => {
-      try {
-        window.speechSynthesis.cancel();
-      } catch {
-        /* ignore */
-      }
-      setIsSpeaking(false);
-    };
-  }, [activeId, audioUnlocked, muted]);
-
-  // Stop any in-flight speech as soon as the user mutes.
+  // Stop any in-flight speech when the active section changes, so an intro
+  // never keeps playing after the visitor has scrolled somewhere else.
   useEffect(() => {
-    if (muted && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      try {
-        window.speechSynthesis.cancel();
-      } catch {
-        /* ignore */
-      }
-    }
-  }, [muted]);
+    stopSpeaking();
+  }, [activeId, stopSpeaking]);
 
   // Auto-hide the bubble after 6s of idleness, but always re-show it
   // when the active section changes. Hover pauses the timer.
@@ -406,61 +350,42 @@ const SectionCharacter = () => {
     };
   }, [activeId, scheduleAutoHide]);
 
+  // Cancel speech if the component unmounts.
+  useEffect(() => stopSpeaking, [stopSpeaking]);
+
   const handleMouseEnter = () => {
     clearTimeout(hideTimer.current);
     clearTimeout(lineTimer.current);
   };
   const handleMouseLeave = () => scheduleAutoHide();
 
-  const toggleMute = () => {
-    setMuted((m) => !m);
-  };
-
-  
   const current =
     SECTION_SPEECHES.find((s) => s.id === activeId) || FALLBACK_SPEECH;
   const line = current.lines[lineIndex % current.lines.length];
 
+  // Broadcast state so the hero can mirror the bubble + play control.
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent('character-state', {
-      detail: { activeId, line, greeting: current.greeting, isSpeaking, bubbleVisible, muted }
-    }));
-  }, [activeId, line, current.greeting, isSpeaking, bubbleVisible, muted]);
+    window.dispatchEvent(
+      new CustomEvent('character-state', {
+        detail: { activeId, line, greeting: current.greeting, isSpeaking, bubbleVisible, canSpeak },
+      })
+    );
+  }, [activeId, line, current.greeting, isSpeaking, bubbleVisible, canSpeak]);
 
+  // The hero's mirrored play button dispatches this to drive the same speech.
   useEffect(() => {
-    const handleToggleMute = () => setMuted(m => !m);
-    window.addEventListener('toggle-mute', handleToggleMute);
-    return () => window.removeEventListener('toggle-mute', handleToggleMute);
-  }, []);
-
+    const handleSpeak = () => speakCurrent();
+    window.addEventListener('character-speak', handleSpeak);
+    return () => window.removeEventListener('character-speak', handleSpeak);
+  }, [speakCurrent]);
 
   return (
     <div
       ref={wrapperRef}
       className={`hidden md:flex fixed bottom-5 left-5 z-[150] items-end gap-3 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeId === "hero" ? "opacity-0 translate-y-12 scale-90" : "opacity-100 translate-y-0 scale-100"}`}
-      aria-hidden="true"
     >
-      {/* Mute / unmute control — small, sits above the speech bubble
-          so it doesn't fight the character for attention. */}
-      <div className="absolute -top-2 right-0 flex flex-col items-end gap-1 pointer-events-auto" style={{ transform: 'translate(0, -100%)' }}>
-        {voiceDebug && (
-          <span className="font-mono text-[9px] tracking-wider uppercase text-text-tertiary bg-[#0d1f3c]/80 border border-glass/10 rounded-full px-2 py-0.5 backdrop-blur-md">
-            {voiceDebug}
-          </span>
-        )}
-        <m.button
-          type="button"
-          onClick={toggleMute}
-          className="w-8 h-8 rounded-full bg-[#0d1f3c]/92 border border-accent-cyan/35 backdrop-blur-xl text-white flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.35)] hover:border-accent-cyan hover:text-accent-cyan transition-colors"
-          whileTap={{ scale: 0.9 }}
-          aria-label={muted ? 'Unmute character voice' : 'Mute character voice'}
-          aria-pressed={muted}
-        >
-          {muted ? <FaVolumeMute size={12} /> : <FaVolumeUp size={12} />}
-        </m.button>
-      </div>
-
-      {/* Speech bubble — appears above the character. */}
+      {/* Speech bubble — appears above the character with an on-demand
+          play button. Nothing is spoken until the visitor clicks it. */}
       <AnimatePresence mode="wait">
         {bubbleVisible && (
           <m.div
@@ -479,33 +404,41 @@ const SectionCharacter = () => {
                 <span className="text-base leading-none mt-0.5" aria-hidden="true">
                   {current.greeting}
                 </span>
-                <p className="font-sans text-[13px] leading-snug text-white">
+                <p className="font-sans text-[13px] leading-snug text-white pr-1">
                   {line}
                 </p>
               </div>
-              {/* Tiny "speaking" EQ bars next to the line so you can
-                  see audio is playing even with the sound off. */}
-              {isSpeaking && (
-                <span
-                  className="ml-2 inline-flex items-end gap-[2px] h-3 align-middle"
-                  aria-hidden="true"
-                >
-                  {[0, 1, 2, 3].map((i) => (
-                    <m.span
-                      key={i}
-                      className="w-[2px] rounded-full bg-accent-cyan"
-                      animate={{ height: ['30%', '100%', '40%', '80%', '30%'] }}
-                      transition={{
-                        duration: 0.7,
-                        repeat: Infinity,
-                        delay: i * 0.1,
-                        ease: 'easeInOut',
-                      }}
-                      style={{ display: 'inline-block' }}
-                    />
-                  ))}
-                </span>
+
+              {/* On-demand voice control + speaking indicator */}
+              {canSpeak && (
+                <div className="mt-2.5 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={speakCurrent}
+                    aria-label={isSpeaking ? 'Stop voice' : 'Hear this'}
+                    aria-pressed={isSpeaking}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-accent-cyan/15 text-accent-cyan hover:bg-accent-cyan hover:text-slate-900 transition-colors px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider active:scale-95"
+                  >
+                    {isSpeaking ? <FaStop size={9} /> : <FaPlay size={9} />}
+                    {isSpeaking ? 'Stop' : 'Hear this'}
+                  </button>
+
+                  {isSpeaking && (
+                    <span className="inline-flex items-end gap-[2px] h-3" aria-hidden="true">
+                      {[0, 1, 2, 3].map((i) => (
+                        <m.span
+                          key={i}
+                          className="w-[2px] rounded-full bg-accent-cyan"
+                          animate={{ height: ['30%', '100%', '40%', '80%', '30%'] }}
+                          transition={{ duration: 0.7, repeat: Infinity, delay: i * 0.1, ease: 'easeInOut' }}
+                          style={{ display: 'inline-block' }}
+                        />
+                      ))}
+                    </span>
+                  )}
+                </div>
               )}
+
               <span
                 className="absolute -bottom-1.5 left-3 w-3 h-3 rotate-45 bg-[#0d1f3c]/92 border-r border-b border-accent-cyan/35"
                 aria-hidden="true"
@@ -523,6 +456,7 @@ const SectionCharacter = () => {
         initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        aria-hidden="true"
       >
         {/* Soft cyan glow under the feet so the float reads. */}
         <m.div

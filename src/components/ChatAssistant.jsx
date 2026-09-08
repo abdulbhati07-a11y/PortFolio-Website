@@ -152,7 +152,7 @@ const ChatAssistant = ({ scrollTo }) => {
               )}
               <FaRobot size={24} className="relative z-10" aria-hidden="true" />
               {/* Little greeting bubble on hover (desktop) */}
-              <span className="absolute right-full mr-3 hidden md:flex items-center whitespace-nowrap px-3 py-1.5 rounded-full rounded-br-sm bg-secondary/90 backdrop-blur-md text-text-primary text-xs font-sans font-medium opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shadow-lg pointer-events-none">
+              <span className="absolute right-full mr-3 hidden md:flex items-center whitespace-nowrap px-3 py-1.5 rounded-full rounded-br-sm bg-secondary text-text-primary text-xs font-sans font-medium opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shadow-lg pointer-events-none">
                 Ask me about {DEVELOPER_INFO.nickname} 👋
               </span>
             </m.button>
@@ -175,7 +175,7 @@ const ChatAssistant = ({ scrollTo }) => {
             transition={{ duration: 0.4, ease: EASE }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between gap-3 px-5 py-4 bg-glass/[0.04] backdrop-blur-xl shrink-0">
+            <div className="flex items-center justify-between gap-3 px-5 py-4 bg-secondary shrink-0">
               <div className="flex items-center gap-3">
                 <span className="relative w-10 h-10 rounded-full bg-accent-cyan/15 flex items-center justify-center text-accent-cyan">
                   <FaRobot size={18} aria-hidden="true" />
@@ -247,7 +247,7 @@ const ChatAssistant = ({ scrollTo }) => {
             </div>
 
             {/* Composer */}
-            <form onSubmit={handleSubmit} className="shrink-0 p-3 bg-glass/[0.04] backdrop-blur-xl">
+            <form onSubmit={handleSubmit} className="shrink-0 p-3 bg-secondary">
               <div className="flex items-center gap-2 bg-glass/[0.06] rounded-full pl-4 pr-2 py-1.5 focus-within:ring-1 focus-within:ring-accent-cyan/50 transition-all">
                 <input
                   ref={inputRef}
