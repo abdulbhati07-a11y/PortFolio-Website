@@ -262,11 +262,11 @@ const Hero = ({ scrollTo }) => {
         <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-2.5 sm:gap-3 lg:h-full">
 
           {/* ── LEFT: INTRO + three feature cards stacked below ── */}
-          <div className="flex flex-col gap-2.5 sm:gap-3 lg:h-full">
+          <div className="flex flex-col gap-2.5 sm:gap-3 lg:h-full lg:min-h-0">
 
           {/* ─── INTRO ─── */}
           <m.div
-            className={`${PANEL} p-5 sm:p-6 lg:p-7 flex-1 flex flex-col justify-center gap-3 overflow-hidden group`}
+            className={`${PANEL} p-5 sm:p-6 lg:p-5 xl:p-7 flex-1 min-h-0 flex flex-col justify-center gap-3 overflow-hidden group`}
             variants={containerVariants}
             initial={shouldReduceMotion ? 'visible' : 'hidden'}
             animate="visible"
@@ -303,7 +303,7 @@ const Hero = ({ scrollTo }) => {
               </m.p>
 
               <m.h1
-                className="font-display font-bold text-white uppercase leading-[1.03] tracking-tight text-4xl sm:text-5xl lg:text-[3.1rem] xl:text-6xl"
+                className="font-display font-bold text-white uppercase leading-[1.03] tracking-tight text-4xl sm:text-5xl lg:text-[2.7rem] xl:text-6xl"
                 variants={itemVariants}
                 aria-label={DEVELOPER_INFO.name}
               >
@@ -419,7 +419,7 @@ const Hero = ({ scrollTo }) => {
           </div>{/* end left column */}
 
           {/* ── RIGHT: AVATAR fills top, 2×2 stats sit below ── */}
-          <div className="flex flex-col gap-2.5 sm:gap-3 lg:h-full">
+          <div className="flex flex-col gap-2.5 sm:gap-3 lg:h-full lg:min-h-0">
 
           {/* ─── AVATAR ─── */}
           <m.div

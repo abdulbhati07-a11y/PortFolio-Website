@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <rect width="120" height="120" rx="20" fill="#06b6d4"/>
+  <!-- Branching path / decision tree icon -->
+  <g transform="translate(60,62)" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Stem -->
+    <line x1="0" y1="28" x2="0" y2="8" stroke-width="3.5"/>
+    <!-- Left branch -->
+    <line x1="0" y1="8" x2="-18" y2="-10" stroke-width="3"/>
+    <!-- Right branch -->
+    <line x1="0" y1="8" x2="18" y2="-10" stroke-width="3"/>
+    <!-- Left-left branch -->
+    <line x1="-18" y1="-10" x2="-26" y2="-26" stroke-width="2.2"/>
+    <!-- Left-right branch -->
+    <line x1="-18" y1="-10" x2="-10" y2="-26" stroke-width="2.2"/>
+    <!-- Right-left branch -->
+    <line x1="18" y1="-10" x2="10" y2="-26" stroke-width="2.2"/>
+    <!-- Right-right branch -->
+    <line x1="18" y1="-10" x2="26" y2="-26" stroke-width="2.2"/>
+    <!-- Terminal dots -->
+    <circle cx="-26" cy="-26" r="3.5" fill="#fff" stroke="none"/>
+    <circle cx="-10" cy="-26" r="3.5" fill="rgba(255,255,255,0.5)" stroke="none"/>
+    <circle cx="10" cy="-26" r="3.5" fill="rgba(255,255,255,0.5)" stroke="none"/>
+    <circle cx="26" cy="-26" r="3.5" fill="#fff" stroke="none"/>
+    <!-- Root dot -->
+    <circle cx="0" cy="28" r="4" fill="#fff" stroke="none"/>
+  </g>
+</svg>

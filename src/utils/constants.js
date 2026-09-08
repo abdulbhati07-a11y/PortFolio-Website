@@ -130,6 +130,27 @@ export const PROJECTS = [
     }
   },
   {
+    id: 9,
+    title: "FuturePath AI",
+    description: "An AI decision-simulation platform that interviews you, then projects three weighted futures — best, likely, and worst — with risk scores, financial deltas, and satisfaction estimates.",
+    longDescription: "Full-stack AI product: conversational interview engine, scenario-modeling backend, three-case outcome projections with risk and confidence scoring, and a privacy-first web UI.",
+    tech: ["AI/ML", "Full Stack", "React", "API Integration"],
+    category: "AI/ML",
+    featured: true,
+    links: {
+      demo: "https://www.futurepathai.org/"
+    },
+    gradient: "bg-accent-cyan/15",
+    icon: "🔮",
+    logo: "/assets/logos/futurepathai.svg",
+    screenshot: "/assets/screenshots/futurepathai.jpg",
+    caseStudy: {
+      challenge: "Major life decisions — career pivots, relocations, education choices — are high-stakes and irreversible, yet most people make them on gut feel with no structured way to model possible outcomes.",
+      solution: "Built an AI platform that runs a structured interview, then simulates three weighted futures (best-case, most-likely, worst-case) with quantified risk scores, financial deltas, and satisfaction estimates — turning vague decisions into concrete, comparable projections.",
+      impact: "A live commercial product combining conversational AI, scenario modeling, and multi-case outcome inference into one privacy-first web app — demonstrating end-to-end AI product development from interview UX to probabilistic projection.",
+    }
+  },
+  {
     id: 1,
     title: "Pet Sitting Web",
     description: "A beautifully crafted frontend for a premium pet sitting service, featuring responsive layouts, interactive components, and a polished user experience that builds trust with pet owners.",
