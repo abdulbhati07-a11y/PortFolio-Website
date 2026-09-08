@@ -131,7 +131,7 @@ const ChatAssistant = ({ scrollTo }) => {
   return (
     <>
       {/* ─── Floating launcher (bottom-right) ─── */}
-      <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[200]">
+      <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[150]">
         <AnimatePresence>
           {!open && (
             <m.button
@@ -168,7 +168,7 @@ const ChatAssistant = ({ scrollTo }) => {
             role="dialog"
             aria-modal="false"
             aria-label={`Chat assistant for ${DEVELOPER_INFO.nickname}`}
-            className="fixed z-[200] bottom-0 right-0 sm:bottom-6 sm:right-6 w-full sm:w-[400px] h-[100dvh] sm:h-[600px] sm:max-h-[85vh] flex flex-col glass-card sm:rounded-3xl rounded-none overflow-hidden shadow-[0_24px_70px_-12px_rgba(0,0,0,0.6)]"
+            className="fixed z-[150] bottom-0 right-0 sm:bottom-6 sm:right-6 w-full sm:w-[400px] h-[100dvh] sm:h-[600px] sm:max-h-[85vh] flex flex-col glass-card sm:rounded-3xl rounded-none overflow-hidden shadow-[0_24px_70px_-12px_rgba(0,0,0,0.6)]"
             initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 30, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20, scale: 0.98 }}

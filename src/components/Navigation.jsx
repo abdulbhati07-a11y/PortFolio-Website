@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { m, AnimatePresence, useScroll, useSpring, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { FaSun, FaMoon } from 'react-icons/fa';
 import { DEVELOPER_INFO } from '../utils/constants';
 import { useTheme } from '../hooks/useTheme';
@@ -19,10 +19,7 @@ const Navigation = ({ scrollTo }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
   const { theme, toggleTheme } = useTheme();
-  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -56,13 +53,6 @@ const Navigation = ({ scrollTo }) => {
 
   return (
     <>
-      {/* Scroll progress bar */}
-      <m.div
-        className="fixed top-0 left-0 right-0 h-[2px] bg-accent-cyan z-[200] origin-left"
-        style={{ scaleX }}
-        aria-hidden="true"
-      />
-
       <m.header
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -95,14 +85,6 @@ const Navigation = ({ scrollTo }) => {
             aria-label="Primary"
             className="relative hidden md:flex items-center gap-1 bg-glass/[0.04] rounded-full px-2 py-1.5 backdrop-blur-md h-12 border border-glass/[0.08] overflow-hidden"
           >
-            {/* Subtle drifting glow blob, clipped to the pill outline */}
-            <m.span
-              aria-hidden="true"
-              className="absolute w-20 h-20 rounded-full blur-2xl pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.28), transparent 70%)' }}
-              animate={shouldReduceMotion ? { left: '40%', top: '-30%' } : { left: ['-8%', '82%', '-8%'], top: ['-35%', '55%', '-35%'] }}
-              transition={shouldReduceMotion ? {} : { duration: 16, repeat: Infinity, ease: 'easeInOut' }}
-            />
             {links.map((link) => (
               <button
                 key={link.id}

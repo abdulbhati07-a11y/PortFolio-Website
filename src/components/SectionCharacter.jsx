@@ -384,6 +384,20 @@ const SectionCharacter = () => {
       ref={wrapperRef}
       className={`hidden md:flex fixed bottom-5 left-5 z-[150] items-end gap-3 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeId === "hero" ? "opacity-0 translate-y-12 scale-90" : "opacity-100 translate-y-0 scale-100"}`}
     >
+      {/* Focus pool — a soft radial of the page's OWN background colour sitting
+          behind the character (-z-10). Over empty background it is invisible
+          (same colour over itself); where the mascot floats over section text
+          it gently fades that text out, so the character reads as a deliberate
+          floating widget instead of colliding with content. Theme-aware via
+          --bg-primary, so it works in both light and dark. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-8 -z-10"
+        style={{
+          background:
+            'radial-gradient(58% 58% at 42% 72%, rgba(var(--bg-primary),0.82), rgba(var(--bg-primary),0.4) 46%, transparent 72%)',
+        }}
+      />
       {/* Speech bubble — appears above the character with an on-demand
           play button. Nothing is spoken until the visitor clicks it. */}
       <AnimatePresence mode="wait">
@@ -399,7 +413,7 @@ const SectionCharacter = () => {
             exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 4, scale: 0.96 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="relative px-4 py-3 rounded-2xl rounded-bl-sm backdrop-blur-xl bg-[#0d1f3c]/92 border border-accent-cyan/35 shadow-[0_8px_32px_rgba(0,0,0,0.35),0_0_20px_rgba(0,212,255,0.15)]">
+            <div className="relative px-4 py-3 rounded-2xl rounded-bl-sm backdrop-blur-xl bg-[#0d1f3c]/92 border border-accent-cyan/35 shadow-[0_8px_32px_rgba(0,0,0,0.35),0_0_16px_rgba(0,212,255,0.10)]">
               <div className="flex items-start gap-2">
                 <span className="text-base leading-none mt-0.5" aria-hidden="true">
                   {current.greeting}
@@ -452,7 +466,7 @@ const SectionCharacter = () => {
           The hand wave speeds up while the character is talking. */}
       <m.div
         className="relative w-[120px] h-[140px] sm:w-[140px] sm:h-[160px] pointer-events-auto"
-        style={{ filter: 'drop-shadow(0 14px 30px rgba(0,0,0,0.45))' }}
+        style={{ filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.35))' }}
         initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
@@ -464,7 +478,7 @@ const SectionCharacter = () => {
           animate={
             shouldReduceMotion
               ? {}
-              : { scaleX: [1, 0.85, 1], opacity: [0.6, 0.4, 0.6] }
+              : { scaleX: [1, 0.88, 1], opacity: [0.45, 0.3, 0.45] }
           }
           transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
           aria-hidden="true"
@@ -473,15 +487,8 @@ const SectionCharacter = () => {
         {/* Idle float loop. */}
         <m.div
           className="relative w-full h-full"
-          animate={
-            shouldReduceMotion
-              ? {}
-              : { y: [0, -4, 0], rotate: [0, 1.4, 0, -1.4, 0] }
-          }
-          transition={{
-            y: { duration: 4.5, repeat: Infinity, ease: 'easeInOut' },
-            rotate: { duration: 9, repeat: Infinity, ease: 'easeInOut' },
-          }}
+          animate={shouldReduceMotion ? {} : { y: [0, -4, 0] }}
+          transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
           style={{ transformOrigin: '50% 85%' }}
         >
           <img

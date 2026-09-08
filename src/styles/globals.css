@@ -18,7 +18,7 @@
     --cb-grid-fine:    rgba(100, 160, 210, 0.10);
     --cb-grid-coarse:  rgba(60, 140, 200, 0.08);
     --cb-trace:        rgb(56, 152, 220);
-    --cb-trace-mid:    rgba(56, 152, 220, 0.22);
+    --cb-trace-mid:    rgba(56, 152, 220, 0.30);
     --cb-pulse:        rgba(40, 130, 210, 0.60);
     --cb-node-fill:    rgba(30, 120, 200, 0.70);
     --cb-node-glow:    rgba(56, 152, 220, 0.08);
@@ -199,11 +199,11 @@
     @apply hover:bg-secondary/100 dark:hover:bg-secondary/95 hover:-translate-y-1;
   }
   .glass-card-hover:hover {
-    background-image: linear-gradient(155deg, rgba(0, 212, 255, 0.09) 0%, transparent 55%);
-    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.15), 0 8px 48px -12px rgba(0, 212, 255, 0.12);
+    background-image: linear-gradient(155deg, rgba(0, 212, 255, 0.07) 0%, transparent 55%);
+    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.15), 0 8px 48px -12px rgba(0, 212, 255, 0.08);
   }
   .dark .glass-card-hover:hover {
-    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.4), 0 8px 48px -12px rgba(0, 212, 255, 0.15);
+    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.4), 0 8px 48px -12px rgba(0, 212, 255, 0.10);
   }
   /* Soft, colored ambient shadow under key elements (instead of flat black) */
   .ambient-shadow {
@@ -239,7 +239,7 @@
     inset: 0;
     z-index: 95;
     pointer-events: none;
-    opacity: 0.04;
+    opacity: 0.02;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 180px 180px;
   }
@@ -273,34 +273,6 @@
   100% { background-position: 200% 50%; }
 }
 
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 10px rgba(0, 217, 255, 0.3); }
-  50% { box-shadow: 0 0 25px rgba(0, 217, 255, 0.7), 0 0 50px rgba(0, 217, 255, 0.2); }
-}
+/* pulse-glow removed — no callers in the codebase */
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-/* Hero blob subtle animation */
-@keyframes blob-morph {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  33% { transform: scale(1.03) rotate(2deg); }
-  66% { transform: scale(0.97) rotate(-2deg); }
-}
-
-.hero-blob svg {
-  animation: blob-morph 12s ease-in-out infinite;
-}
-
-/* The hero now fills the viewport via a full-bleed section with
-   `min-height: calc(100dvh - 5rem)` and vertically-centered content, so the
-   old `#hero { zoom }` fit-to-height hack is no longer needed (and would
-   fight the edge-to-edge background). Content that is taller than the
-   viewport on very short screens simply extends the section gracefully. */
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-blob svg {
-    animation: none;
-  }
-}
+/* Hero blob animation removed — element no longer present in Hero.jsx */

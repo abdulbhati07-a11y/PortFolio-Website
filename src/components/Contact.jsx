@@ -297,14 +297,14 @@ const Contact = () => {
       {/* Form + info panel */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12 max-w-5xl mx-auto">
         <Reveal className="lg:col-span-3">
-          <div className="glass-card rounded-3xl p-6 sm:p-8 h-full">
+          <div className="glass-card glass-card-hover rounded-3xl p-6 sm:p-8 h-full">
             <h3 className="font-display text-xl font-bold text-text-primary mb-6 tracking-tight">Send a Message</h3>
             <ContactForm />
           </div>
         </Reveal>
 
         <Reveal delay={0.15} className="lg:col-span-2">
-          <div className="glass-card rounded-3xl p-6 sm:p-8 flex flex-col gap-5 h-full">
+          <div className="glass-card glass-card-hover rounded-3xl p-6 sm:p-8 flex flex-col gap-5 h-full">
             <h3 className="font-display text-lg font-bold text-text-primary tracking-tight">Contact Info</h3>
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3">

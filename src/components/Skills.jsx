@@ -32,7 +32,7 @@ const SkillCard = ({ skill, index }) => {
   return (
     <m.div
       ref={cardRef}
-      className="glass-card glass-card-hover !bg-secondary backdrop-blur-none p-4 sm:p-5 rounded-3xl group flex flex-col gap-3 justify-between h-full hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)]"
+      className="glass-card glass-card-hover !bg-secondary p-4 sm:p-5 rounded-3xl group flex flex-col gap-3 justify-between h-full hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)]"
       initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
       animate={shouldReduceMotion || isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ delay: index * 0.05, duration: 0.5 }}
@@ -46,7 +46,7 @@ const SkillCard = ({ skill, index }) => {
         </div>
         <div className="flex items-center gap-2">
           <span className="font-mono text-sm font-bold text-accent-cyan">{Math.round(fill)}%</span>
-          <span className="font-mono text-[9px] font-bold text-text-secondary uppercase tracking-widest border border-glass/10 px-2 py-0.5 rounded-full group-hover:border-accent-cyan/30 transition-colors">
+          <span className="font-mono text-[10px] font-bold text-text-secondary uppercase tracking-widest border border-glass/10 px-2 py-0.5 rounded-full group-hover:border-accent-cyan/30 transition-colors">
             {skill.type}
           </span>
         </div>
@@ -97,7 +97,7 @@ const RadialBadge = ({ skill, index }) => {
   return (
     <m.div
       ref={cardRef}
-      className="glass-card glass-card-hover !bg-secondary backdrop-blur-none rounded-3xl p-5 flex flex-col items-center gap-3 hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)] group"
+      className="glass-card glass-card-hover !bg-secondary rounded-3xl p-5 flex flex-col items-center gap-3 hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)] group"
       initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
       animate={shouldReduceMotion || isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ delay: index * 0.05, duration: 0.5 }}
@@ -167,7 +167,7 @@ const Skills = ({ onSkillClick }) => {
           </div>
         </Reveal>
         <Reveal delay={0.15}>
-          <div className="glass-card !bg-secondary backdrop-blur-none rounded-3xl p-6 sm:p-8 h-full flex flex-col justify-center gap-4">
+          <div className="glass-card !bg-secondary rounded-3xl p-6 sm:p-8 h-full flex flex-col justify-center gap-4">
             <h3 className="font-display text-lg font-bold text-text-primary tracking-tight">Core Competencies</h3>
             <p className="font-sans text-text-secondary text-sm font-light leading-relaxed">
               The graph maps my real, shipped stack — each technology links to the tools it works with.

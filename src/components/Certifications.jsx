@@ -11,9 +11,9 @@ const CertCard = ({ cert, index }) => (
       href={encodeURI(cert.file)}
       target="_blank"
       rel="noopener noreferrer"
-      whileHover={{ y: -6 }}
+      whileHover={{ y: -4 }}
       aria-label={`View ${cert.title} certificate (opens PDF in a new tab)`}
-      className="glass-card glass-card-hover rounded-3xl p-6 sm:p-8 flex flex-col group cursor-pointer relative overflow-hidden h-full transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
+      className="glass-card glass-card-hover rounded-3xl p-6 sm:p-8 flex flex-col group cursor-pointer relative overflow-hidden h-full transition-all duration-500 hover:shadow-[0_14px_40px_rgba(0,0,0,0.35)]"
     >
       <div className={`absolute inset-0 ${cert.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0`} />
 

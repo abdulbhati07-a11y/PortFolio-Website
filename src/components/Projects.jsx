@@ -44,7 +44,7 @@ const CaseStudyModal = ({ project, onClose }) => {
       exit={{ opacity: 0 }}
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-md" aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/70" aria-hidden="true" />
       <m.div
         role="dialog"
         aria-modal="true"
@@ -380,7 +380,7 @@ const Projects = ({ activeFilter, clearFilter }) => {
     <section
       id="projects"
       aria-label="Projects"
-      className={`w-full ${isCinematic ? "relative overflow-hidden" : "py-20 md:py-32"}`}
+      className={`w-full py-20 md:py-32 ${isCinematic ? "relative overflow-hidden" : ""}`}
       ref={containerRef}
     >
       <div className={`${isCinematic ? "h-screen flex flex-col justify-center w-full" : "max-w-screen-2xl mx-auto"}`}>

@@ -84,7 +84,7 @@ const CustomCursor = () => {
     <div className="pointer-events-none" aria-hidden="true">
       {/* Dot — snaps to the raw pointer position */}
       <m.div
-        className="fixed top-0 left-0 z-[9999] pointer-events-none -translate-x-1/2 -translate-y-1/2"
+        className="fixed top-0 left-0 z-[400] pointer-events-none -translate-x-1/2 -translate-y-1/2"
         style={{ x, y }}
         animate={{
           scale: isClicking ? 0.5 : isHovering ? 0 : 1,
@@ -97,7 +97,7 @@ const CustomCursor = () => {
 
       {/* Ring — spring-follows the pointer */}
       <m.div
-        className="fixed top-0 left-0 z-[9998] pointer-events-none -translate-x-1/2 -translate-y-1/2"
+        className="fixed top-0 left-0 z-[399] pointer-events-none -translate-x-1/2 -translate-y-1/2"
         style={{ x: ringX, y: ringY }}
         animate={{ opacity: isVisible ? 1 : 0 }}
         transition={{ duration: 0.3 }}

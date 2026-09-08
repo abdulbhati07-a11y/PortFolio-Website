@@ -19,7 +19,7 @@ const ArticleCard = ({ article, index }) => {
       <Wrapper
         {...wrapperProps}
         className={`glass-card glass-card-hover rounded-3xl p-5 sm:p-6 md:p-8 flex flex-col group transition-all duration-500 overflow-hidden relative h-full ${
-          published ? 'cursor-pointer hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)]' : ''
+          published ? 'cursor-pointer hover:shadow-[0_14px_40px_rgba(0,0,0,0.35)]' : ''
         }`}
       >
         <div className={`absolute inset-0 ${article.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0`} />

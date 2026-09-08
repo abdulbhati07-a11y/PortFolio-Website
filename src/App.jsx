@@ -191,7 +191,14 @@ function App() {
     });
 
     ScrollTrigger.refresh();
-    return () => ctx.revert();
+
+    const onResize = () => ScrollTrigger.refresh();
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      ctx.revert();
+      window.removeEventListener('resize', onResize);
+    };
   }, [isLoaded]);
 
   const scrollTo = (target) => {
@@ -227,9 +234,9 @@ function App() {
 
           <main id="main-content" className="flex-grow pt-20 max-w-screen-2xl mx-auto w-full">
             <Hero scrollTo={scrollTo} />
-            <div data-gsap="divider" className="section-divider mx-6 md:mx-12 origin-left" />
+            <div data-gsap="divider" className="section-divider mx-4 md:mx-8 lg:mx-16 2xl:mx-0 origin-left" />
             <About />
-            <div data-gsap="divider" className="section-divider mx-6 md:mx-12 origin-left" />
+            <div data-gsap="divider" className="section-divider mx-4 md:mx-8 lg:mx-16 2xl:mx-0 origin-left" />
             <Skills onSkillClick={handleSkillClick} />
             <Suspense
               fallback={
@@ -242,11 +249,11 @@ function App() {
             >
               <Projects activeFilter={activeFilter} clearFilter={() => setActiveFilter(null)} />
             </Suspense>
-            <div data-gsap="divider" className="section-divider mx-6 md:mx-12 origin-left" />
+            <div data-gsap="divider" className="section-divider mx-4 md:mx-8 lg:mx-16 2xl:mx-0 origin-left" />
             <Timeline />
-            <div data-gsap="divider" className="section-divider mx-6 md:mx-12 origin-left" />
+            <div data-gsap="divider" className="section-divider mx-4 md:mx-8 lg:mx-16 2xl:mx-0 origin-left" />
             <Blog />
-            <div data-gsap="divider" className="section-divider mx-6 md:mx-12 origin-left" />
+            <div data-gsap="divider" className="section-divider mx-4 md:mx-8 lg:mx-16 2xl:mx-0 origin-left" />
             <Certifications />
             <Contact />
           </main>
