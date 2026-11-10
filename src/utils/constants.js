@@ -17,11 +17,11 @@ export const DEVELOPER_INFO = {
     "Problem Solver"
   ],
   tagline: "Building intelligent solutions with Python, AI/ML, and full-stack expertise.",
-  bio: "I am a 4th Semester CS Student pursuing Data Science and AI/ML specialization. With over 1.5 years of experience in the Computer Science field, I am passionate about solving complex problems and creating premium digital experiences.",
+  bio: "I am a fifth-semester computer science student building web applications, data science projects, and AI experiments.",
   email: "abdulbha77@gmail.com",
   github: "https://github.com/abdulbhati07-a11y",
   linkedin: "https://www.linkedin.com/in/muhammad-abdullah-bhatti-5bab33396/",
-  resume: "/Muhammad_Abdullah_Bhatti_Professional_Resume.docx",
+  resume: "/assets/resumes/abdullah-data-science-resume.pdf",
   certificates: "/The_Ultimate_Job_Ready_Data_Science_Course_Certificate.pdf",
   available: true,
   currentlyBuilding: "AI-powered web apps"

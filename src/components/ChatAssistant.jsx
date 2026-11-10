@@ -56,7 +56,7 @@ const ChatAssistant = ({ scrollTo }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
-  const [unread, setUnread] = useState(true); // pulse on the FAB until first open
+  const [contactVisible, setContactVisible] = useState(false);
 
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
@@ -68,7 +68,6 @@ const ChatAssistant = ({ scrollTo }) => {
     if (open && messages.length === 0) {
       setMessages([makeBotMessage({ text: ASSISTANT_INTRO, suggestions: STARTER_PROMPTS })]);
     }
-    if (open) setUnread(false);
   }, [open, messages.length]);
 
   /* Autoscroll to the newest message. */
@@ -89,6 +88,17 @@ const ChatAssistant = ({ scrollTo }) => {
   }, [open]);
 
   useEffect(() => () => clearTimeout(typingTimer.current), []);
+
+  useEffect(() => {
+    const contact = document.querySelector('#contact');
+    if (!contact || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      setContactVisible(entry.isIntersecting);
+      if (entry.isIntersecting) setOpen(false);
+    }, { threshold: 0.08 });
+    observer.observe(contact);
+    return () => observer.disconnect();
+  }, []);
 
   const handleAction = useCallback(
     (action) => {
@@ -133,11 +143,11 @@ const ChatAssistant = ({ scrollTo }) => {
       {/* ─── Floating launcher (bottom-right) ─── */}
       <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[150]">
         <AnimatePresence>
-          {!open && (
+          {!open && !contactVisible && (
             <m.button
               type="button"
               onClick={() => setOpen(true)}
-              aria-label="Open AI assistant — ask about Abdullah"
+              aria-label="Open portfolio guide — ask about Abdullah"
               className="group relative w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-accent-cyan text-slate-900 flex items-center justify-center shadow-[0_8px_30px_rgba(0,212,255,0.35)] hover:shadow-[0_10px_40px_rgba(0,212,255,0.55)] transition-shadow"
               initial={shouldReduceMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -146,13 +156,14 @@ const ChatAssistant = ({ scrollTo }) => {
               whileHover={shouldReduceMotion ? {} : { scale: 1.06 }}
               whileTap={{ scale: 0.94 }}
             >
-              {/* Pulsing ring to draw the eye until first interaction */}
-              {unread && !shouldReduceMotion && (
-                <span className="absolute inset-0 rounded-full animate-ping bg-accent-cyan/40" aria-hidden="true" />
-              )}
-              <FaRobot size={24} className="relative z-10" aria-hidden="true" />
+              {!shouldReduceMotion && <>
+                <span className="assistant-ring assistant-ring-one" aria-hidden="true" />
+                <span className="assistant-ring assistant-ring-two" aria-hidden="true" />
+                <span className="assistant-signal" aria-hidden="true"><i /><i /><i /></span>
+              </>}
+              <span className="assistant-robot"><FaRobot size={24} aria-hidden="true" /></span>
               {/* Little greeting bubble on hover (desktop) */}
-              <span className="absolute right-full mr-3 hidden md:flex items-center whitespace-nowrap px-3 py-1.5 rounded-full rounded-br-sm bg-secondary text-text-primary text-xs font-sans font-medium opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shadow-lg pointer-events-none">
+              <span className="assistant-tooltip" aria-hidden="true">
                 Ask me about {DEVELOPER_INFO.nickname} 👋
               </span>
             </m.button>

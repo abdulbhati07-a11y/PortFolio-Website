@@ -1,271 +1,61 @@
-import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import Lenis from '@studio-freight/lenis';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion';
-import Navigation from './components/Navigation';
-import Hero from './components/Hero';
-import SiteBackground from './components/SiteBackground';
-import About from './components/About';
-import Skills from './components/Skills';
-import Timeline from './components/Timeline';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
-import Blog from './components/Blog';
-import Certifications from './components/Certifications';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { LazyMotion, domAnimation } from 'framer-motion';
 import SEO from './components/SEO';
-import CustomCursor from './components/CustomCursor';
-import ScrollProgress from './components/ui/ScrollProgress';
-import Skeleton from './components/Skeleton';
-import ChatAssistant from './components/ChatAssistant';
-import SectionCharacter from './components/SectionCharacter';
-import Logo from './components/ui/Logo';
-
-const Projects = lazy(() => import('./components/Projects'));
-
-gsap.registerPlugin(ScrollTrigger);
-
-const prefersReducedMotion = () =>
-  typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/* ─── Loading Screen ──────────────────────────────────────────────────── */
-const EASE_OUT_EXPO = [0.16, 1, 0.3, 1];
-
-const LoadingScreen = ({ onComplete }) => {
-  const reduced = prefersReducedMotion();
-  const [count, setCount] = useState(reduced ? 100 : 0);
-  const [pageLoaded, setPageLoaded] = useState(document.readyState === 'complete');
-
+import LabHero from './components/lab/LabHero';
+import Bookshelf from './components/lab/Bookshelf';
+import SocialActivity from './components/lab/SocialActivity';
+import LabJournal from './components/lab/LabJournal';
+import LabContact from './components/lab/LabContact';
+import Doorway from './components/lab/Doorway';
+import Credentials from './components/lab/Credentials';
+import LabCursor from './components/lab/LabCursor';
+import Brand from './components/lab/Brand';
+import ProcessSequence from './components/lab/ProcessSequence';
+import useLabMotion from './hooks/useLabMotion';
+import useMagneticMotion from './hooks/useMagneticMotion';
+import './styles/lab.css';
+import './styles/experience.css';
+import './styles/bookshelf.css';
+import './styles/refresh.css';
+import './styles/chapters.css';
+import './styles/premium.css';
+import './styles/social.css';
+const RegressionLab = lazy(() => import('./components/lab/RegressionLab'));
+const ChatAssistant = lazy(() => import('./components/ChatAssistant'));
+export default function App() {
+  const root=useRef(null);
+  useLabMotion(root);
+  useMagneticMotion(root);
+  const [menu, setMenu] = useState(false);
+  useEffect(()=>{if(!menu)return;const previous=document.body.style.overflow;document.body.style.overflow='hidden';const close=e=>{if(e.key==='Escape')setMenu(false);};document.addEventListener('keydown',close);return()=>{document.body.style.overflow=previous;document.removeEventListener('keydown',close);};},[menu]);
+  const [boot, setBoot] = useState(() => { try { return !sessionStorage.getItem('lab-ready') && !matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } });
   useEffect(() => {
-    if (pageLoaded) return;
-    const handleLoad = () => setPageLoaded(true);
-    window.addEventListener('load', handleLoad);
-    return () => window.removeEventListener('load', handleLoad);
-  }, [pageLoaded]);
-
-  // 0 → 100 counter, eased. Holds at 99 until the window has actually loaded.
-  useEffect(() => {
-    if (reduced) return;
-    let rafId;
-    let start;
-    const duration = 1200;
-    const tick = (now) => {
-      if (start === undefined) start = now;
-      const progress = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * 100));
-      if (progress < 1) rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [reduced]);
-
-  const displayCount = pageLoaded ? count : Math.min(count, 99);
-
-  useEffect(() => {
-    if (pageLoaded && displayCount >= 100) {
-      const t = setTimeout(onComplete, 300);
-      return () => clearTimeout(t);
-    }
-  }, [pageLoaded, displayCount, onComplete]);
-
-  return (
-    <m.div
-      className="fixed inset-0 z-[999] flex flex-col items-center justify-center gap-8"
-      // Root stays put while the curtains and content run their exits below;
-      // AnimatePresence waits for the longest descendant exit.
-      exit={{ transition: { duration: reduced ? 0.2 : 0.9 } }}
-      role="status"
-      aria-label="Loading portfolio"
-    >
-      {/* Curtain panels — split apart on exit to reveal the hero */}
-      <m.div
-        className="absolute inset-x-0 top-0 h-1/2 bg-primary"
-        exit={reduced ? { opacity: 0 } : { y: '-100%' }}
-        transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
-        aria-hidden="true"
-      />
-      <m.div
-        className="absolute inset-x-0 bottom-0 h-1/2 bg-primary"
-        exit={reduced ? { opacity: 0 } : { y: '100%' }}
-        transition={{ duration: 0.8, ease: EASE_OUT_EXPO, delay: 0.08 }}
-        aria-hidden="true"
-      />
-
-      {/* Loader content */}
-      <m.div
-        className="relative flex flex-col items-center gap-8"
-        exit={{ opacity: 0, scale: 0.96 }}
-        transition={{ duration: 0.3, ease: EASE_OUT_EXPO }}
-      >
-        <div className="flex flex-col items-center gap-4">
-          <Logo size={72} glow />
-          <div className="font-mono text-text-secondary text-xs tracking-[0.4em] uppercase">
-            Portfolio
-          </div>
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <span className="font-mono text-3xl font-bold text-text-primary tabular-nums" aria-hidden="true">
-            {displayCount}
-            <span className="text-accent-cyan text-lg">%</span>
-          </span>
-          <div className="w-48 h-[2px] bg-glass/[0.06] rounded-full overflow-hidden">
-            <div
-              className="h-full bg-accent-cyan rounded-full"
-              style={{ width: `${displayCount}%` }}
-            />
-          </div>
-        </div>
-      </m.div>
-    </m.div>
-  );
-};
-
-/* ─── App ─────────────────────────────────────────────────────────────── */
-function App() {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [activeFilter, setActiveFilter] = useState(null);
-  const lenisRef = useRef(null);
-
-  // Smooth scrolling + GSAP ScrollTrigger, bridged through one rAF loop.
-  // (Skipped entirely for reduced-motion users.)
-  useEffect(() => {
-    if (prefersReducedMotion()) return;
-
-    const lenis = new Lenis({
-      lerp: 0.08,             // low lerp = long, buttery glide (very smooth)
-      wheelMultiplier: 1,
-      touchMultiplier: 1.6,
-      smoothWheel: true,
-      syncTouch: true,        // smooth momentum on touch devices too
-    });
-    lenisRef.current = lenis;
-
-    lenis.on('scroll', () => {
-      ScrollTrigger.update();
-    });
-
-    // Drive Lenis from GSAP's ticker so both share one clock.
-    const tick = (time) => lenis.raf(time * 1000);
-    gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
-
-    return () => {
-      gsap.ticker.remove(tick);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
+    const timer = setTimeout(() => { setBoot(false); try { sessionStorage.setItem('lab-ready', '1'); } catch { /* Storage is optional. */ } }, 700);
+    return () => clearTimeout(timer);
   }, []);
-
-  // GSAP ScrollTrigger reveals for section dividers, set up after content mounts.
   useEffect(() => {
-    if (!isLoaded || prefersReducedMotion()) return;
-
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray('[data-gsap="divider"]').forEach((el) => {
-        gsap.fromTo(
-          el,
-          { scaleX: 0, opacity: 0 },
-          {
-            scaleX: 1,
-            opacity: 1,
-            duration: 1.1,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: el, start: 'top 92%' },
-          }
-        );
-      });
-
-      gsap.utils.toArray('[data-gsap="section"]').forEach((el) => {
-        gsap.from(el, {
-          y: 48,
-          opacity: 0,
-          filter: 'blur(6px)',
-          duration: 0.9,
-          ease: 'expo.out',
-          scrollTrigger: { trigger: el, start: 'top 85%' },
-          clearProps: 'filter', // don't leave a stale filter that breaks fixed/sticky children
-        });
-      });
-    });
-
-    ScrollTrigger.refresh();
-
-    const onResize = () => ScrollTrigger.refresh();
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      ctx.revert();
-      window.removeEventListener('resize', onResize);
-    };
-  }, [isLoaded]);
-
-  const scrollTo = (target) => {
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(target, { offset: -80 });
-    } else {
-      const el = typeof target === 'string' ? document.querySelector(target) : target;
-      el?.scrollIntoView({ block: 'start' });
-    }
-  };
-
-  const handleSkillClick = (skill) => {
-    setActiveFilter(skill);
-    scrollTo('#projects');
-  };
-
-  return (
-    <LazyMotion features={domAnimation}>
-      <SEO />
-      <AnimatePresence mode="wait">
-        {!isLoaded && <LoadingScreen key="loader" onComplete={() => setIsLoaded(true)} />}
-      </AnimatePresence>
-
-      {isLoaded && (
-        <div className="min-h-screen flex flex-col relative">
-          {/* Global circuit board — fixed behind all sections, theme-aware */}
-          <SiteBackground />
-          <a href="#main-content" className="skip-link">Skip to content</a>
-          <div className="grain-overlay" aria-hidden="true" />
-          <CustomCursor />
-          <ScrollProgress scrollTo={scrollTo} />
-          <Navigation scrollTo={scrollTo} />
-
-          <main id="main-content" className="flex-grow pt-20 max-w-screen-2xl mx-auto w-full">
-            <Hero scrollTo={scrollTo} />
-            <div data-gsap="divider" className="section-divider mx-4 md:mx-8 lg:mx-16 2xl:mx-0 origin-left" />
-            <About />
-            <div data-gsap="divider" className="section-divider mx-4 md:mx-8 lg:mx-16 2xl:mx-0 origin-left" />
-            <Skills onSkillClick={handleSkillClick} />
-            <Suspense
-              fallback={
-                <div className="px-4 md:px-8 lg:px-16 py-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-                  {[1, 2, 3].map((i) => (
-                    <Skeleton key={i} width="100%" height="380px" borderRadius="24px" />
-                  ))}
-                </div>
-              }
-            >
-              <Projects activeFilter={activeFilter} clearFilter={() => setActiveFilter(null)} />
-            </Suspense>
-            <div data-gsap="divider" className="section-divider mx-4 md:mx-8 lg:mx-16 2xl:mx-0 origin-left" />
-            <Timeline />
-            <div data-gsap="divider" className="section-divider mx-4 md:mx-8 lg:mx-16 2xl:mx-0 origin-left" />
-            <Blog />
-            <div data-gsap="divider" className="section-divider mx-4 md:mx-8 lg:mx-16 2xl:mx-0 origin-left" />
-            <Certifications />
-            <Contact />
-          </main>
-
-          <Footer scrollTo={scrollTo} />
-
-          <ChatAssistant scrollTo={scrollTo} />
-          <SectionCharacter />
-        </div>
-      )}
-    </LazyMotion>
-  );
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('lab-in-view'); observer.unobserve(entry.target); } }), { threshold: .08 });
+    document.querySelectorAll('.section-title,.identity-body,.notes-heading,.project-heading').forEach(node => { node.classList.add('lab-reveal'); observer.observe(node); });
+    return () => { observer.disconnect(); document.querySelectorAll('.lab-reveal').forEach(node=>node.classList.remove('lab-reveal')); };
+  }, []);
+  const scrollTo = target => document.querySelector(target)?.scrollIntoView({ block: 'start' });
+  return <LazyMotion features={domAnimation}><SEO />
+    {boot && <div className="lab-boot" role="status"><Brand /><p>ABDULLAH.OS / INITIALIZING NEURAL INTERFACE</p><div className="boot-track"><i /></div><span className="micro">CONNECTING PROJECT GRAPH → SYSTEM READY</span></div>}
+    <LabCursor /><div className="lab-site" ref={root}><div className="reading-progress" aria-hidden="true"><i/></div><a className="lab-skip" href="#main-content">Skip to content</a>
+      <header className="lab-header"><Brand href="#home" /><button className="menu-toggle" onClick={() => setMenu(!menu)} aria-expanded={menu} aria-controls="lab-nav">{menu ? 'CLOSE −' : 'MENU +'}</button><nav id="lab-nav" className={menu ? 'is-open' : ''} aria-label="Main navigation">{[['home','Home'],['projects','Projects'],['about','About'],['credentials','Credentials'],['contact','Contact ↗']].map(([id,label]) => <a key={id} href={`#${id}`} onClick={() => setMenu(false)} data-magnetic={id === 'contact' ? 'button' : undefined}>{label}</a>)}</nav></header>
+      <main id="main-content"><LabHero />
+        <Doorway number="01" eyebrow="THE FIRST CHAPTER" title="ENTER THE LIBRARY" target="projects" action="Explore the projects" />
+        <Bookshelf />
+        <SocialActivity />
+        <Doorway number="02" eyebrow="BEHIND THE WORK" title="MEET THE MAKER" target="identity" action="Turn the page" />
+        <section className="lab-identity lab-section" id="identity"><div className="section-kicker"><span className="micro">01 / THE HUMAN BEHIND THE SYSTEM</span><span className="micro">CS × AI × ENGINEERING</span></div><div className="identity-body"><span className="micro accent">A LITTLE CONTEXT ↘</span><h2>Curiosity in.<br /><span>Intelligence out.</span></h2><p>I’m Muhammad Abdullah Bhatti, a computer science student exploring machine learning and building software that turns complex ideas into useful, interactive systems.</p></div><div className="identity-areas">{['Machine learning','Intelligent systems','Software engineering'].map((item,i) => <a href={i === 0 ? '#playground' : '#projects'} key={item}><span className="micro">0{i+1}</span>{item}<span>↗</span></a>)}</div></section>
+        <ProcessSequence /><Suspense fallback={<div className="lab-section">Loading interactive experiment…</div>}><RegressionLab /></Suspense><LabJournal />
+        <Doorway number="03" eyebrow="THE CREDENTIALS" title="OPEN THE RECORD" target="credentials" action="See resumes & certificates" />
+        <Credentials />
+        <Doorway number="04" eyebrow="THE NEXT CHAPTER" title="LET’S TALK" target="contact" action="Start a conversation" />
+        <LabContact />
+      </main><footer className="lab-footer"><Brand href="#home" /><span className="micro">DESIGNED & ENGINEERED BY MUHAMMAD ABDULLAH BHATTI</span><span className="micro">© {new Date().getFullYear()} THE ABDULLAH LAB</span><a href="#home" className="micro">BACK TO TOP ↑</a></footer>
+    </div><div className="lab-assistant"><Suspense fallback={null}><ChatAssistant scrollTo={scrollTo} /></Suspense></div>
+  </LazyMotion>;
 }
-
-export default App;

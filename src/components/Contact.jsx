@@ -109,7 +109,7 @@ const fields = [
   { name: 'email', label: 'Email', type: 'email', placeholder: 'you@example.com', required: true },
 ];
 
-const ContactForm = () => {
+export const ContactForm = () => {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | sending | sent | error
