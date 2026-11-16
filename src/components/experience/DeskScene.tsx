@@ -8,9 +8,10 @@ import { AssistantBot, BadgeBoard, Bookcase, ContactPhone, DeskLamp, RoomShell }
 import type { QualityProfile } from '@/lib/quality';
 
 export type Destination = 'room' | 'projects' | 'journey' | 'about' | 'contact';
+export type PreviewKey = Exclude<Destination, 'room'> | 'assistant';
 
 const cameraStops: Record<Destination, { position: [number, number, number]; target: [number, number, number] }> = {
-  room: { position: [0, 2.8, 8.8], target: [0, 1.45, 0] },
+  room: { position: [0, 3.15, 10.2], target: [0, 1.65, -.65] },
   projects: { position: [0.2, 2.3, 4.05], target: [0, 1.85, 0] },
   journey: { position: [-2.85, 2.55, 2.4], target: [-3.65, 2.05, -2.76] },
   about: { position: [2.55, 2.35, 3.6], target: [2, 1.46, -.28] },
@@ -23,7 +24,7 @@ function CameraController({ destination, reduced }: { destination: Destination; 
   useFrame((_, delta) => {
     const stop = cameraStops[destination];
     const targetPosition = new THREE.Vector3(...stop.position);
-    if (mobile && destination === 'room') targetPosition.set(0, 3.2, 10.2);
+    if (mobile && destination === 'room') targetPosition.set(0, 3.5, 12.8);
     if (mobile && destination !== 'room') targetPosition.z += 1.1;
     const targetLook = new THREE.Vector3(...stop.target);
     const alpha = reduced ? 1 : 1 - Math.exp(-delta * 3.2);
@@ -74,13 +75,13 @@ function WindowCity() {
   </group>;
 }
 
-function Hotspot({ position, onClick, active }: { position: [number, number, number]; onClick: () => void; active: boolean }) {
+function Hotspot({ position, onClick, onPreview, active }: { position: [number, number, number]; onClick: () => void; onPreview: () => void; active: boolean }) {
   return <group position={position}>
-    <mesh onClick={onClick}><sphereGeometry args={[.1, 16, 16]} /><meshBasicMaterial color={active ? '#ffe4ad' : '#a6f4e1'} /></mesh>
+    <mesh onClick={onClick} onPointerOver={(event) => { if (event.pointerType === 'mouse') onPreview(); }}><sphereGeometry args={[.1, 16, 16]} /><meshBasicMaterial color={active ? '#ffe4ad' : '#a6f4e1'} /></mesh>
   </group>;
 }
 
-function Desk({ onSelect, active }: { onSelect: (destination: Destination) => void; active: Destination }) {
+function Desk({ onSelect, onPreview, onChat, active }: { onSelect: (destination: Destination) => void; onPreview: (preview: PreviewKey) => void; onChat: () => void; active: Destination }) {
   const monitorTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 1024; canvas.height = 600;
@@ -109,28 +110,30 @@ function Desk({ onSelect, active }: { onSelect: (destination: Destination) => vo
     <RoundedBox args={[2.6, .08, .76]} radius={.06} position={[0, .956, 1.45]}><meshStandardMaterial color="#14171d" roughness={.82} /></RoundedBox>
     {Array.from({ length: 44 }, (_, i) => <mesh key={i} position={[-1.18 + (i % 11) * .215, 1.005, 1.16 + Math.floor(i / 11) * .16]}><boxGeometry args={[.16, .025, .105]} /><meshStandardMaterial color={i % 8 === 0 ? '#485969' : '#303643'} roughness={.75} /></mesh>)}
     <RoundedBox args={[.2, .06, .32]} radius={.06} position={[1.63, .96, 1.49]}><meshStandardMaterial color="#2d3342" /></RoundedBox>
-    <group onClick={() => onSelect('projects')}>
+    <group onClick={() => onSelect('projects')} onPointerOver={(event) => { if (event.pointerType === 'mouse') onPreview('projects'); }}>
       <RoundedBox args={[2.57, 1.56, .13]} radius={.09} position={[0, 1.94, .04]} castShadow><meshStandardMaterial color="#10141d" metalness={.55} roughness={.24} /></RoundedBox>
       <mesh position={[0, 1.94, .115]}><planeGeometry args={[2.37, 1.35]} /><meshBasicMaterial map={monitorTexture} toneMapped={false} /></mesh>
       <mesh position={[0, 1.16, .04]}><boxGeometry args={[.12, .55, .1]} /><meshStandardMaterial color="#181b23" metalness={.6} /></mesh>
       <RoundedBox args={[.7, .05, .42]} radius={.025} position={[0, .93, .13]}><meshStandardMaterial color="#191c25" /></RoundedBox>
       <pointLight position={[0, 1.9, .55]} color="#719bc0" intensity={6} distance={2.8} />
     </group>
-    <RoundedBox args={[1.05, .08, .8]} radius={.03} position={[-1.9, .96, .72]} rotation={[0, -.12, 0]} castShadow><meshStandardMaterial color="#d3c4aa" roughness={.87} /></RoundedBox>
-    <mesh position={[-1.9, 1.008, .72]} rotation={[-Math.PI / 2, 0, -.12]}><planeGeometry args={[.87, .65]} /><meshStandardMaterial color="#e9dfc7" roughness={.96} /></mesh>
-    {Array.from({ length: 5 }, (_, i) => <mesh key={i} position={[-1.9, 1.013, .5 + i * .085]} rotation={[-Math.PI / 2, 0, -.12]}><planeGeometry args={[.68, .008]} /><meshBasicMaterial color="#8c8490" /></mesh>)}
-    <AssistantBot onClick={() => onSelect('about')} />
-    <ContactPhone onClick={() => onSelect('contact')} />
+    <group onClick={() => onSelect('about')} onPointerOver={(event) => { if (event.pointerType === 'mouse') onPreview('about'); }}>
+      <RoundedBox args={[1.05, .08, .8]} radius={.03} position={[-1.9, .96, .72]} rotation={[0, -.12, 0]} castShadow><meshStandardMaterial color="#d3c4aa" roughness={.87} /></RoundedBox>
+      <mesh position={[-1.9, 1.008, .72]} rotation={[-Math.PI / 2, 0, -.12]}><planeGeometry args={[.87, .65]} /><meshStandardMaterial color="#e9dfc7" roughness={.96} /></mesh>
+      {Array.from({ length: 5 }, (_, i) => <mesh key={i} position={[-1.9, 1.013, .5 + i * .085]} rotation={[-Math.PI / 2, 0, -.12]}><planeGeometry args={[.68, .008]} /><meshBasicMaterial color="#8c8490" /></mesh>)}
+    </group>
+    <AssistantBot onClick={onChat} onHover={() => onPreview('assistant')} />
+    <ContactPhone onClick={() => onSelect('contact')} onHover={() => onPreview('contact')} />
     <DeskLamp />
-    <Hotspot position={[.6, 2.72, .28]} onClick={() => onSelect('projects')} active={active === 'projects'} />
-    <Hotspot position={[-3.65, 2.9, -2.55]} onClick={() => onSelect('journey')} active={active === 'journey'} />
-    <Hotspot position={[2.12, 2.05, -.1]} onClick={() => onSelect('about')} active={active === 'about'} />
-    <Hotspot position={[2.34, 1.9, 1]} onClick={() => onSelect('contact')} active={active === 'contact'} />
+    <Hotspot position={[.6, 2.72, .28]} onClick={() => onSelect('projects')} onPreview={() => onPreview('projects')} active={active === 'projects'} />
+    <Hotspot position={[-3.65, 2.9, -2.55]} onClick={() => onSelect('journey')} onPreview={() => onPreview('journey')} active={active === 'journey'} />
+    <Hotspot position={[-1.9, 1.12, .72]} onClick={() => onSelect('about')} onPreview={() => onPreview('about')} active={active === 'about'} />
+    <Hotspot position={[2.34, 1.9, 1]} onClick={() => onSelect('contact')} onPreview={() => onPreview('contact')} active={active === 'contact'} />
   </group>;
 }
 
-export default function DeskScene({ destination, onSelect, reduced, quality, onFailure }: { destination: Destination; onSelect: (destination: Destination) => void; reduced: boolean; quality: QualityProfile; onFailure: () => void }) {
-  return <Canvas className="desk-canvas" shadows={quality === 'high'} dpr={quality === 'high' ? [1, 1.7] : [1, 1.15]} camera={{ position: [0, 2.8, 8.8], fov: 44 }} onCreated={({ gl }) => { gl.outputColorSpace = THREE.SRGBColorSpace; gl.toneMapping = THREE.ACESFilmicToneMapping; gl.toneMappingExposure = 1.5; gl.domElement.addEventListener('webglcontextlost', onFailure, { once: true }); }}>
+export default function DeskScene({ destination, onSelect, onPreview, onChat, reduced, quality, onFailure }: { destination: Destination; onSelect: (destination: Destination) => void; onPreview: (preview: PreviewKey) => void; onChat: () => void; reduced: boolean; quality: QualityProfile; onFailure: () => void }) {
+  return <Canvas className="desk-canvas" shadows={quality === 'high'} dpr={quality === 'high' ? [1, 1.7] : [1, 1.15]} camera={{ position: [0, 3.15, 10.2], fov: 50 }} onCreated={({ gl }) => { gl.outputColorSpace = THREE.SRGBColorSpace; gl.toneMapping = THREE.ACESFilmicToneMapping; gl.toneMappingExposure = 1.5; gl.domElement.addEventListener('webglcontextlost', onFailure, { once: true }); }}>
     <color attach="background" args={['#101521']} />
     <fog attach="fog" args={['#101521', 8, 17]} />
     <ambientLight intensity={1.8} color="#b6bfd5" />
@@ -139,9 +142,9 @@ export default function DeskScene({ destination, onSelect, reduced, quality, onF
     <pointLight position={[-2.7, 2.8, -1]} color="#80c9bf" intensity={9} distance={3.5} />
     <RoomShell />
     <WindowCity />
-    <BadgeBoard onClick={() => onSelect('journey')} />
+    <BadgeBoard onClick={() => onSelect('journey')} onHover={() => onPreview('journey')} />
     <Bookcase />
-    <Desk onSelect={onSelect} active={destination} />
+    <Desk onSelect={onSelect} onPreview={onPreview} onChat={onChat} active={destination} />
     {quality === 'high' && <ContactShadows position={[0, .001, .4]} opacity={.5} scale={10} blur={2.5} far={4} frames={1} />}
     <CameraController destination={destination} reduced={reduced} />
   </Canvas>;

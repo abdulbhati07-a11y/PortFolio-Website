@@ -1,15 +1,24 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
-export default function PortfolioChat() {
+export default function PortfolioChat({ openSignal = 0 }: { openSignal?: number }) {
   const [open, setOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (openSignal === 0) return;
+    const frame = requestAnimationFrame(() => setOpen(true));
+    return () => cancelAnimationFrame(frame);
+  }, [openSignal]);
+
+  useEffect(() => { if (open) inputRef.current?.focus(); }, [open]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -38,7 +47,7 @@ export default function PortfolioChat() {
   }
 
   return <div className="chat-dock">
-    {open && <section className="chat-window" aria-label="Portfolio assistant"><div className="chat-head"><div><strong>Ask about Abdullah</strong><small>Answers from approved portfolio content</small></div><button onClick={() => setOpen(false)} aria-label="Close assistant">×</button></div><div className="chat-messages" aria-live="polite">{messages.length === 0 && <p>Ask about projects, Python work, certificates or how to get in touch.</p>}{messages.map((item, index) => <div className={'chat-bubble ' + item.role} key={index}>{item.content || (busy ? 'Thinking…' : '')}</div>)}{error && <p role="alert">{error}</p>}</div><form onSubmit={submit}><label className="sr-only" htmlFor="chat-input">Your question</label><input id="chat-input" value={input} onChange={(event) => setInput(event.target.value)} maxLength={500} placeholder="Ask a question…" /><button disabled={busy || !input.trim()} aria-label="Send question">↑</button></form></section>}
+    {open && <section className="chat-window" aria-label="Portfolio assistant"><div className="chat-head"><div><strong>Ask about Abdullah</strong><small>Answers from approved portfolio content</small></div><button onClick={() => setOpen(false)} aria-label="Close assistant">×</button></div><div className="chat-messages" aria-live="polite">{messages.length === 0 && <p>Ask about projects, Python work, certificates or how to get in touch.</p>}{messages.map((item, index) => <div className={'chat-bubble ' + item.role} key={index}>{item.content || (busy ? 'Thinking…' : '')}</div>)}{error && <p role="alert">{error}</p>}</div><form onSubmit={submit}><label className="sr-only" htmlFor="chat-input">Your question</label><input ref={inputRef} id="chat-input" value={input} onChange={(event) => setInput(event.target.value)} maxLength={500} placeholder="Ask a question…" /><button disabled={busy || !input.trim()} aria-label="Send question">↑</button></form></section>}
     <button className="chat-trigger" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Close assistant' : 'Open portfolio assistant'}>✳</button>
   </div>;
 }

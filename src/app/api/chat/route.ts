@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { approvedKnowledge } from '@/lib/knowledge';
+import { answerPortfolioQuestion, approvedKnowledge } from '@/lib/knowledge';
 import { limitRequest } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
@@ -18,7 +18,17 @@ export async function POST(request: Request) {
   try { body = bodySchema.parse(await request.json()); } catch { return new Response('Invalid message', { status: 400 }); }
   const rate = await limitRequest('chat', request);
   if (!rate.ok) return new Response(rate.reason, { status: rate.status });
-  if (!process.env.OPENAI_API_KEY) return new Response('Chat is unavailable until its server key is configured.', { status: 503 });
+  if (!process.env.OPENAI_API_KEY) {
+    const answer = answerPortfolioQuestion(body.message);
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (let index = 0; index < answer.length; index += 64) controller.enqueue(encoder.encode(answer.slice(index, index + 64)));
+        controller.close();
+      },
+    });
+    return new Response(stream, { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
+  }
 
   const controller = new AbortController();
   request.signal.addEventListener('abort', () => controller.abort(), { once: true });

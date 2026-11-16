@@ -3,7 +3,7 @@
 An original developer desk and a complete Flat portfolio built with Next.js App Router, React, TypeScript, React Three Fiber, Drei, Tailwind CSS, and Framer Motion. This branch preserves the existing public assets, project screenshots, resumes, and certificates.
 
 ## Routes
-- `/` — interactive room with Projects, Journey, About, and Contact.
+- `/` — full room view with hover previews, a desk robot that opens the assistant, and Projects, Journey, About, and Contact.
 - `/flat` — complete portfolio without WebGL.
 - `/projects/[slug]` — shareable project case studies.
 - `/api/chat` — server-side streaming portfolio assistant.
@@ -18,14 +18,14 @@ Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Open `http://localhost:3000`. The room and Flat route work without API credentials. Chat and form submission report their configuration state until the services below are configured.
+Open `http://localhost:3000`. The room and Flat route work without API credentials. Chat gives limited answers from verified portfolio facts without an OpenAI key. Contact delivery requires the service settings below.
 
 ## Environment variables
 Set these only on the server, in `.env.local` or deployment platform settings:
 
-- `OPENAI_API_KEY`: key for streaming assistant responses.
+- `OPENAI_API_KEY`: optional key for richer streaming assistant responses. Without it, a limited server-side portfolio guide answers common verified questions and declines unknown claims.
 - `OPENAI_MODEL`: optional model ID; default is `gpt-4o-mini`.
-- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`: production rate limiting for chat and contact. Production API requests are rejected when this service is missing.
+- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`: production rate limiting for AI chat and contact. With no OpenAI key, the limited portfolio guide uses a local per-process limit. AI and contact requests are rejected in production if the rate limit service is missing.
 - `EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, `EMAILJS_PUBLIC_KEY`: existing contact delivery service, now called from the server. The template expects `from_name`, `from_email`, `subject`, `message`, and `to_name`.
 
 No API key is exposed through a `NEXT_PUBLIC_` variable.

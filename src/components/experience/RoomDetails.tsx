@@ -1,6 +1,6 @@
 'use client';
 
-import { Float, RoundedBox } from '@react-three/drei';
+import { RoundedBox } from '@react-three/drei';
 import { useMemo } from 'react';
 import * as THREE from 'three';
 
@@ -43,8 +43,8 @@ export function RoomShell() {
   </group>;
 }
 
-export function BadgeBoard({ onClick }: { onClick: () => void }) {
-  return <group position={[-3.65, 2.05, -2.76]} onClick={onClick}>
+export function BadgeBoard({ onClick, onHover }: { onClick: () => void; onHover: () => void }) {
+  return <group position={[-3.65, 2.05, -2.76]} onClick={onClick} onPointerOver={(event) => { if (event.pointerType === 'mouse') onHover(); }}>
     <RoundedBox args={[1.45, 1.3, .13]} radius={.03} castShadow><meshStandardMaterial color="#343b43" roughness={.72} /></RoundedBox>
     {Array.from({ length: 8 }, (_, row) => Array.from({ length: 9 }, (_, col) => <mesh key={row + '-' + col} position={[-.59 + col * .147, -.5 + row * .145, .073]}><cylinderGeometry args={[.013, .013, .008, 8]} /><meshStandardMaterial color="#141c24" /></mesh>))}
     {[-.38, 0, .38].map((x, i) => <group key={i} position={[x, -.04 + (i % 2) * .08, .15]} rotation={[0, 0, (i - 1) * .08]}>
@@ -77,8 +77,13 @@ export function DeskLamp() {
   </group>;
 }
 
-export function AssistantBot({ onClick }: { onClick: () => void }) {
-  return <Float speed={1.3} floatIntensity={.05} rotationIntensity={.02}><group position={[2.0, 1.46, -.28]} onClick={onClick}>
+export function AssistantBot({ onClick, onHover }: { onClick: () => void; onHover: () => void }) {
+  return <group position={[2.0, 1.55, -.28]} onClick={onClick} onPointerOver={(event) => { if (event.pointerType === 'mouse') onHover(); }}>
+    <RoundedBox args={[.54, .1, .46]} radius={.04} position={[0, -.47, 0]} castShadow><meshStandardMaterial color="#566c6a" metalness={.38} roughness={.4} /></RoundedBox>
+    {[-.19, .19].map((x) => <group key={x}>
+      <RoundedBox args={[.17, .32, .2]} radius={.05} position={[x, -.51, .17]} rotation={[.38, 0, 0]}><meshStandardMaterial color="#aab5ad" metalness={.26} roughness={.48} /></RoundedBox>
+      <RoundedBox args={[.23, .09, .3]} radius={.04} position={[x, -.68, .29]}><meshStandardMaterial color="#526a68" metalness={.38} roughness={.38} /></RoundedBox>
+    </group>)}
     <RoundedBox args={[.88, .66, .55]} radius={.12} castShadow><meshStandardMaterial color="#d0d3ca" metalness={.18} roughness={.45} /></RoundedBox>
     <RoundedBox args={[.68, .48, .03]} radius={.08} position={[0, .04, .29]}><meshStandardMaterial color="#111f2b" emissive="#2c7674" emissiveIntensity={.3} roughness={.18} /></RoundedBox>
     {[-.16, .16].map((x) => <mesh key={x} position={[x, .09, .31]}><sphereGeometry args={[.055, 16, 16]} /><meshBasicMaterial color="#b1ffdb" /></mesh>)}
@@ -88,11 +93,11 @@ export function AssistantBot({ onClick }: { onClick: () => void }) {
     <mesh position={[0, .42, 0]}><cylinderGeometry args={[.015, .015, .2, 8]} /><meshStandardMaterial color="#c4c9ba" /></mesh>
     <mesh position={[0, .54, 0]}><sphereGeometry args={[.055, 12, 12]} /><meshBasicMaterial color="#e9bd82" /></mesh>
     <pointLight position={[0, .04, .45]} color="#73d5c1" intensity={3} distance={1.4} />
-  </group></Float>;
+  </group>;
 }
 
-export function ContactPhone({ onClick }: { onClick: () => void }) {
-  return <group position={[2.34, 1.28, 1.03]} rotation={[0, -.28, -.1]} onClick={onClick}>
+export function ContactPhone({ onClick, onHover }: { onClick: () => void; onHover: () => void }) {
+  return <group position={[2.34, 1.28, 1.03]} rotation={[0, -.28, -.1]} onClick={onClick} onPointerOver={(event) => { if (event.pointerType === 'mouse') onHover(); }}>
     <RoundedBox args={[.44, .78, .075]} radius={.07} castShadow><meshStandardMaterial color="#1b222c" metalness={.72} roughness={.2} /></RoundedBox>
     <mesh position={[0, 0, .041]}><planeGeometry args={[.38, .68]} /><meshStandardMaterial color="#1d3d43" emissive="#338c8c" emissiveIntensity={.44} /></mesh>
     <mesh position={[0, .16, .046]}><circleGeometry args={[.055, 16]} /><meshBasicMaterial color="#aef0d5" /></mesh>

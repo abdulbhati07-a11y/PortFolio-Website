@@ -36,6 +36,22 @@ test('Room opens all four destinations and Escape returns home', async ({ page }
   }
 });
 
+test('Room previews enlarge on hover and the desk bot opens portfolio chat', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Enter without sound' }).click();
+  await page.locator('.object-label.projects').hover();
+  await expect(page.getByLabel('Projects preview')).toBeVisible();
+  await expect(page.getByLabel('Projects preview').locator('img')).toBeVisible();
+  await page.getByRole('button', { name: 'Close preview' }).click();
+  await expect(page.getByLabel('Projects preview')).toHaveCount(0);
+  await page.locator('.object-label.assistant').hover();
+  await expect(page.getByLabel('Ask Abdullah’s assistant preview')).toBeVisible();
+  await page.getByLabel('Ask Abdullah’s assistant preview').getByRole('button', { name: /Open assistant/ }).click();
+  await expect(page.getByLabel('Portfolio assistant')).toBeVisible();
+  await expect(page.getByRole('textbox', { name: 'Your question' })).toBeFocused();
+});
+
 test('WebGL failure exposes complete Flat route', async ({ page }) => {
   await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;
@@ -50,12 +66,15 @@ test('WebGL failure exposes complete Flat route', async ({ page }) => {
   await expect(page).toHaveURL(/\/flat/);
 });
 
-test('Unconfigured chat reports its error without fabricating an answer', async ({ page }) => {
+test('Portfolio chat answers verified facts and declines unknown claims', async ({ page }) => {
   await page.goto('/flat');
   await page.getByRole('button', { name: 'Open portfolio assistant' }).click();
-  await page.getByRole('textbox', { name: 'Your question' }).fill('What is Abdullah working on?');
+  await page.getByRole('textbox', { name: 'Your question' }).fill('What university does Abdullah attend?');
   await page.getByRole('button', { name: 'Send question' }).click();
-  await expect(page.locator('.chat-messages [role="alert"]')).toContainText('unavailable');
+  await expect(page.locator('.chat-bubble.assistant').last()).toContainText('University of Management and Technology, Lahore');
+  await page.getByRole('textbox', { name: 'Your question' }).fill('What is the GPA?');
+  await page.getByRole('button', { name: 'Send question' }).click();
+  await expect(page.locator('.chat-bubble.assistant').last()).toContainText('do not have verified portfolio information');
 });
 
 test('Mobile Flat layout fits the viewport', async ({ page }) => {

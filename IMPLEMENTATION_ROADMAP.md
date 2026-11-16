@@ -50,7 +50,7 @@
 
 ## Verification on the feature branch
 - `npm run typecheck`, `npm run lint`, and `npm run build` pass.
-- All 9 Playwright browser tests pass against a local production server, including room navigation, the independent Flat route, WebGL fallback, mobile layouts, case studies, and service error states. Chat streaming and contact success are tested with mocked responses; live external services remain unverified.
+- The browser suite covers room navigation and previews, the desk bot, the independent Flat route, WebGL fallback, mobile layouts, case studies, and service behavior. The limited server-side portfolio guide answers verified facts without credentials; AI streaming and contact success are tested with mocked responses. Live external services remain unverified.
 - A single local Edge lab run measured Flat LCP at about 1.6 s and room frame rate at about 37 FPS after scene optimization. These are machine-specific samples, not field performance results. INP and production Core Web Vitals remain unmeasured.
 - The link audit confirms local asset paths. Its external requests were blocked by the current network sandbox, so live link availability needs a check from an unrestricted connection before publication.
 - The current 3D room uses original procedural geometry and materials. Higher fidelity art assets and further device testing would improve fidelity to the reference's visual polish.
