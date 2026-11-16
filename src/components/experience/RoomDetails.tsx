@@ -34,8 +34,8 @@ export function RoomShell() {
   return <group>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -.03, 0]} receiveShadow><planeGeometry args={[30, 30]} /><meshStandardMaterial map={floor} roughness={.92} /></mesh>
     <mesh position={[0, 2, -3.05]} receiveShadow><boxGeometry args={[12, 4.2, .16]} /><meshStandardMaterial color="#202432" roughness={.94} /></mesh>
-    <mesh position={[-4.5, 2, 0]} receiveShadow><boxGeometry args={[.16, 4.2, 7]} /><meshStandardMaterial color="#1c2230" roughness={.95} /></mesh>
-    <mesh position={[4.5, 2, 0]} receiveShadow><boxGeometry args={[.16, 4.2, 7]} /><meshStandardMaterial color="#1d222e" roughness={.95} /></mesh>
+    <mesh position={[-4.5, 2, -.7]} receiveShadow><boxGeometry args={[.16, 4.2, 5.6]} /><meshStandardMaterial color="#1c2230" roughness={.95} /></mesh>
+    <mesh position={[4.5, 2, -.7]} receiveShadow><boxGeometry args={[.16, 4.2, 5.6]} /><meshStandardMaterial color="#1d222e" roughness={.95} /></mesh>
     {[-4.25, -3.4, 3.4, 4.25].map((x) => <mesh key={x} position={[x, 2.1, -2.93]}><boxGeometry args={[.025, 3.8, .025]} /><meshStandardMaterial color="#30394a" metalness={.3} /></mesh>)}
     {[.25, 1.35, 2.45, 3.55].map((y) => <mesh key={y} position={[-3.7, y, -2.93]}><boxGeometry args={[1.25, .018, .03]} /><meshStandardMaterial color="#30394a" /></mesh>)}
     <mesh position={[0, .04, 1.2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[7.8, 3.5]} /><meshStandardMaterial color="#2e3037" roughness={1} /></mesh>

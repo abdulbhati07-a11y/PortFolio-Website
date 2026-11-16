@@ -12,7 +12,7 @@ export type IntroStage = 'boot' | 'name' | 'bot' | 'reveal' | 'ready';
 export type PreviewKey = Exclude<Destination, 'room'> | 'assistant';
 
 const cameraStops: Record<Destination, { position: [number, number, number]; target: [number, number, number] }> = {
-  room: { position: [0, 3.15, 10.2], target: [0, 1.65, -.65] },
+  room: { position: [5.1, 3.7, 9.2], target: [0, 1.55, -.55] },
   projects: { position: [0.2, 2.3, 4.05], target: [0, 1.85, 0] },
   journey: { position: [-2.85, 2.55, 2.4], target: [-3.65, 2.05, -2.76] },
   about: { position: [2.55, 2.35, 3.6], target: [2, 1.46, -.28] },
@@ -43,7 +43,7 @@ function CameraController({ destination, introStage, reduced }: { destination: D
       revealTime.current = Math.min(1, revealTime.current + delta / 5.6);
       const progress = ease(revealTime.current);
       const roomPosition = new THREE.Vector3(...cameraStops.room.position);
-      if (mobile) roomPosition.set(0, 3.5, 12.8);
+      if (mobile) roomPosition.set(2.75, 3.65, 12.2);
       camera.position.lerpVectors(botPosition, roomPosition, progress);
       look.current.lerpVectors(botLook, new THREE.Vector3(...cameraStops.room.target), progress);
       camera.lookAt(look.current);
@@ -51,7 +51,7 @@ function CameraController({ destination, introStage, reduced }: { destination: D
     }
     const stop = cameraStops[destination];
     const targetPosition = new THREE.Vector3(...stop.position);
-    if (mobile && destination === 'room') targetPosition.set(0, 3.5, 12.8);
+    if (mobile && destination === 'room') targetPosition.set(2.75, 3.65, 12.2);
     if (mobile && destination !== 'room') targetPosition.z += 1.1;
     const alpha = reduced ? 1 : 1 - Math.exp(-delta * 3.2);
     camera.position.lerp(targetPosition, alpha);
