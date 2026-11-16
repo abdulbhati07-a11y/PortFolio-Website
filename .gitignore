@@ -56,3 +56,4 @@ tailwind.config.cjs
 # one-off debug probes. Generated while testing; never part of the app.
 scripts/qa-shots/
 scripts/debug-*.mjs
+.vercel
