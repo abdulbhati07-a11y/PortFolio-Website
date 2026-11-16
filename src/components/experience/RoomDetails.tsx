@@ -1,7 +1,8 @@
 'use client';
 
 import { RoundedBox } from '@react-three/drei';
-import { useMemo } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 function useFloorTexture() {
@@ -73,11 +74,12 @@ export function DeskLamp() {
     <mesh position={[.22, .75, 0]} rotation={[0, 0, .55]}><cylinderGeometry args={[.033, .033, .6, 12]} /><meshStandardMaterial color="#7a8587" metalness={.7} /></mesh>
     <mesh position={[.36, .98, 0]} rotation={[0, 0, -.5]}><coneGeometry args={[.28, .3, 32, 1, true]} /><meshStandardMaterial color="#789385" metalness={.3} roughness={.55} side={THREE.DoubleSide} /></mesh>
     <mesh position={[.43, .85, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[.16, 24]} /><meshBasicMaterial color="#ffe4b7" /></mesh>
-    <spotLight position={[.42, .87, .05]} color="#ffd3a1" intensity={17} angle={.65} distance={3} penumbra={.8} />
   </group>;
 }
 
 export function AssistantBot({ onClick, onHover }: { onClick: () => void; onHover: () => void }) {
+  const eyes = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => { if (eyes.current) eyes.current.scale.y = Math.sin(clock.elapsedTime * 1.15) > .995 ? .12 : 1; });
   return <group position={[2.0, 1.55, -.28]} onClick={onClick} onPointerOver={(event) => { if (event.pointerType === 'mouse') onHover(); }}>
     <RoundedBox args={[.54, .1, .46]} radius={.04} position={[0, -.47, 0]} castShadow><meshStandardMaterial color="#566c6a" metalness={.38} roughness={.4} /></RoundedBox>
     {[-.19, .19].map((x) => <group key={x}>
@@ -85,10 +87,21 @@ export function AssistantBot({ onClick, onHover }: { onClick: () => void; onHove
       <RoundedBox args={[.23, .09, .3]} radius={.04} position={[x, -.68, .29]}><meshStandardMaterial color="#526a68" metalness={.38} roughness={.38} /></RoundedBox>
     </group>)}
     <RoundedBox args={[.88, .66, .55]} radius={.12} castShadow><meshStandardMaterial color="#d0d3ca" metalness={.18} roughness={.45} /></RoundedBox>
-    <RoundedBox args={[.68, .48, .03]} radius={.08} position={[0, .04, .29]}><meshStandardMaterial color="#111f2b" emissive="#2c7674" emissiveIntensity={.3} roughness={.18} /></RoundedBox>
-    {[-.16, .16].map((x) => <mesh key={x} position={[x, .09, .31]}><sphereGeometry args={[.055, 16, 16]} /><meshBasicMaterial color="#b1ffdb" /></mesh>)}
-    <mesh position={[0, -.1, .313]}><boxGeometry args={[.16, .018, .005]} /><meshBasicMaterial color="#b1ffdb" /></mesh>
+    <RoundedBox args={[.75, .54, .045]} radius={.09} position={[0, .04, .287]}><meshStandardMaterial color="#9cb9b3" metalness={.68} roughness={.22} /></RoundedBox>
+    <RoundedBox args={[.68, .48, .03]} radius={.08} position={[0, .04, .315]}><meshStandardMaterial color="#071a23" emissive="#174f51" emissiveIntensity={.48} roughness={.1} metalness={.35} /></RoundedBox>
+    <group ref={eyes}>{[-.16, .16].map((x) => <group key={x} position={[x, .09, .34]}>
+      <mesh><circleGeometry args={[.09, 24]} /><meshBasicMaterial color="#5dceb5" transparent opacity={.18} /></mesh>
+      <mesh position={[0, 0, .005]}><sphereGeometry args={[.055, 20, 20]} /><meshBasicMaterial color="#b1ffdb" /></mesh>
+      <mesh position={[-.01, .018, .057]}><sphereGeometry args={[.012, 12, 12]} /><meshBasicMaterial color="#ffffff" /></mesh>
+    </group>)}</group>
+    <mesh position={[0, -.1, .342]}><boxGeometry args={[.16, .018, .005]} /><meshBasicMaterial color="#b1ffdb" /></mesh>
+    {[-.33, .33].map((x) => [-.19, .26].map((y) => <mesh key={x + '-' + y} position={[x, y, .315]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[.012, .012, .008, 12]} /><meshStandardMaterial color="#e6f1df" metalness={.8} roughness={.24} /></mesh>))}
+    {[-.48, .48].map((x) => <group key={x} position={[x, .02, 0]}>
+      <mesh rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[.13, .13, .08, 24]} /><meshStandardMaterial color="#648d86" metalness={.65} roughness={.28} /></mesh>
+      <mesh position={[x < 0 ? -.05 : .05, 0, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[.075, .075, .015, 24]} /><meshBasicMaterial color="#a6edd2" /></mesh>
+    </group>)}
     <mesh position={[0, -.44, 0]}><cylinderGeometry args={[.18, .23, .27, 20]} /><meshStandardMaterial color="#9ea8a2" metalness={.28} /></mesh>
+    <RoundedBox args={[.18, .08, .018]} radius={.02} position={[0, -.42, .197]}><meshBasicMaterial color="#8ce5c8" /></RoundedBox>
     {[-.52, .52].map((x) => <mesh key={x} position={[x, -.21, 0]}><sphereGeometry args={[.12, 16, 16]} /><meshStandardMaterial color="#728a86" metalness={.42} /></mesh>)}
     <mesh position={[0, .42, 0]}><cylinderGeometry args={[.015, .015, .2, 8]} /><meshStandardMaterial color="#c4c9ba" /></mesh>
     <mesh position={[0, .54, 0]}><sphereGeometry args={[.055, 12, 12]} /><meshBasicMaterial color="#e9bd82" /></mesh>

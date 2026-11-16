@@ -1,31 +1,33 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export default function BootSequence({ onEnter }: { onEnter: (sound: boolean) => void }) {
+export default function BootSequence({ onEnter, onSkip }: { onEnter: (sound: boolean) => void; onSkip: () => void }) {
   const [progress, setProgress] = useState(0);
+  const onEnterRef = useRef(onEnter);
+  useEffect(() => { onEnterRef.current = onEnter; }, [onEnter]);
   useEffect(() => {
     const started = performance.now();
-    const timer = window.setInterval(() => setProgress(Math.min(100, Math.round((performance.now() - started) / 18))), 30);
-    return () => window.clearInterval(timer);
+    const timer = window.setInterval(() => setProgress(Math.min(100, Math.round((performance.now() - started) / 34))), 40);
+    const auto = window.setTimeout(() => onEnterRef.current(false), 3900);
+    return () => { window.clearInterval(timer); window.clearTimeout(auto); };
   }, []);
-  return <div className="boot-screen" role="dialog" aria-modal="true" aria-label="Enter the portfolio">
+  return <div className="boot-screen" role="dialog" aria-modal="true" aria-label="Starting the portfolio">
     <div className="boot-inner">
-      <div className="boot-top"><span>ABDULLAH.OS</span><span>WORKBENCH / 2026</span></div>
-      <p className="boot-command"><span>abdullah@lab:~$</span> open --projects --journey --about --contact</p>
+      <div className="boot-top"><span>ABDULLAH.OS</span><span>INITIALIZING / WORKBENCH</span></div>
+      <p className="boot-command"><span>abdullah@lab:~$</span> ./open-room --projects --journey --about --contact</p>
       <svg className="boot-graph" viewBox="0 0 700 180" role="img" aria-label="Boot waveform">
-        <path d="M0 150 C55 150 70 36 105 80 S160 146 200 125 S260 53 305 102 S370 138 410 100 S460 119 500 90 S550 112 590 74 S650 100 700 43" fill="none" stroke="#b2f1d6" strokeWidth="3" />
-        <path d="M0 150 C55 150 70 36 105 80 S160 146 200 125 S260 53 305 102 S370 138 410 100 S460 119 500 90 S550 112 590 74 S650 100 700 43" fill="none" stroke="#b2f1d6" strokeWidth="12" opacity=".12" />
+        <path className="boot-graph-line" d="M0 145 C75 145 100 124 165 122 S260 85 330 91 S440 52 525 55 S640 34 700 20" fill="none" stroke="#b2f1d6" strokeWidth="2" pathLength={100} strokeDasharray={100} strokeDashoffset={100 - progress} />
       </svg>
       <div className="boot-log" aria-live="off">
-        <p><span>[ OK ]</span> Loading original 3D desk scene</p>
-        <p><span>[ OK ]</span> Indexing {11} projects and case studies</p>
-        <p><span>[ OK ]</span> Linking resumes and certificates</p>
-        <p><span>[ OK ]</span> Flat portfolio available at /flat</p>
+        {progress >= 16 && <p><span>[ OK ]</span> preparing Abdullah’s workbench</p>}
+        {progress >= 38 && <p><span>[ OK ]</span> indexing 11 projects and case studies</p>}
+        {progress >= 62 && <p><span>[ OK ]</span> connecting the room’s four destinations</p>}
+        {progress >= 84 && <p><span>[ OK ]</span> complete Flat portfolio available</p>}
       </div>
-      <div className="boot-progress-label"><span>{progress < 100 ? 'INITIALIZING THE ROOM' : 'ROOM READY'}</span><span>{progress}%</span></div>
+      <div className="boot-progress-label"><span>{progress < 100 ? 'BOOTING' : 'READY'}</span><span>{progress}%</span></div>
       <div className="boot-progress" aria-label={'Loading ' + progress + ' percent'}><span style={{ width: progress + '%' }} /></div>
-      <div className="boot-actions"><button onClick={() => onEnter(false)}>Enter without sound ↗</button><button onClick={() => onEnter(true)}>Enter with sound ♪</button></div>
+      <div className="boot-actions"><button onClick={() => onEnter(false)}>Enter without sound ↗</button><button onClick={() => onEnter(true)}>Enter with sound ♪</button><button onClick={onSkip}>Skip intro ↗</button></div>
       <a href="/flat">Explore the complete Flat portfolio →</a>
     </div>
   </div>;

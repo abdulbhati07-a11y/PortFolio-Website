@@ -7,12 +7,12 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import BootSequence from './BootSequence';
 import WindowManager from './WindowManager';
 import RoomPreview from './RoomPreview';
-import type { Destination, PreviewKey } from './DeskScene';
+import type { Destination, IntroStage, PreviewKey } from './DeskScene';
 import PortfolioChat from '@/components/shared/PortfolioChat';
 import { profile } from '@/content/portfolio';
 import { detectQuality, type QualityProfile } from '@/lib/quality';
 
-const DeskScene = dynamic(() => import('./DeskScene'), { ssr: false, loading: () => <div className="scene-loading">Preparing the room…</div> });
+const DeskScene = dynamic(() => import('./DeskScene'), { ssr: false, loading: () => <div className="scene-loading" aria-label="Preparing the 3D room" /> });
 const destinations: Exclude<Destination, 'room'>[] = ['projects', 'journey', 'about', 'contact'];
 
 class SceneBoundary extends Component<{ children: ReactNode; onFailure: () => void }, { failed: boolean }> {
@@ -60,13 +60,23 @@ function useSound() {
 export default function ImmersiveExperience() {
   const [destination, setDestination] = useState<Destination>('room');
   const [visibleWindow, setVisibleWindow] = useState<Destination>('room');
-  const [boot, setBoot] = useState(true);
+  const [introStage, setIntroStage] = useState<IntroStage>('boot');
   const [webglFailed, setWebglFailed] = useState(false);
   const [preview, setPreview] = useState<PreviewKey | null>(null);
   const [chatRequest, setChatRequest] = useState(0);
   const [quality] = useState<QualityProfile>(() => detectQuality());
   const [sound, setSound] = useSound();
   const reduced = Boolean(useReducedMotion());
+  const boot = introStage === 'boot';
+  const roomReady = introStage === 'ready';
+
+  useEffect(() => {
+    const next = introStage === 'name' ? 'bot' : introStage === 'bot' ? 'reveal' : introStage === 'reveal' ? 'ready' : null;
+    if (!next) return;
+    const delay = introStage === 'name' ? 1700 : introStage === 'bot' ? 1900 : 5600;
+    const timer = window.setTimeout(() => setIntroStage(next), delay);
+    return () => window.clearTimeout(timer);
+  }, [introStage]);
 
   useEffect(() => {
     if (destination === 'room') return;
@@ -76,13 +86,13 @@ export default function ImmersiveExperience() {
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      try { if (sessionStorage.getItem('abdullah-entered') === 'yes') setBoot(false); } catch { /* Storage is optional. */ }
+      try { if (sessionStorage.getItem('abdullah-entered') === 'yes') setIntroStage('ready'); } catch { /* Storage is optional. */ }
       try {
         const canvas = document.createElement('canvas');
-        if (!(canvas.getContext('webgl2') || canvas.getContext('webgl'))) setWebglFailed(true);
-      } catch { setWebglFailed(true); }
+        if (!(canvas.getContext('webgl2') || canvas.getContext('webgl'))) { setWebglFailed(true); setIntroStage('ready'); }
+      } catch { setWebglFailed(true); setIntroStage('ready'); }
       const fromHash = window.location.hash.slice(1);
-      if (destinations.includes(fromHash as Exclude<Destination, 'room'>)) setDestination(fromHash as Destination);
+      if (destinations.includes(fromHash as Exclude<Destination, 'room'>)) { setDestination(fromHash as Destination); setIntroStage('ready'); }
     });
     return () => cancelAnimationFrame(frame);
   }, []);
@@ -90,10 +100,12 @@ export default function ImmersiveExperience() {
   useEffect(() => {
     function key(event: KeyboardEvent) {
       if (event.key === 'Escape') {
+        if (!roomReady) { setIntroStage('ready'); return; }
         if (preview) { setPreview(null); return; }
         setDestination('room'); history.pushState(null, '', location.pathname); return;
       }
       if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+        if (!roomReady) return;
         if (document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement) return;
         const index = destinations.indexOf(destination as Exclude<Destination, 'room'>);
         const next = index === -1
@@ -109,7 +121,7 @@ export default function ImmersiveExperience() {
     window.addEventListener('keydown', key);
     window.addEventListener('popstate', pop);
     return () => { window.removeEventListener('keydown', key); window.removeEventListener('popstate', pop); };
-  }, [destination, preview]);
+  }, [destination, preview, roomReady]);
 
   function select(next: Destination) {
     setPreview(null);
@@ -122,26 +134,30 @@ export default function ImmersiveExperience() {
     setChatRequest((value) => value + 1);
   }
 
-  function enter(withSound: boolean) {
-    setBoot(false);
+  function enter(withSound: boolean, skip = false) {
+    setIntroStage(skip || reduced ? 'ready' : 'name');
     setSound(withSound);
     try { sessionStorage.setItem('abdullah-entered', 'yes'); } catch { /* Storage is optional. */ }
   }
 
-  return <main className="immersive-shell">
+  return <main className="immersive-shell" data-intro-stage={introStage}>
     <a className="skip-link" href="/flat">Skip 3D experience and open Flat portfolio</a>
     <div className="scene-vignette" aria-hidden="true" />
-    {webglFailed ? <div className="webgl-fallback"><p className="eyebrow">THE ROOM IS UNAVAILABLE</p><h1>The work is still here.</h1><p>Your browser could not display the 3D scene. Explore the complete portfolio in Flat mode.</p><Link href="/flat">Open the full Flat portfolio ↗</Link></div> : !boot && <SceneBoundary onFailure={() => setWebglFailed(true)}><DeskScene destination={destination} onSelect={select} onPreview={setPreview} onChat={openChat} reduced={reduced} quality={quality} onFailure={() => setWebglFailed(true)} /></SceneBoundary>}
+    {webglFailed ? <div className="webgl-fallback"><p className="eyebrow">THE ROOM IS UNAVAILABLE</p><h1>The work is still here.</h1><p>Your browser could not display the 3D scene. Explore the complete portfolio in Flat mode.</p><Link href="/flat">Open the full Flat portfolio ↗</Link></div> : !boot && <SceneBoundary onFailure={() => { setWebglFailed(true); setIntroStage('ready'); }}><DeskScene destination={destination} introStage={introStage} onSelect={select} onPreview={setPreview} onChat={openChat} reduced={reduced} quality={quality} onFailure={() => { setWebglFailed(true); setIntroStage('ready'); }} /></SceneBoundary>}
     <div className="scene-grain" aria-hidden="true" />
-    {!boot && !webglFailed && destination === 'room' && <div className="object-labels">{destinations.map((item) => <button className={'object-label ' + item} key={item} onMouseEnter={() => setPreview(item)} onFocus={() => setPreview(item)} onClick={() => select(item)}>{item} ↗</button>)}<button className="object-label assistant" onMouseEnter={() => setPreview('assistant')} onFocus={() => setPreview('assistant')} onClick={openChat}>ask the bot ↗</button></div>}
-    <header className="hud-header"><button className="hud-logo" onClick={() => select('room')} aria-label="Return to room">A<span>B</span><small>THE ABDULLAH LAB</small></button><div><Link href="/flat">FLAT VERSION ↗</Link><button onClick={() => setSound(!sound)} aria-pressed={sound} aria-label={sound ? 'Mute sound' : 'Enable sound'}>{sound ? 'SOUND ON ♪' : 'SOUND OFF ♩'}</button></div></header>
-    <AnimatePresence mode="wait">{destination === 'room' && !boot && !webglFailed && <motion.div className="room-intro" key="intro" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: reduced ? 0 : .55 }}><span className="eyebrow">DEVELOPER / DATA SCIENCE / PYTHON</span><h1>Ideas become<br /><em>things here.</em></h1><p>Explore Muhammad Abdullah Bhatti’s workbench.</p></motion.div>}</AnimatePresence>
-    {!boot && !webglFailed && destination !== 'room' && <button className="back-room" onClick={() => select('room')}>← Back to the room</button>}
-    {!boot && !webglFailed && <nav className="scene-dock" aria-label="Room destinations">{destinations.map((item, index) => <button key={item} onClick={() => select(item)} aria-current={destination === item ? 'page' : undefined}><span>0{index + 1}</span>{item}</button>)}</nav>}
-    {!boot && !webglFailed && <WindowManager key={destination} destination={visibleWindow === destination ? visibleWindow : 'room'} onClose={() => select('room')} />}
-    {!boot && !webglFailed && destination === 'room' && preview && <RoomPreview preview={preview} onClose={() => setPreview(null)} onOpen={() => preview === 'assistant' ? openChat() : select(preview)} />}
-    {!boot && <PortfolioChat openSignal={chatRequest} />}
-    {boot && !webglFailed && <BootSequence onEnter={enter} />}
-    <div className="scene-status">{profile.name} <span>·</span> 5TH SEMESTER / UMT LAHORE</div>
+    {roomReady && !webglFailed && destination === 'room' && <div className="object-labels">{destinations.map((item) => <button className={'object-label ' + item} key={item} onMouseEnter={() => setPreview(item)} onFocus={() => setPreview(item)} onClick={() => select(item)}>{item} ↗</button>)}<button className="object-label assistant" onMouseEnter={() => setPreview('assistant')} onFocus={() => setPreview('assistant')} onClick={openChat}>ask the bot ↗</button></div>}
+    {roomReady && <header className="hud-header"><button className="hud-logo" onClick={() => select('room')} aria-label="Return to room">A<span>B</span><small>THE ABDULLAH LAB</small></button><div><Link href="/flat">FLAT VERSION ↗</Link><button onClick={() => setSound(!sound)} aria-pressed={sound} aria-label={sound ? 'Mute sound' : 'Enable sound'}>{sound ? 'SOUND ON ♪' : 'SOUND OFF ♩'}</button></div></header>}
+    <AnimatePresence mode="wait">{destination === 'room' && roomReady && !webglFailed && <motion.div className="room-intro" key="intro" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: reduced ? 0 : .55 }}><span className="eyebrow">DEVELOPER / DATA SCIENCE / PYTHON</span><h1>Ideas become<br /><em>things here.</em></h1><p>Explore Muhammad Abdullah Bhatti’s workbench.</p></motion.div>}</AnimatePresence>
+    {roomReady && !webglFailed && destination !== 'room' && <button className="back-room" onClick={() => select('room')}>← Back to the room</button>}
+    {roomReady && !webglFailed && <nav className="scene-dock" aria-label="Room destinations">{destinations.map((item, index) => <button key={item} onClick={() => select(item)} aria-current={destination === item ? 'page' : undefined}><span>0{index + 1}</span>{item}</button>)}</nav>}
+    {roomReady && !webglFailed && <WindowManager key={destination} destination={visibleWindow === destination ? visibleWindow : 'room'} onClose={() => select('room')} />}
+    {roomReady && !webglFailed && destination === 'room' && preview && <RoomPreview preview={preview} onClose={() => setPreview(null)} onOpen={() => preview === 'assistant' ? openChat() : select(preview)} />}
+    {roomReady && <PortfolioChat openSignal={chatRequest} />}
+    {boot && !webglFailed && <BootSequence onEnter={enter} onSkip={() => enter(false, true)} />}
+    {!boot && !roomReady && !webglFailed && <><Link className="intro-flat-link" href="/flat">FLAT VERSION ↗</Link><button className="intro-skip" onClick={() => setIntroStage('ready')}>Skip intro ↗</button></>}
+    {introStage === 'name' && !webglFailed && <div className="cinematic-name" role="status"><span>INTRODUCING</span><strong>ABDULLAH</strong><small>MUHAMMAD ABDULLAH BHATTI / DEVELOPER</small></div>}
+    {introStage === 'bot' && !webglFailed && <div className="cinematic-caption"><span>01 / MEET YOUR GUIDE</span><p>Every room has a story.<br />This one begins here.</p></div>}
+    {introStage === 'reveal' && !webglFailed && <div className="cinematic-caption reveal-caption"><span>02 / THE WORKBENCH</span><p>Ideas become things here.</p></div>}
+    {roomReady && <div className="scene-status">{profile.name} <span>·</span> 5TH SEMESTER / UMT LAHORE</div>}
   </main>;
 }
