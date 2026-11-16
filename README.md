@@ -1,175 +1,49 @@
-# Muhammad Abdullah Bhatti — Personal Portfolio
+# Muhammad Abdullah Bhatti — Immersive Portfolio
 
-Welcome to the repository for my personal developer portfolio! This portfolio showcases my projects, skills, and experience as an AI/ML Developer, Full Stack Engineer, and Data Science Enthusiast.
+An original developer desk and a complete Flat portfolio built with Next.js App Router, React, TypeScript, React Three Fiber, Drei, Tailwind CSS, and Framer Motion. This branch preserves the existing public assets, project screenshots, resumes, and certificates.
 
-## 🌟 About Me
-I am a CS student pursuing a Data Science and AI/ML specialization. With over 1.5 years of experience in the Computer Science field, I am passionate about solving complex problems and creating premium digital experiences. I specialize in building intelligent solutions with Python, AI/ML, and full-stack web technologies.
+## Routes
+- `/` — full room view with hover previews, a desk robot that opens the assistant, and Projects, Journey, About, and Contact.
+- `/flat` — complete portfolio without WebGL.
+- `/projects/[slug]` — shareable project case studies.
+- `/api/chat` — server-side streaming portfolio assistant.
+- `/api/contact` — validated contact submission.
 
-## 🚀 Built With
-This portfolio is built to be a high-performance, visually stunning web application. 
+## Local setup
+Requires Node.js 20.9 or newer.
 
-### Technologies Used:
-- **Frontend Framework:** React 18, Vite
-- **Styling:** Tailwind CSS, PostCSS
-- **3D & Animations:** Three.js, React Three Fiber, React Three Drei
-- **Motion:** Framer Motion, GSAP (GreenSock Animation Platform)
-- **Smooth Scrolling:** @studio-freight/lenis
-- **Icons:** React Icons
+```powershell
+npm install
+Copy-Item .env.example .env.local
+npm run dev
+```
 
-## ✨ Premium Experience
+Open `http://localhost:3000`. The room and Flat route work without API credentials. Chat gives limited answers from verified portfolio facts without an OpenAI key. Contact delivery requires the service settings below.
 
-This portfolio is designed as more than a personal website—it's an immersive digital experience that blends modern engineering with thoughtful design.
+## Environment variables
+Set these only on the server, in `.env.local` or deployment platform settings:
 
-### 🎨 Premium UI/UX
+- `OPENAI_API_KEY`: optional key for richer streaming assistant responses. Without it, a limited server-side portfolio guide answers common verified questions and declines unknown claims.
+- `OPENAI_MODEL`: optional model ID; default is `gpt-4o-mini`.
+- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`: production rate limiting for AI chat and contact. With no OpenAI key, the limited portfolio guide uses a local per-process limit. AI and contact requests are rejected in production if the rate limit service is missing.
+- `EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, `EMAILJS_PUBLIC_KEY`: existing contact delivery service, now called from the server. The template expects `from_name`, `from_email`, `subject`, `message`, and `to_name`.
 
-- Pixel-perfect responsive layouts
-- Luxury-inspired design language
-- Consistent design system
-- Light & Dark themes
-- Accessible interface (WCAG-friendly)
-- Fluid spacing and typography
-- High-contrast readability
+No API key is exposed through a `NEXT_PUBLIC_` variable.
 
-### 🎬 Motion & Interactions
+## Checks
+```powershell
+npm run typecheck
+npm run lint
+npm run build
+npm run test:e2e
+```
 
-- Cinematic page transitions
-- Smooth scroll powered by Lenis
-- GSAP timeline animations
-- Framer Motion micro-interactions
-- Interactive hover states
-- Scroll-triggered storytelling
-- Magnetic buttons
-- Animated section reveals
-- Physics-inspired motion
-- Custom cursor interactions
+End-to-end tests use the locally installed Microsoft Edge and expect a dev server at `http://localhost:3000`.
 
-### 🌌 Interactive Experience
+## Content and claims
+`src/content/portfolio.ts` is the single source for both modes and project pages. Assistant answers are grounded in this content through `src/lib/knowledge.ts`. The owner confirmed fifth semester at the University of Management and Technology, Lahore. VisionGuard evaluation remains disputed, and five project repositories are private; their public source actions are hidden. Do not add employment, metrics, completion dates, or technical capabilities without evidence.
 
-- Three.js immersive 3D scenes
-- Interactive particle systems
-- Mouse-responsive effects
-- Dynamic lighting
-- Animated backgrounds
-- Premium visual effects
-- GPU-optimized rendering
+## Deployment
+Deploy to a host that supports the Next.js Node.js runtime and route handlers. Configure the server environment variables before enabling chat and contact in production. Run the checks above, create a deploy preview, verify its routes and API behavior, then switch the live domain only after the owner's explicit approval. A static export cannot run the streaming assistant or contact routes.
 
-### 🚀 Performance
-
-- Lightning-fast Vite build
-- Lazy-loaded components
-- Code splitting
-- Optimized assets
-- Excellent Core Web Vitals
-- Lighthouse-focused optimizations
-
-### 🧠 Engineering
-
-- Modular React architecture
-- Reusable components
-- Clean code principles
-- Scalable project structure
-- Modern frontend best practices
-- Maintainable design system
-
-### 📱 Responsive Design
-
-- Mobile-first development
-- Tablet optimization
-- Desktop-first premium layouts
-- Adaptive typography
-- Responsive animations
-- Touch-friendly interactions
-
-### ♿ Accessibility
-
-- Semantic HTML
-- Keyboard navigation
-- Screen reader support
-- Reduced motion support
-- Focus indicators
-- Accessible color contrast
-
-### 💼 Portfolio Highlights
-
-- AI & Machine Learning projects
-- Full-Stack web applications
-- Interactive project showcases
-- Skills visualization
-- Professional timeline
-- Modern contact experience
-- GitHub integration
-- Downloadable résumé
-- Premium project case studies
-
-## 💼 Featured Projects
-Here are some of the key projects featured in my portfolio:
-
-- **AI YouTube Video Summarizer:** A full-stack AI application built with Flask that ingests YouTube video transcripts and generates concise summaries using advanced language models via API integration.
-- **Algorithm Visualizer:** An interactive real-time visualization tool for sorting and search algorithms, built with C++ and OpenGL.
-- **Pet Sitting & Laundry Service Websites:** Beautifully crafted frontends with responsive design and interactive components.
-- **Python Utilities:** Tools like the Drink Water Reminder desktop app and a customizable PyQR Code Generator.
-
-## 🛠️ Skills & Expertise
-- **Programming Languages:** Python, C++, JavaScript, SQL
-- **Frameworks & Libraries:** React, Flask, NumPy, Pandas, TensorFlow/PyTorch
-- **Tools:** Git & GitHub, Docker, VS Code, Jupyter Notebooks
-
-## ⚙️ Running Locally
-
-To run this project locally, follow these steps:
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/abdulbhati07-a11y/PortFolio-Website.git
-   cd PortFolio-Website
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Run the development server:**
-   ```bash
-   npm run dev
-   ```
-
-4. **Build for production:**
-   ```bash
-   npm run build
-   ```
-
-## 🎯 Design Philosophy
-
-Every section of this portfolio is crafted with three guiding principles:
-
-- **Performance First** — Fast, optimized, and responsive.
-- **Purposeful Motion** — Every animation enhances usability and storytelling.
-- **Premium User Experience** — Clean aesthetics, intuitive navigation, and memorable interactions.
-
-The goal is not just to present projects, but to create an engaging experience that reflects the quality of my work as an AI/ML Developer and Full-Stack Engineer.
-
-## 📈 Future Roadmap
-
-Planned enhancements include:
-
-- AI-powered portfolio assistant
-- Interactive project demos
-- Live GitHub contribution analytics
-- Dynamic coding statistics
-- Blog and technical articles
-- Case study pages
-- Interactive skill graph
-- 3D project showcases
-- Multilingual support
-- Progressive Web App (PWA)
-- Visitor analytics dashboard
-- CMS-powered content management
-
-## 📫 Connect With Me
-- **Email:** abdulbha77@gmail.com
-- **LinkedIn:** [Muhammad Abdullah Bhatti](https://www.linkedin.com/in/muhammad-abdullah-bhatti-5bab33396/)
-- **GitHub:** [abdulbhati07-a11y](https://github.com/abdulbhati07-a11y)
-
----
-*Designed and built by Muhammad Abdullah Bhatti.*
+The current live portfolio is untouched by this feature branch. See `IMPLEMENTATION_ROADMAP.md` for acceptance gates and outstanding inputs.

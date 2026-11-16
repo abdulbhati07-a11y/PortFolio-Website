@@ -4,6 +4,10 @@ node_modules/
 .pnp.js
 
 # Build output
+.next/
+tsconfig.tsbuildinfo
+playwright-report/
+test-results/
 dist/
 dist-ssr/
 build/
