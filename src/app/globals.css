@@ -31,3 +31,5 @@
 @media(prefers-reduced-motion:reduce){.cinematic-name,.cinematic-caption{animation:none}}
 .cinematic-name strong{font-size:clamp(3rem,8vw,8rem);max-width:96vw;white-space:nowrap}
 @media(max-width:600px){.cinematic-name strong{font-size:9.5vw;letter-spacing:-.08em}}
+.object-label.assistant{left:71%;top:57%}
+@media(max-width:600px){.object-label.assistant{left:67%;top:58%}}

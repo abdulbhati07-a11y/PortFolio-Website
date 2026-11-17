@@ -23,7 +23,7 @@ function useFloorTexture() {
     }
     const texture = new THREE.CanvasTexture(canvas);
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(8, 8);
+    texture.repeat.set(3, 2);
     texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
   }, []);
@@ -32,20 +32,28 @@ function useFloorTexture() {
 export function RoomShell() {
   const floor = useFloorTexture();
   return <group>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -.03, 0]} receiveShadow><planeGeometry args={[30, 30]} /><meshStandardMaterial map={floor} roughness={.92} /></mesh>
-    <mesh position={[0, 2, -3.05]} receiveShadow><boxGeometry args={[12, 4.2, .16]} /><meshStandardMaterial color="#202432" roughness={.94} /></mesh>
-    <mesh position={[-4.5, 2, -.7]} receiveShadow><boxGeometry args={[.16, 4.2, 5.6]} /><meshStandardMaterial color="#1c2230" roughness={.95} /></mesh>
-    <mesh position={[4.5, 2, -.7]} receiveShadow><boxGeometry args={[.16, 4.2, 5.6]} /><meshStandardMaterial color="#1d222e" roughness={.95} /></mesh>
+    <mesh position={[0, -.17, .08]} castShadow receiveShadow><boxGeometry args={[9.3, .3, 6.65]} /><meshStandardMaterial color="#141c25" metalness={.2} roughness={.74} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .002, .08]} receiveShadow><planeGeometry args={[9.2, 6.55]} /><meshStandardMaterial map={floor} roughness={.82} metalness={.06} /></mesh>
+    <mesh position={[0, -.08, 3.42]}><boxGeometry args={[9.3, .12, .035]} /><meshStandardMaterial color="#a47b62" metalness={.5} roughness={.38} /></mesh>
+    <mesh position={[0, 2, -3.05]} receiveShadow><boxGeometry args={[9.2, 4.2, .16]} /><meshStandardMaterial color="#202432" roughness={.94} /></mesh>
+    <mesh position={[-4.55, 2, .08]} receiveShadow><boxGeometry args={[.16, 4.2, 6.4]} /><meshStandardMaterial color="#1c2230" roughness={.95} /></mesh>
+    <mesh position={[4.55, 2, -.55]} receiveShadow><boxGeometry args={[.035, 4.1, 5]} /><meshPhysicalMaterial color="#68818e" transparent opacity={.09} depthWrite={false} roughness={.2} metalness={.42} side={THREE.DoubleSide} /></mesh>
+    {[-3.05, 1.95].map((z) => <mesh key={z} position={[4.55, z < 0 ? 2 : 1.42, z]}><boxGeometry args={[.085, z < 0 ? 4.2 : 2.85, .085]} /><meshStandardMaterial color="#252d38" metalness={.62} roughness={.38} /></mesh>)}
+    {[.12, 2.04, 4.06].map((y) => <mesh key={y} position={[4.55, y, -.55]}><boxGeometry args={[.085, .07, 5]} /><meshStandardMaterial color="#29313b" metalness={.58} roughness={.42} /></mesh>)}
     {[-4.25, -3.4, 3.4, 4.25].map((x) => <mesh key={x} position={[x, 2.1, -2.93]}><boxGeometry args={[.025, 3.8, .025]} /><meshStandardMaterial color="#30394a" metalness={.3} /></mesh>)}
     {[.25, 1.35, 2.45, 3.55].map((y) => <mesh key={y} position={[-3.7, y, -2.93]}><boxGeometry args={[1.25, .018, .03]} /><meshStandardMaterial color="#30394a" /></mesh>)}
     <mesh position={[0, .04, 1.2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[7.8, 3.5]} /><meshStandardMaterial color="#2e3037" roughness={1} /></mesh>
     <mesh position={[0, .045, 1.2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[7.25, 2.95]} /><meshStandardMaterial color="#353540" roughness={1} /></mesh>
-    <mesh position={[0, 4.05, -1]}><boxGeometry args={[9, .12, 4]} /><meshStandardMaterial color="#171c28" /></mesh>
+    <mesh position={[0, 4.12, -3]}><boxGeometry args={[9.2, .16, .22]} /><meshStandardMaterial color="#171c28" metalness={.22} /></mesh>
+    <mesh position={[-4.5, 4.12, .06]}><boxGeometry args={[.18, .16, 6.3]} /><meshStandardMaterial color="#171c28" metalness={.22} /></mesh>
+    <mesh position={[4.5, 4.12, -.55]}><boxGeometry args={[.12, .13, 5]} /><meshStandardMaterial color="#171c28" metalness={.22} /></mesh>
+    <mesh position={[-4.46, .16, .08]}><boxGeometry args={[.04, .31, 6.2]} /><meshStandardMaterial color="#5a6470" metalness={.45} roughness={.54} /></mesh>
+    <mesh position={[0, .16, -2.93]}><boxGeometry args={[8.9, .31, .04]} /><meshStandardMaterial color="#5a6470" metalness={.45} roughness={.54} /></mesh>
   </group>;
 }
 
-export function BadgeBoard({ onClick, onHover }: { onClick: () => void; onHover: () => void }) {
-  return <group position={[-3.65, 2.05, -2.76]} onClick={onClick} onPointerOver={(event) => { if (event.pointerType === 'mouse') onHover(); }}>
+export function BadgeBoard({ onClick }: { onClick: () => void }) {
+  return <group position={[-3.65, 2.05, -2.76]} onClick={onClick}>
     <RoundedBox args={[1.45, 1.3, .13]} radius={.03} castShadow><meshStandardMaterial color="#343b43" roughness={.72} /></RoundedBox>
     {Array.from({ length: 8 }, (_, row) => Array.from({ length: 9 }, (_, col) => <mesh key={row + '-' + col} position={[-.59 + col * .147, -.5 + row * .145, .073]}><cylinderGeometry args={[.013, .013, .008, 8]} /><meshStandardMaterial color="#141c24" /></mesh>))}
     {[-.38, 0, .38].map((x, i) => <group key={i} position={[x, -.04 + (i % 2) * .08, .15]} rotation={[0, 0, (i - 1) * .08]}>
@@ -77,10 +85,10 @@ export function DeskLamp() {
   </group>;
 }
 
-export function AssistantBot({ onClick, onHover }: { onClick: () => void; onHover: () => void }) {
+export function AssistantBot({ onClick }: { onClick: () => void }) {
   const eyes = useRef<THREE.Group>(null);
   useFrame(({ clock }) => { if (eyes.current) eyes.current.scale.y = Math.sin(clock.elapsedTime * 1.15) > .995 ? .12 : 1; });
-  return <group position={[2.0, 1.55, -.28]} onClick={onClick} onPointerOver={(event) => { if (event.pointerType === 'mouse') onHover(); }}>
+  return <group position={[1.72, 1.58, 2.27]} rotation={[0, -2.5, 0]} onClick={onClick}>
     <RoundedBox args={[.54, .1, .46]} radius={.04} position={[0, -.47, 0]} castShadow><meshStandardMaterial color="#566c6a" metalness={.38} roughness={.4} /></RoundedBox>
     {[-.19, .19].map((x) => <group key={x}>
       <RoundedBox args={[.17, .32, .2]} radius={.05} position={[x, -.51, .17]} rotation={[.38, 0, 0]}><meshStandardMaterial color="#aab5ad" metalness={.26} roughness={.48} /></RoundedBox>
@@ -89,6 +97,8 @@ export function AssistantBot({ onClick, onHover }: { onClick: () => void; onHove
     <RoundedBox args={[.88, .66, .55]} radius={.12} castShadow><meshStandardMaterial color="#d0d3ca" metalness={.18} roughness={.45} /></RoundedBox>
     <RoundedBox args={[.75, .54, .045]} radius={.09} position={[0, .04, .287]}><meshStandardMaterial color="#9cb9b3" metalness={.68} roughness={.22} /></RoundedBox>
     <RoundedBox args={[.68, .48, .03]} radius={.08} position={[0, .04, .315]}><meshStandardMaterial color="#071a23" emissive="#174f51" emissiveIntensity={.48} roughness={.1} metalness={.35} /></RoundedBox>
+    <RoundedBox args={[.51, .25, .02]} radius={.05} position={[0, .02, -.288]}><meshStandardMaterial color="#47766f" metalness={.56} roughness={.3} emissive="#1b504b" emissiveIntensity={.5} /></RoundedBox>
+    <mesh position={[0, .02, -.302]} rotation={[0, Math.PI, 0]}><torusGeometry args={[.072, .012, 8, 24]} /><meshBasicMaterial color="#9ff1d4" /></mesh>
     <group ref={eyes}>{[-.16, .16].map((x) => <group key={x} position={[x, .09, .34]}>
       <mesh><circleGeometry args={[.09, 24]} /><meshBasicMaterial color="#5dceb5" transparent opacity={.18} /></mesh>
       <mesh position={[0, 0, .005]}><sphereGeometry args={[.055, 20, 20]} /><meshBasicMaterial color="#b1ffdb" /></mesh>
@@ -103,14 +113,18 @@ export function AssistantBot({ onClick, onHover }: { onClick: () => void; onHove
     <mesh position={[0, -.44, 0]}><cylinderGeometry args={[.18, .23, .27, 20]} /><meshStandardMaterial color="#9ea8a2" metalness={.28} /></mesh>
     <RoundedBox args={[.18, .08, .018]} radius={.02} position={[0, -.42, .197]}><meshBasicMaterial color="#8ce5c8" /></RoundedBox>
     {[-.52, .52].map((x) => <mesh key={x} position={[x, -.21, 0]}><sphereGeometry args={[.12, 16, 16]} /><meshStandardMaterial color="#728a86" metalness={.42} /></mesh>)}
+    {[-.52, .52].map((x) => <group key={'typing-' + x} position={[x, -.31, .2]} rotation={[-.58, 0, x < 0 ? -.12 : .12]}>
+      <RoundedBox args={[.16, .31, .16]} radius={.06}><meshStandardMaterial color="#b4c6bb" metalness={.22} roughness={.5} /></RoundedBox>
+      <mesh position={[0, -.18, .02]}><sphereGeometry args={[.09, 12, 12]} /><meshStandardMaterial color="#91b9ae" roughness={.43} /></mesh>
+    </group>)}
     <mesh position={[0, .42, 0]}><cylinderGeometry args={[.015, .015, .2, 8]} /><meshStandardMaterial color="#c4c9ba" /></mesh>
     <mesh position={[0, .54, 0]}><sphereGeometry args={[.055, 12, 12]} /><meshBasicMaterial color="#e9bd82" /></mesh>
     <pointLight position={[0, .04, .45]} color="#73d5c1" intensity={3} distance={1.4} />
   </group>;
 }
 
-export function ContactPhone({ onClick, onHover }: { onClick: () => void; onHover: () => void }) {
-  return <group position={[2.34, 1.28, 1.03]} rotation={[0, -.28, -.1]} onClick={onClick} onPointerOver={(event) => { if (event.pointerType === 'mouse') onHover(); }}>
+export function ContactPhone({ onClick }: { onClick: () => void }) {
+  return <group position={[2.34, 1.28, 1.03]} rotation={[0, -.28, -.1]} onClick={onClick}>
     <RoundedBox args={[.44, .78, .075]} radius={.07} castShadow><meshStandardMaterial color="#1b222c" metalness={.72} roughness={.2} /></RoundedBox>
     <mesh position={[0, 0, .041]}><planeGeometry args={[.38, .68]} /><meshStandardMaterial color="#1d3d43" emissive="#338c8c" emissiveIntensity={.44} /></mesh>
     <mesh position={[0, .16, .046]}><circleGeometry args={[.055, 16]} /><meshBasicMaterial color="#aef0d5" /></mesh>

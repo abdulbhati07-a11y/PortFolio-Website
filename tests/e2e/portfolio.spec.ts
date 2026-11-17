@@ -48,18 +48,18 @@ test('Room opens all four destinations and Escape returns home', async ({ page }
   }
 });
 
-test('Room previews enlarge on hover and the desk bot opens portfolio chat', async ({ page }) => {
+test('Room previews open on click and the desk bot opens portfolio chat', async ({ page }) => {
   test.setTimeout(90000);
   await page.goto('/');
   await page.getByRole('button', { name: 'Skip intro' }).click();
   await page.locator('.object-label.projects').hover();
+  await expect(page.getByLabel('Projects preview')).toHaveCount(0);
+  await page.locator('.object-label.projects').click();
   await expect(page.getByLabel('Projects preview')).toBeVisible();
   await expect(page.getByLabel('Projects preview').locator('img')).toBeVisible();
   await page.getByRole('button', { name: 'Close preview' }).click();
   await expect(page.getByLabel('Projects preview')).toHaveCount(0);
-  await page.locator('.object-label.assistant').hover();
-  await expect(page.getByLabel('Ask Abdullah’s assistant preview')).toBeVisible();
-  await page.getByLabel('Ask Abdullah’s assistant preview').getByRole('button', { name: /Open assistant/ }).click();
+  await page.locator('.object-label.assistant').click();
   await expect(page.getByLabel('Portfolio assistant')).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'Your question' })).toBeFocused();
 });
