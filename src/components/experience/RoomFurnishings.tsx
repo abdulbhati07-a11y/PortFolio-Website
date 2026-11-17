@@ -39,13 +39,13 @@ function SleepingCat() {
 export function LoungeCouch() {
   return <group position={[-3.08, 0, 2.67]} rotation={[0, .18, 0]}>
     {[-.68, .68].map((x) => <mesh key={x} castShadow position={[x, .17, .28]}><cylinderGeometry args={[.055, .07, .31, 12]} /><meshStandardMaterial color="#2e3032" metalness={.42} /></mesh>)}
-    <RoundedBox args={[1.94, .27, .95]} radius={.12} position={[0, .48, 0]} castShadow receiveShadow><meshStandardMaterial color="#40545a" roughness={.85} /></RoundedBox>
-    <RoundedBox args={[1.84, .17, .8]} radius={.075} position={[0, .69, .05]} castShadow><meshStandardMaterial color="#587176" roughness={.92} /></RoundedBox>
-    <RoundedBox args={[1.92, .77, .22]} radius={.1} position={[0, .89, -.45]} castShadow><meshStandardMaterial color="#31464d" roughness={.88} /></RoundedBox>
-    {[-.88, .88].map((x) => <RoundedBox key={x} args={[.23, .47, .95]} radius={.1} position={[x, .73, 0]} castShadow><meshStandardMaterial color="#344a50" roughness={.87} /></RoundedBox>)}
-    <RoundedBox args={[.56, .29, .12]} radius={.055} position={[-.55, .95, -.27]} rotation={[0, 0, -.1]}><meshStandardMaterial color="#ad8978" roughness={.96} /></RoundedBox>
-    <RoundedBox args={[.35, .2, .12]} radius={.05} position={[.65, .88, -.3]} rotation={[0, 0, .15]}><meshStandardMaterial color="#759d91" roughness={.95} /></RoundedBox>
-    <mesh position={[-.48, .78, .13]} rotation={[-Math.PI / 2, 0, .06]}><planeGeometry args={[.86, .58]} /><meshStandardMaterial color="#9eab9d" roughness={1} side={THREE.DoubleSide} /></mesh>
+    <RoundedBox args={[1.94, .27, .95]} radius={.12} position={[0, .48, 0]} castShadow receiveShadow><meshStandardMaterial color="#ac788d" roughness={.85} /></RoundedBox>
+    <RoundedBox args={[1.84, .17, .8]} radius={.075} position={[0, .69, .05]} castShadow><meshStandardMaterial color="#d7a6b6" roughness={.92} /></RoundedBox>
+    <RoundedBox args={[1.92, .77, .22]} radius={.1} position={[0, .89, -.45]} castShadow><meshStandardMaterial color="#b98096" roughness={.88} /></RoundedBox>
+    {[-.88, .88].map((x) => <RoundedBox key={x} args={[.23, .47, .95]} radius={.1} position={[x, .73, 0]} castShadow><meshStandardMaterial color="#bc8ba2" roughness={.87} /></RoundedBox>)}
+    <RoundedBox args={[.56, .29, .12]} radius={.055} position={[-.55, .95, -.27]} rotation={[0, 0, -.1]}><meshStandardMaterial color="#e3c3c9" roughness={.96} /></RoundedBox>
+    <RoundedBox args={[.35, .2, .12]} radius={.05} position={[.65, .88, -.3]} rotation={[0, 0, .15]}><meshStandardMaterial color="#a57691" roughness={.95} /></RoundedBox>
+    <mesh position={[-.48, .78, .13]} rotation={[-Math.PI / 2, 0, .06]}><planeGeometry args={[.86, .58]} /><meshStandardMaterial color="#f0d5d8" roughness={1} side={THREE.DoubleSide} /></mesh>
     <SleepingCat />
   </group>;
 }
@@ -58,8 +58,8 @@ export function PracticalFixtures({ introStage }: { introStage: 'boot' | 'name' 
   const revealTime = useRef(0);
   useEffect(() => { if (introStage === 'reveal') revealTime.current = 0; }, [introStage]);
   useFrame((_, delta) => {
-    if (introStage === 'reveal') revealTime.current = Math.min(1, revealTime.current + delta / 5.6);
-    const progress = introStage === 'ready' ? 1 : introStage === 'reveal' ? revealTime.current : 0;
+    if (introStage === 'reveal') revealTime.current = Math.min(1, revealTime.current + delta / 4.2);
+    const progress = introStage === 'ready' || introStage === 'name' ? 1 : introStage === 'reveal' ? revealTime.current : 0;
     if (cove.current) cove.current.opacity = THREE.MathUtils.smoothstep(progress, .25, .78) * .88;
     if (warm.current) warm.current.opacity = THREE.MathUtils.smoothstep(progress, .43, .85) * .95;
     if (rose.current) rose.current.opacity = THREE.MathUtils.smoothstep(progress, .55, .93) * .82;
@@ -72,8 +72,8 @@ export function PracticalFixtures({ introStage }: { introStage: 'boot' | 'name' 
       <mesh position={[0, -.088, 0]} rotation={[Math.PI / 2, 0, 0]}><circleGeometry args={[.145, 20]} /><meshBasicMaterial color={x < 0 ? '#ffe3bd' : x > 0 ? '#bbdfed' : '#d5e8de'} /></mesh>
     </group>)}
     <mesh position={[0, 3.83, -2.79]}><boxGeometry args={[7.6, .035, .045]} /><meshBasicMaterial ref={cove} color="#a9dfff" transparent opacity={0} toneMapped={false} /></mesh>
-    <mesh position={[-4.26, 3.73, -.8]}><boxGeometry args={[.045, .04, 4.2]} /><meshBasicMaterial color="#799db6" transparent opacity={introStage === 'ready' ? .65 : .18} toneMapped={false} /></mesh>
-    <mesh position={[4.26, 3.73, -.8]}><boxGeometry args={[.045, .04, 4.2]} /><meshBasicMaterial color="#dba0bb" transparent opacity={introStage === 'ready' ? .65 : .18} toneMapped={false} /></mesh>
+    <mesh position={[-4.26, 3.73, -.8]}><boxGeometry args={[.045, .04, 4.2]} /><meshBasicMaterial color="#d89db9" transparent opacity={introStage === 'ready' || introStage === 'name' ? .65 : .18} toneMapped={false} /></mesh>
+    <mesh position={[4.26, 3.73, -.8]}><boxGeometry args={[.045, .04, 4.2]} /><meshBasicMaterial color="#dba0bb" transparent opacity={introStage === 'ready' || introStage === 'name' ? .65 : .18} toneMapped={false} /></mesh>
     {[-3.56, 3.56].map((x) => <group key={x} position={[x, 2.28, -2.76]}>
       <RoundedBox args={[.26, .64, .12]} radius={.07}><meshStandardMaterial color="#27323c" metalness={.63} roughness={.35} /></RoundedBox>
       <mesh position={[0, 0, .068]}><boxGeometry args={[.095, .48, .018]} /><meshBasicMaterial ref={x < 0 ? warm : rose} color={x < 0 ? '#ffd29a' : '#dba5c8'} transparent opacity={0} toneMapped={false} /></mesh>

@@ -28,10 +28,10 @@ test('Cinematic opening moves from the bot close-up into the lit room', async ({
   test.setTimeout(45000);
   await page.goto('/');
   await page.getByRole('button', { name: 'Enter without sound' }).click();
-  await expect(page.locator('.immersive-shell')).toHaveAttribute('data-intro-stage', 'name');
-  await expect(page.getByText('MUHAMMAD ABDULLAH BHATTI / DEVELOPER')).toBeVisible();
   await expect(page.locator('.immersive-shell')).toHaveAttribute('data-intro-stage', 'bot', { timeout: 7000 });
   await expect(page.locator('.immersive-shell')).toHaveAttribute('data-intro-stage', 'reveal', { timeout: 7000 });
+  await expect(page.locator('.immersive-shell')).toHaveAttribute('data-intro-stage', 'name', { timeout: 7000 });
+  await expect(page.getByText('MUHAMMAD ABDULLAH BHATTI / DEVELOPER')).toBeVisible();
   await expect(page.locator('.immersive-shell')).toHaveAttribute('data-intro-stage', 'ready', { timeout: 10000 });
   await expect(page.getByRole('navigation', { name: 'Room destinations' })).toBeVisible();
 });

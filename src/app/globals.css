@@ -33,3 +33,29 @@
 @media(max-width:600px){.cinematic-name strong{font-size:9.5vw;letter-spacing:-.08em}}
 .object-label.assistant{left:71%;top:57%}
 @media(max-width:600px){.object-label.assistant{left:67%;top:58%}}
+.immersive-shell{--mint:#efb5cd;--gold:#f6c58e;--paper:#f8edf0;--muted:#d2bcc8;background:#1c1b25}
+.immersive-shell .scene-vignette{background:radial-gradient(ellipse at 47% 43%,transparent 37%,#12121c84 78%,#0c0d15c9 100%)}
+.immersive-shell .room-intro{left:clamp(1.2rem,4vw,4rem);bottom:clamp(5.4rem,9vh,7.5rem);max-width:32rem;text-shadow:0 2px 20px #000b}
+.immersive-shell .room-intro h1{font-size:clamp(1.2rem,2.2vw,2rem);line-height:1.1;letter-spacing:-.04em;max-width:none;margin:0 0 .45rem;color:#f4e9e7}
+.immersive-shell .room-intro p{font:.62rem/1.6 var(--font-mono),monospace;letter-spacing:.11em;color:#e2a9c5;margin:0}
+.immersive-shell .object-label{background:#201c2bcf;border-color:#eab1cb80;color:#f7e8ee;box-shadow:0 0 15px #e9a9c44d;font-size:.56rem;letter-spacing:.1em;padding:.48rem .65rem}
+.immersive-shell .object-label:before{content:'◆';color:#f3aacc;margin-right:.35rem;font-size:.5rem}
+.immersive-shell .object-label:hover,.immersive-shell .object-label:focus-visible{background:#f1b6d0;color:#17141c}
+.immersive-shell .object-label:hover:before,.immersive-shell .object-label:focus-visible:before{color:#17141c}
+.immersive-shell .scene-dock{background:#17151fcc;border-color:#ebbad456;box-shadow:0 8px 28px #0008}
+.immersive-shell .scene-dock button[aria-current=page]{background:#eeb1ca;color:#1d1823}
+.immersive-shell .hud-header>div>*{border-color:#edb7ce73;background:#201b29b8}
+.immersive-shell .chat-trigger{background:#efb5cd;color:#211620}
+.immersive-shell .cinematic-name{background:#0c0c17a6}
+.immersive-shell .cinematic-name strong{color:#f3d7e2;text-shadow:0 7px 30px #0008}
+.immersive-shell .cinematic-name span,.immersive-shell .cinematic-name small,.immersive-shell .cinematic-caption span{color:#f2accb}
+.immersive-shell .boot-screen{background:radial-gradient(circle at 47% 72%,#302330 0,#10111b 55%,#080a11 100%)}
+.immersive-shell .boot-progress span{background:#efb5cd;box-shadow:0 0 20px #efb5cd}
+.immersive-shell .boot-actions button{background:#efb5cd;border-color:#efb5cd;color:#201822}
+.immersive-shell .boot-actions button+button{background:#17151f;color:#f4e8ec;border-color:#f0b8d062}
+@media(max-width:600px){.immersive-shell .room-intro{left:1rem;right:1rem;bottom:5.8rem}.immersive-shell .room-intro h1{font-size:1.26rem}.immersive-shell .room-intro p{font-size:.49rem}.immersive-shell .object-label{font-size:.49rem;padding:.4rem .52rem}}
+.immersive-shell .object-label.journey{left:70%;top:28%}
+.room-drag-hint{position:absolute;left:50%;bottom:5.6rem;transform:translateX(-50%);z-index:8;pointer-events:none;border:1px solid #efbad066;border-radius:.5rem;background:#16141fc7;backdrop-filter:blur(14px);padding:.6rem .9rem;color:#f3d4df;font:700 .55rem var(--font-mono),monospace;letter-spacing:.14em;white-space:nowrap;animation:hint-in .6s ease-out 1s both}
+@keyframes hint-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(max-width:600px){.immersive-shell .object-label.journey{left:15%;top:40%}.room-drag-hint{bottom:5rem;font-size:.45rem}}
+@media(prefers-reduced-motion:reduce){.room-drag-hint{animation:none}}

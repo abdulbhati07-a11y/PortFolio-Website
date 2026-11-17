@@ -23,7 +23,7 @@ function useFloorTexture() {
     }
     const texture = new THREE.CanvasTexture(canvas);
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(3, 2);
+    texture.repeat.set(8, 8);
     texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
   }, []);
@@ -32,36 +32,32 @@ function useFloorTexture() {
 export function RoomShell() {
   const floor = useFloorTexture();
   return <group>
-    <mesh position={[0, -.17, .08]} castShadow receiveShadow><boxGeometry args={[9.3, .3, 6.65]} /><meshStandardMaterial color="#141c25" metalness={.2} roughness={.74} /></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .002, .08]} receiveShadow><planeGeometry args={[9.2, 6.55]} /><meshStandardMaterial map={floor} roughness={.82} metalness={.06} /></mesh>
-    <mesh position={[0, -.08, 3.42]}><boxGeometry args={[9.3, .12, .035]} /><meshStandardMaterial color="#a47b62" metalness={.5} roughness={.38} /></mesh>
-    <mesh position={[0, 2, -3.05]} receiveShadow><boxGeometry args={[9.2, 4.2, .16]} /><meshStandardMaterial color="#202432" roughness={.94} /></mesh>
-    <mesh position={[-4.55, 2, .08]} receiveShadow><boxGeometry args={[.16, 4.2, 6.4]} /><meshStandardMaterial color="#1c2230" roughness={.95} /></mesh>
-    <mesh position={[4.55, 2, -.55]} receiveShadow><boxGeometry args={[.035, 4.1, 5]} /><meshPhysicalMaterial color="#68818e" transparent opacity={.09} depthWrite={false} roughness={.2} metalness={.42} side={THREE.DoubleSide} /></mesh>
-    {[-3.05, 1.95].map((z) => <mesh key={z} position={[4.55, z < 0 ? 2 : 1.42, z]}><boxGeometry args={[.085, z < 0 ? 4.2 : 2.85, .085]} /><meshStandardMaterial color="#252d38" metalness={.62} roughness={.38} /></mesh>)}
-    {[.12, 2.04, 4.06].map((y) => <mesh key={y} position={[4.55, y, -.55]}><boxGeometry args={[.085, .07, 5]} /><meshStandardMaterial color="#29313b" metalness={.58} roughness={.42} /></mesh>)}
-    {[-4.25, -3.4, 3.4, 4.25].map((x) => <mesh key={x} position={[x, 2.1, -2.93]}><boxGeometry args={[.025, 3.8, .025]} /><meshStandardMaterial color="#30394a" metalness={.3} /></mesh>)}
-    {[.25, 1.35, 2.45, 3.55].map((y) => <mesh key={y} position={[-3.7, y, -2.93]}><boxGeometry args={[1.25, .018, .03]} /><meshStandardMaterial color="#30394a" /></mesh>)}
-    <mesh position={[0, .04, 1.2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[7.8, 3.5]} /><meshStandardMaterial color="#2e3037" roughness={1} /></mesh>
-    <mesh position={[0, .045, 1.2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[7.25, 2.95]} /><meshStandardMaterial color="#353540" roughness={1} /></mesh>
-    <mesh position={[0, 4.12, -3]}><boxGeometry args={[9.2, .16, .22]} /><meshStandardMaterial color="#171c28" metalness={.22} /></mesh>
-    <mesh position={[-4.5, 4.12, .06]}><boxGeometry args={[.18, .16, 6.3]} /><meshStandardMaterial color="#171c28" metalness={.22} /></mesh>
-    <mesh position={[4.5, 4.12, -.55]}><boxGeometry args={[.12, .13, 5]} /><meshStandardMaterial color="#171c28" metalness={.22} /></mesh>
-    <mesh position={[-4.46, .16, .08]}><boxGeometry args={[.04, .31, 6.2]} /><meshStandardMaterial color="#5a6470" metalness={.45} roughness={.54} /></mesh>
-    <mesh position={[0, .16, -2.93]}><boxGeometry args={[8.9, .31, .04]} /><meshStandardMaterial color="#5a6470" metalness={.45} roughness={.54} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -.025, 4]} receiveShadow><planeGeometry args={[30, 30]} /><meshStandardMaterial map={floor} roughness={.9} metalness={.03} /></mesh>
+    <mesh position={[0, 2.3, -3.08]} receiveShadow><boxGeometry args={[30, 8, .18]} /><meshStandardMaterial color="#252630" roughness={.95} /></mesh>
+    <mesh position={[-4.58, 2.3, 3.5]} receiveShadow><boxGeometry args={[.18, 8, 13]} /><meshStandardMaterial color="#23242e" roughness={.95} /></mesh>
+    {Array.from({ length: 19 }, (_, i) => <mesh key={'v' + i} position={[-9 + i, 2, -2.975]}><boxGeometry args={[.012, 5.4, .017]} /><meshBasicMaterial color="#171923" /></mesh>)}
+    {[.28, 1.52, 2.76, 4].map((y) => <mesh key={'h' + y} position={[0, y, -2.972]}><boxGeometry args={[30, .014, .017]} /><meshBasicMaterial color="#171923" /></mesh>)}
+    {[-3.9, -2.85, -1.8, -.75, .3, 1.35, 2.4, 3.45, 4.5].map((z) => <mesh key={z} position={[-4.47, 2.15, z]}><boxGeometry args={[.018, 4.8, .012]} /><meshBasicMaterial color="#181a24" /></mesh>)}
+    <mesh position={[0, .17, -2.94]}><boxGeometry args={[30, .34, .04]} /><meshStandardMaterial color="#151820" roughness={.62} /></mesh>
+    <mesh position={[-4.45, .17, 3.5]}><boxGeometry args={[.04, .34, 13]} /><meshStandardMaterial color="#151820" roughness={.62} /></mesh>
+    <mesh position={[0, .038, 1.2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[8, 4.05]} /><meshStandardMaterial color="#9d9693" roughness={1} /></mesh>
+    <mesh position={[0, .043, 1.2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[7.55, 3.64]} /><meshStandardMaterial color="#c5bab0" roughness={1} /></mesh>
+    <mesh position={[0, .048, 1.2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[7.27, 3.36]} /><meshStandardMaterial color="#bcb3aa" roughness={1} /></mesh>
+    <mesh position={[0, 4.26, -3.02]}><boxGeometry args={[30, .1, .14]} /><meshStandardMaterial color="#151820" /></mesh>
   </group>;
 }
 
 export function BadgeBoard({ onClick }: { onClick: () => void }) {
-  return <group position={[-3.65, 2.05, -2.76]} onClick={onClick}>
-    <RoundedBox args={[1.45, 1.3, .13]} radius={.03} castShadow><meshStandardMaterial color="#343b43" roughness={.72} /></RoundedBox>
-    {Array.from({ length: 8 }, (_, row) => Array.from({ length: 9 }, (_, col) => <mesh key={row + '-' + col} position={[-.59 + col * .147, -.5 + row * .145, .073]}><cylinderGeometry args={[.013, .013, .008, 8]} /><meshStandardMaterial color="#141c24" /></mesh>))}
-    {[-.38, 0, .38].map((x, i) => <group key={i} position={[x, -.04 + (i % 2) * .08, .15]} rotation={[0, 0, (i - 1) * .08]}>
-      <mesh position={[0, .35, 0]}><boxGeometry args={[.035, .52, .02]} /><meshStandardMaterial color={['#a8d5c2', '#d9ac7b', '#9aafc1'][i]} /></mesh>
-      <RoundedBox args={[.3, .4, .03]} radius={.02} castShadow><meshStandardMaterial color="#e6e3d7" roughness={.85} /></RoundedBox>
-      <mesh position={[0, .07, .018]}><planeGeometry args={[.22, .08]} /><meshBasicMaterial color="#36595a" /></mesh>
-      <mesh position={[0, -.11, .018]}><planeGeometry args={[.2, .025]} /><meshBasicMaterial color="#808c89" /></mesh>
+  return <group position={[2.42, 2.54, -2.76]} onClick={onClick}>
+    <RoundedBox args={[2.27, 1.36, .13]} radius={.025} castShadow><meshStandardMaterial color="#40404f" roughness={.72} emissive="#5f5d8b" emissiveIntensity={.22} /></RoundedBox>
+    {Array.from({ length: 9 }, (_, row) => Array.from({ length: 16 }, (_, col) => <mesh key={row + '-' + col} position={[-1.03 + col * .137, -.55 + row * .137, .071]}><cylinderGeometry args={[.015, .015, .008, 8]} /><meshBasicMaterial color="#161921" /></mesh>))}
+    {[-.82, -.41, 0, .41, .82].map((x, i) => <group key={i} position={[x, -.14, .15]} rotation={[0, 0, (i - 2) * .025]}>
+      <mesh position={[0, .42, 0]}><boxGeometry args={[.035, .62, .02]} /><meshStandardMaterial color={['#d05769', '#48b9aa', '#7281c9', '#d09b58', '#ab82c9'][i]} /></mesh>
+      <RoundedBox args={[.31, .44, .03]} radius={.02} castShadow><meshStandardMaterial color="#eee8e7" roughness={.85} /></RoundedBox>
+      <mesh position={[0, .11, .018]}><planeGeometry args={[.29, .14]} /><meshBasicMaterial color={['#d05769', '#48b9aa', '#7281c9', '#d09b58', '#ab82c9'][i]} /></mesh>
+      <mesh position={[0, -.11, .018]}><planeGeometry args={[.2, .018]} /><meshBasicMaterial color="#696b75" /></mesh>
     </group>)}
+    <mesh position={[0, 0, -.052]}><boxGeometry args={[2.38, 1.48, .025]} /><meshBasicMaterial color="#abb5d9" transparent opacity={.08} /></mesh>
   </group>;
 }
 
@@ -85,31 +81,44 @@ export function DeskLamp() {
   </group>;
 }
 
-export function AssistantBot({ onClick }: { onClick: () => void }) {
+export function AssistantBot({ onClick, introStage, reduced }: { onClick: () => void; introStage: 'boot' | 'name' | 'bot' | 'reveal' | 'ready'; reduced: boolean }) {
   const eyes = useRef<THREE.Group>(null);
-  useFrame(({ clock }) => { if (eyes.current) eyes.current.scale.y = Math.sin(clock.elapsedTime * 1.15) > .995 ? .12 : 1; });
+  const head = useRef<THREE.Group>(null);
+  useFrame(({ clock, pointer }, delta) => {
+    if (eyes.current) eyes.current.scale.y = Math.sin(clock.elapsedTime * 1.15) > .997 ? .1 : 1;
+    if (!head.current) return;
+    const turn = introStage === 'ready' || introStage === 'name' ? 1.55 : introStage === 'reveal' ? .8 : 0;
+    const targetY = reduced ? turn : turn + (introStage === 'ready' ? pointer.x * .24 + Math.sin(clock.elapsedTime * .7) * .07 : 0);
+    head.current.rotation.y = THREE.MathUtils.damp(head.current.rotation.y, targetY, 2.2, delta);
+    head.current.rotation.x = THREE.MathUtils.damp(head.current.rotation.x, introStage === 'ready' && !reduced ? pointer.y * -.09 : 0, 2.5, delta);
+    head.current.position.y = reduced ? 0 : Math.sin(clock.elapsedTime * 1.3) * .012;
+  });
   return <group position={[1.72, 1.58, 2.27]} rotation={[0, -2.5, 0]} onClick={onClick}>
     <RoundedBox args={[.54, .1, .46]} radius={.04} position={[0, -.47, 0]} castShadow><meshStandardMaterial color="#566c6a" metalness={.38} roughness={.4} /></RoundedBox>
     {[-.19, .19].map((x) => <group key={x}>
       <RoundedBox args={[.17, .32, .2]} radius={.05} position={[x, -.51, .17]} rotation={[.38, 0, 0]}><meshStandardMaterial color="#aab5ad" metalness={.26} roughness={.48} /></RoundedBox>
       <RoundedBox args={[.23, .09, .3]} radius={.04} position={[x, -.68, .29]}><meshStandardMaterial color="#526a68" metalness={.38} roughness={.38} /></RoundedBox>
     </group>)}
-    <RoundedBox args={[.88, .66, .55]} radius={.12} castShadow><meshStandardMaterial color="#d0d3ca" metalness={.18} roughness={.45} /></RoundedBox>
-    <RoundedBox args={[.75, .54, .045]} radius={.09} position={[0, .04, .287]}><meshStandardMaterial color="#9cb9b3" metalness={.68} roughness={.22} /></RoundedBox>
-    <RoundedBox args={[.68, .48, .03]} radius={.08} position={[0, .04, .315]}><meshStandardMaterial color="#071a23" emissive="#174f51" emissiveIntensity={.48} roughness={.1} metalness={.35} /></RoundedBox>
+    <group ref={head}>
+    <RoundedBox args={[.88, .66, .55]} radius={.12} castShadow><meshStandardMaterial color="#eee8e3" metalness={.18} roughness={.45} /></RoundedBox>
+    <RoundedBox args={[.75, .54, .045]} radius={.09} position={[0, .04, .287]}><meshStandardMaterial color="#23202b" metalness={.48} roughness={.22} /></RoundedBox>
+    <RoundedBox args={[.68, .48, .03]} radius={.08} position={[0, .04, .315]}><meshStandardMaterial color="#efbbcf" emissive="#b66b96" emissiveIntensity={.3} roughness={.14} metalness={.12} /></RoundedBox>
     <RoundedBox args={[.51, .25, .02]} radius={.05} position={[0, .02, -.288]}><meshStandardMaterial color="#47766f" metalness={.56} roughness={.3} emissive="#1b504b" emissiveIntensity={.5} /></RoundedBox>
     <mesh position={[0, .02, -.302]} rotation={[0, Math.PI, 0]}><torusGeometry args={[.072, .012, 8, 24]} /><meshBasicMaterial color="#9ff1d4" /></mesh>
     <group ref={eyes}>{[-.16, .16].map((x) => <group key={x} position={[x, .09, .34]}>
-      <mesh><circleGeometry args={[.09, 24]} /><meshBasicMaterial color="#5dceb5" transparent opacity={.18} /></mesh>
-      <mesh position={[0, 0, .005]}><sphereGeometry args={[.055, 20, 20]} /><meshBasicMaterial color="#b1ffdb" /></mesh>
-      <mesh position={[-.01, .018, .057]}><sphereGeometry args={[.012, 12, 12]} /><meshBasicMaterial color="#ffffff" /></mesh>
+      <RoundedBox args={[.075, .12, .012]} radius={.014} position={[0, 0, .011]}><meshBasicMaterial color="#201923" /></RoundedBox>
     </group>)}</group>
-    <mesh position={[0, -.1, .342]}><boxGeometry args={[.16, .018, .005]} /><meshBasicMaterial color="#b1ffdb" /></mesh>
+    <mesh position={[0, -.1, .342]}><boxGeometry args={[.16, .023, .005]} /><meshBasicMaterial color="#201923" /></mesh>
     {[-.33, .33].map((x) => [-.19, .26].map((y) => <mesh key={x + '-' + y} position={[x, y, .315]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[.012, .012, .008, 12]} /><meshStandardMaterial color="#e6f1df" metalness={.8} roughness={.24} /></mesh>))}
     {[-.48, .48].map((x) => <group key={x} position={[x, .02, 0]}>
       <mesh rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[.13, .13, .08, 24]} /><meshStandardMaterial color="#648d86" metalness={.65} roughness={.28} /></mesh>
-      <mesh position={[x < 0 ? -.05 : .05, 0, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[.075, .075, .015, 24]} /><meshBasicMaterial color="#a6edd2" /></mesh>
+      <mesh position={[x < 0 ? -.05 : .05, 0, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[.075, .075, .015, 24]} /><meshBasicMaterial color="#e8b0cb" /></mesh>
     </group>)}
+    {[-.19, .19].map((x) => <group key={x} position={[x, .44, 0]} rotation={[0, 0, x < 0 ? -.42 : .42]}>
+      <mesh position={[0, .08, 0]}><cylinderGeometry args={[.013, .013, .2, 8]} /><meshStandardMaterial color="#27232c" /></mesh>
+      <mesh position={[0, .2, 0]}><sphereGeometry args={[.04, 12, 12]} /><meshBasicMaterial color="#e8b0cb" /></mesh>
+    </group>)}
+    </group>
     <mesh position={[0, -.44, 0]}><cylinderGeometry args={[.18, .23, .27, 20]} /><meshStandardMaterial color="#9ea8a2" metalness={.28} /></mesh>
     <RoundedBox args={[.18, .08, .018]} radius={.02} position={[0, -.42, .197]}><meshBasicMaterial color="#8ce5c8" /></RoundedBox>
     {[-.52, .52].map((x) => <mesh key={x} position={[x, -.21, 0]}><sphereGeometry args={[.12, 16, 16]} /><meshStandardMaterial color="#728a86" metalness={.42} /></mesh>)}
@@ -117,9 +126,7 @@ export function AssistantBot({ onClick }: { onClick: () => void }) {
       <RoundedBox args={[.16, .31, .16]} radius={.06}><meshStandardMaterial color="#b4c6bb" metalness={.22} roughness={.5} /></RoundedBox>
       <mesh position={[0, -.18, .02]}><sphereGeometry args={[.09, 12, 12]} /><meshStandardMaterial color="#91b9ae" roughness={.43} /></mesh>
     </group>)}
-    <mesh position={[0, .42, 0]}><cylinderGeometry args={[.015, .015, .2, 8]} /><meshStandardMaterial color="#c4c9ba" /></mesh>
-    <mesh position={[0, .54, 0]}><sphereGeometry args={[.055, 12, 12]} /><meshBasicMaterial color="#e9bd82" /></mesh>
-    <pointLight position={[0, .04, .45]} color="#73d5c1" intensity={3} distance={1.4} />
+    <pointLight position={[0, .04, .45]} color="#e7a5c8" intensity={3} distance={1.4} />
   </group>;
 }
 
