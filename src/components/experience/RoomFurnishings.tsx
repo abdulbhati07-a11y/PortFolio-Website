@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
 export function StudioChair() {
-  return <group position={[1.72, 0, 2.27]} rotation={[0, .64, 0]}>
+  return <group position={[1.58, 0, -.26]} rotation={[0, Math.PI, 0]}>
     <mesh position={[0, .39, 0]} castShadow><cylinderGeometry args={[.055, .07, .72, 12]} /><meshStandardMaterial color="#263039" metalness={.75} roughness={.29} /></mesh>
     <mesh position={[0, .13, 0]} castShadow><cylinderGeometry args={[.16, .19, .09, 18]} /><meshStandardMaterial color="#19242c" metalness={.64} roughness={.4} /></mesh>
     {[0, 1, 2, 3, 4].map((index) => <group key={index} rotation={[0, index * Math.PI * 2 / 5, 0]}>

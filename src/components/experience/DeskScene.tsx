@@ -14,14 +14,14 @@ export type IntroStage = 'boot' | 'name' | 'bot' | 'reveal' | 'ready';
 export type PreviewKey = Exclude<Destination, 'room'> | 'assistant';
 
 const cameraStops: Record<Destination, { position: [number, number, number]; target: [number, number, number] }> = {
-  room: { position: [4.7, 3.6, 8.45], target: [0, 1.55, -.55] },
-  projects: { position: [0.2, 2.3, 4.05], target: [0, 1.85, 0] },
+  room: { position: [4.35, 3.45, 8.1], target: [0, 1.55, -.55] },
+  projects: { position: [0.2, 2.3, 4.05], target: [0, 1.85, .35] },
   journey: { position: [2.25, 2.65, 1.15], target: [2.42, 2.54, -2.76] },
-  about: { position: [3.15, 2.45, 4.1], target: [1.72, 1.62, 2.27] },
+  about: { position: [2.55, 2.45, 3.15], target: [1.58, 1.62, -.26] },
   contact: { position: [2.05, 2.2, 3.15], target: [2.34, 1.28, 1.03] },
 };
 
-const botStop = { position: [.82, 1.96, 1.79] as [number, number, number], target: [1.69, 1.66, 2.24] as [number, number, number] };
+const botStop = { position: [1.62, 1.91, 1.04] as [number, number, number], target: [1.58, 1.66, -.26] as [number, number, number] };
 const mobileRoomPosition = new THREE.Vector3(2.75, 2.95, 11.2);
 const mobileRoomTarget = new THREE.Vector3(0, .75, -.55);
 const ease = (value: number) => value * value * (3 - 2 * value);
@@ -146,7 +146,7 @@ function WindowCity({ introStage }: { introStage: IntroStage }) {
     canvas.width = 512; canvas.height = 512;
     const ctx = canvas.getContext('2d')!;
     const gradient = ctx.createLinearGradient(0, 0, 0, 512);
-    gradient.addColorStop(0, '#696b86'); gradient.addColorStop(.55, '#bd8f92'); gradient.addColorStop(1, '#e0ad86');
+    gradient.addColorStop(0, '#55465f'); gradient.addColorStop(.48, '#b47786'); gradient.addColorStop(1, '#f0b77d');
     ctx.fillStyle = gradient; ctx.fillRect(0, 0, 512, 512);
     const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
@@ -170,7 +170,7 @@ function WindowCity({ introStage }: { introStage: IntroStage }) {
       object.scale.set(.11, .035, 1);
       object.updateMatrix();
       mesh.setMatrixAt(index, object.matrix);
-      mesh.setColorAt(index, new THREE.Color(light.lit ? '#ffd9a8' : '#8d8293'));
+      mesh.setColorAt(index, new THREE.Color(light.lit ? '#ffdc99' : '#756a7f'));
     });
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
@@ -179,7 +179,7 @@ function WindowCity({ introStage }: { introStage: IntroStage }) {
     <mesh position={[0, .1, -.2]}><planeGeometry args={[3.55, 2.8]} /><meshBasicMaterial map={sky} /></mesh>
     <mesh position={[0, -.67, -.17]}><planeGeometry args={[3.55, .35]} /><meshBasicMaterial color="#dcab88" transparent opacity={.7} /></mesh>
     {blocks.map((block, i) => <group key={i} position={[block.x, -.84 + block.height / 2, block.z]}>
-      <mesh><boxGeometry args={[.18, block.height, .12]} /><meshStandardMaterial color={i % 3 === 0 ? '#45495e' : '#5f5b70'} roughness={.88} /></mesh>
+      <mesh><boxGeometry args={[.18, block.height, .12]} /><meshStandardMaterial color={i % 3 === 0 ? '#494454' : '#6b566b'} roughness={.88} /></mesh>
     </group>)}
     <instancedMesh ref={lightMesh} args={[undefined, undefined, lights.length]}><planeGeometry args={[1, 1]} /><meshBasicMaterial color="white" transparent opacity={.72} /></instancedMesh>
     <group position={[.55, -.52, .21]}>
@@ -220,6 +220,18 @@ function Desk({ onPreview, onChat, introStage, reduced }: { onPreview: (preview:
     const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
   }, []);
+  const rearTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024; canvas.height = 600;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = '#141724'; ctx.fillRect(0, 0, 1024, 600);
+    ctx.fillStyle = '#e9a8c6'; ctx.font = 'bold 104px monospace';
+    ctx.textAlign = 'center'; ctx.fillText('PROJECTS', 512, 325);
+    ctx.fillStyle = '#b8a8b5'; ctx.font = '27px monospace';
+    ctx.fillText('ABDULLAH.OS  /  EXPLORE THE WORK', 512, 391);
+    const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }, []);
   return <group>
     <RoundedBox args={[6.02, .73, 2.15]} radius={.14} position={[0, .41, .64]} castShadow><meshStandardMaterial color="#151721" roughness={.63} metalness={.16} /></RoundedBox>
     <RoundedBox args={[6.5, .27, 2.5]} radius={.09} position={[0, .76, .65]} castShadow receiveShadow><meshStandardMaterial color="#252835" roughness={.34} metalness={.25} /></RoundedBox>
@@ -231,7 +243,8 @@ function Desk({ onPreview, onChat, introStage, reduced }: { onPreview: (preview:
     <RoundedBox args={[.2, .06, .32]} radius={.06} position={[1.63, .96, 1.49]}><meshStandardMaterial color="#2d3342" /></RoundedBox>
     <group onClick={() => onPreview('projects')}>
       <RoundedBox args={[2.57, 1.56, .13]} radius={.09} position={[0, 1.94, .04]} castShadow><meshStandardMaterial color="#10141d" metalness={.55} roughness={.24} /></RoundedBox>
-      <mesh position={[0, 1.94, .115]}><planeGeometry args={[2.37, 1.35]} /><meshBasicMaterial ref={monitorMaterial} map={monitorTexture} color="#010101" toneMapped={false} /></mesh>
+      <mesh position={[0, 1.94, -.115]} rotation={[0, Math.PI, 0]}><planeGeometry args={[2.37, 1.35]} /><meshBasicMaterial ref={monitorMaterial} map={monitorTexture} color="#010101" toneMapped={false} /></mesh>
+      <mesh position={[0, 1.94, .116]}><planeGeometry args={[2.37, 1.35]} /><meshBasicMaterial map={rearTexture} toneMapped={false} /></mesh>
       <mesh position={[0, 1.16, .04]}><boxGeometry args={[.12, .55, .1]} /><meshStandardMaterial color="#181b23" metalness={.6} /></mesh>
       <RoundedBox args={[.7, .05, .42]} radius={.025} position={[0, .93, .13]}><meshStandardMaterial color="#191c25" /></RoundedBox>
     </group>
@@ -243,6 +256,20 @@ function Desk({ onPreview, onChat, introStage, reduced }: { onPreview: (preview:
     <AssistantBot onClick={onChat} introStage={introStage} reduced={reduced} />
     {(introStage === 'reveal' || introStage === 'ready') && <ContactPhone onClick={() => onPreview('contact')} />}
     <DeskLamp />
+  </group>;
+}
+
+function DiamondHotspot({ position, onClick, reduced }: { position: [number, number, number]; onClick: () => void; reduced: boolean }) {
+  const marker = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (marker.current && !reduced) marker.current.position.y = Math.sin(clock.elapsedTime * 1.7 + position[0]) * .065;
+  });
+  return <group position={position} onClick={(event) => { event.stopPropagation(); onClick(); }}>
+    <group ref={marker}>
+      <mesh rotation={[0, 0, Math.PI / 4]}><octahedronGeometry args={[.115]} /><meshBasicMaterial color="#f4accb" toneMapped={false} /></mesh>
+      <mesh scale={1.55}><octahedronGeometry args={[.115]} /><meshBasicMaterial color="#f2a6ca" transparent opacity={.12} depthWrite={false} /></mesh>
+      <pointLight color="#f4a5c9" intensity={.45} distance={.95} />
+    </group>
   </group>;
 }
 
@@ -260,6 +287,13 @@ export default function DeskScene({ destination, introStage, onPreview, onChat, 
     <BadgeBoard onClick={() => onPreview('journey')} />
     <Bookcase />
     <Desk onPreview={onPreview} onChat={onChat} introStage={introStage} reduced={reduced} />
+    {introStage === 'ready' && <group>
+      <DiamondHotspot position={[-.15, 2.94, .28]} onClick={() => onPreview('projects')} reduced={reduced} />
+      <DiamondHotspot position={[2.42, 3.46, -2.62]} onClick={() => onPreview('journey')} reduced={reduced} />
+      <DiamondHotspot position={[-1.9, 1.62, .72]} onClick={() => onPreview('about')} reduced={reduced} />
+      <DiamondHotspot position={[2.34, 2.12, 1.03]} onClick={() => onPreview('contact')} reduced={reduced} />
+      <DiamondHotspot position={[1.58, 2.48, -.26]} onClick={onChat} reduced={reduced} />
+    </group>}
     {quality === 'high' && <ContactShadows position={[0, .001, .4]} opacity={.5} scale={10} blur={2.5} far={4} frames={1} />}
     <CameraController destination={destination} introStage={introStage} reduced={reduced} onDrag={onDrag} />
   </Canvas>;

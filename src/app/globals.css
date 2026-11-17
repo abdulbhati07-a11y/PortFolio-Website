@@ -59,3 +59,8 @@
 @keyframes hint-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 @media(max-width:600px){.immersive-shell .object-label.journey{left:15%;top:40%}.room-drag-hint{bottom:5rem;font-size:.45rem}}
 @media(prefers-reduced-motion:reduce){.room-drag-hint{animation:none}}
+.immersive-shell .object-label.projects{left:45%;top:30%}
+.immersive-shell .object-label.about{left:32%;top:50%}
+.immersive-shell .object-label.contact{left:62%;top:58%}
+.immersive-shell .object-label.assistant{left:63%;top:46%}
+@media(max-width:600px){.immersive-shell .object-label.projects{left:45%;top:23%}.immersive-shell .object-label.journey{left:69%;top:31%}.immersive-shell .object-label.about{left:14%;top:55%}.immersive-shell .object-label.contact{left:72%;top:53%}.immersive-shell .object-label.assistant{left:66%;top:45%}}

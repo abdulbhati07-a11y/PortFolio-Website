@@ -4,13 +4,13 @@ import { RoundedBox } from '@react-three/drei';
 
 export function RoomSetDressing() {
   return <group>
-    <group position={[3.55, 0, -1.92]}>
-      <RoundedBox args={[1.17, .62, .52]} radius={.04} position={[0, .33, 0]} castShadow><meshStandardMaterial color="#171923" roughness={.62} /></RoundedBox>
-      <mesh position={[0, .65, 0]}><boxGeometry args={[1.22, .04, .59]} /><meshStandardMaterial color="#30303d" metalness={.38} roughness={.4} /></mesh>
-      <mesh position={[-.29, .38, .29]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.21, .04, 10, 28]} /><meshStandardMaterial color="#d38caa" metalness={.65} roughness={.25} emissive="#a34e78" emissiveIntensity={.4} /></mesh>
-      <mesh position={[-.29, .38, .304]}><circleGeometry args={[.14, 24]} /><meshStandardMaterial color="#111622" roughness={.55} /></mesh>
-      <RoundedBox args={[.29, .04, .21]} radius={.02} position={[.34, .7, 0]}><meshStandardMaterial color="#9da0ab" metalness={.4} roughness={.36} /></RoundedBox>
-      {[-.16, .16].map((x) => <mesh key={x} position={[x, .38, .307]}><boxGeometry args={[.025, .16, .009]} /><meshBasicMaterial color="#dfa9ba" /></mesh>)}
+    <group position={[3.63, 0, -.76]}>
+      <RoundedBox args={[1.17, 1.24, .52]} radius={.04} position={[0, .64, 0]} castShadow><meshStandardMaterial color="#171923" roughness={.62} /></RoundedBox>
+      <mesh position={[0, 1.27, 0]}><boxGeometry args={[1.22, .04, .59]} /><meshStandardMaterial color="#30303d" metalness={.38} roughness={.4} /></mesh>
+      <mesh position={[-.29, .95, .29]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.21, .04, 10, 28]} /><meshStandardMaterial color="#d38caa" metalness={.65} roughness={.25} emissive="#a34e78" emissiveIntensity={.4} /></mesh>
+      <mesh position={[-.29, .95, .304]}><circleGeometry args={[.14, 24]} /><meshStandardMaterial color="#111622" roughness={.55} /></mesh>
+      <RoundedBox args={[.29, .04, .21]} radius={.02} position={[.34, 1.32, 0]}><meshStandardMaterial color="#9da0ab" metalness={.4} roughness={.36} /></RoundedBox>
+      {[-.16, .16].map((x) => <mesh key={x} position={[x, .55, .307]}><boxGeometry args={[.025, .16, .009]} /><meshBasicMaterial color="#dfa9ba" /></mesh>)}
     </group>
     <group position={[3.95, 0, 1.25]}>
       {[-.52, .52].map((x) => <mesh key={x} position={[x, .44, 0]}><boxGeometry args={[.065, .88, .58]} /><meshStandardMaterial color="#242831" metalness={.34} roughness={.5} /></mesh>)}

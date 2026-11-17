@@ -49,7 +49,7 @@ export function RoomShell() {
 
 export function BadgeBoard({ onClick }: { onClick: () => void }) {
   return <group position={[2.42, 2.54, -2.76]} onClick={onClick}>
-    <RoundedBox args={[2.27, 1.36, .13]} radius={.025} castShadow><meshStandardMaterial color="#40404f" roughness={.72} emissive="#5f5d8b" emissiveIntensity={.22} /></RoundedBox>
+    <RoundedBox args={[2.37, 1.46, .17]} radius={.025} castShadow><meshStandardMaterial color="#292a39" roughness={.72} emissive="#4e4263" emissiveIntensity={.22} /></RoundedBox>
     {Array.from({ length: 9 }, (_, row) => Array.from({ length: 16 }, (_, col) => <mesh key={row + '-' + col} position={[-1.03 + col * .137, -.55 + row * .137, .071]}><cylinderGeometry args={[.015, .015, .008, 8]} /><meshBasicMaterial color="#161921" /></mesh>))}
     {[-.82, -.41, 0, .41, .82].map((x, i) => <group key={i} position={[x, -.14, .15]} rotation={[0, 0, (i - 2) * .025]}>
       <mesh position={[0, .42, 0]}><boxGeometry args={[.035, .62, .02]} /><meshStandardMaterial color={['#d05769', '#48b9aa', '#7281c9', '#d09b58', '#ab82c9'][i]} /></mesh>
@@ -58,6 +58,7 @@ export function BadgeBoard({ onClick }: { onClick: () => void }) {
       <mesh position={[0, -.11, .018]}><planeGeometry args={[.2, .018]} /><meshBasicMaterial color="#696b75" /></mesh>
     </group>)}
     <mesh position={[0, 0, -.052]}><boxGeometry args={[2.38, 1.48, .025]} /><meshBasicMaterial color="#abb5d9" transparent opacity={.08} /></mesh>
+    <mesh position={[0, 0, -.07]}><boxGeometry args={[2.48, 1.57, .025]} /><meshBasicMaterial color="#d6c2ef" transparent opacity={.15} /></mesh>
   </group>;
 }
 
@@ -87,13 +88,13 @@ export function AssistantBot({ onClick, introStage, reduced }: { onClick: () => 
   useFrame(({ clock, pointer }, delta) => {
     if (eyes.current) eyes.current.scale.y = Math.sin(clock.elapsedTime * 1.15) > .997 ? .1 : 1;
     if (!head.current) return;
-    const turn = introStage === 'ready' || introStage === 'name' ? 1.55 : introStage === 'reveal' ? .8 : 0;
+    const turn = introStage === 'ready' || introStage === 'name' ? -.12 : introStage === 'reveal' ? -.06 : 0;
     const targetY = reduced ? turn : turn + (introStage === 'ready' ? pointer.x * .24 + Math.sin(clock.elapsedTime * .7) * .07 : 0);
     head.current.rotation.y = THREE.MathUtils.damp(head.current.rotation.y, targetY, 2.2, delta);
     head.current.rotation.x = THREE.MathUtils.damp(head.current.rotation.x, introStage === 'ready' && !reduced ? pointer.y * -.09 : 0, 2.5, delta);
     head.current.position.y = reduced ? 0 : Math.sin(clock.elapsedTime * 1.3) * .012;
   });
-  return <group position={[1.72, 1.58, 2.27]} rotation={[0, -2.5, 0]} onClick={onClick}>
+  return <group position={[1.58, 1.58, -.26]} rotation={[0, .12, 0]} onClick={onClick}>
     <RoundedBox args={[.54, .1, .46]} radius={.04} position={[0, -.47, 0]} castShadow><meshStandardMaterial color="#566c6a" metalness={.38} roughness={.4} /></RoundedBox>
     {[-.19, .19].map((x) => <group key={x}>
       <RoundedBox args={[.17, .32, .2]} radius={.05} position={[x, -.51, .17]} rotation={[.38, 0, 0]}><meshStandardMaterial color="#aab5ad" metalness={.26} roughness={.48} /></RoundedBox>
