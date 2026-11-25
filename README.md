@@ -1,9 +1,9 @@
 # Muhammad Abdullah Bhatti — Immersive Portfolio
 
-An original developer desk and a complete Flat portfolio built with Next.js App Router, React, TypeScript, React Three Fiber, Drei, Tailwind CSS, and Framer Motion. This branch preserves the existing public assets, project screenshots, resumes, and certificates.
+An original developer desk and a complete Flat portfolio built with Next.js App Router, React, TypeScript, Three.js, GSAP, Tailwind CSS, and Framer Motion. This branch preserves the existing public assets, project screenshots, resumes, and certificates.
 
 ## Routes
-- `/` — full room view with hover previews, a desk robot that opens the assistant, and Projects, Journey, About, and Contact.
+- `/` — custom tiled room with staged lighting, bounded drag navigation, a robot portfolio guide, project blueprints, and Projects, Experience, About, and Contact.
 - `/flat` — complete portfolio without WebGL.
 - `/projects/[slug]` — shareable project case studies.
 - `/api/chat` — server-side streaming portfolio assistant.
@@ -18,7 +18,7 @@ Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Open `http://localhost:3000`. The room and Flat route work without API credentials. Chat gives limited answers from verified portfolio facts without an OpenAI key. Contact delivery requires the service settings below.
+Open `http://localhost:3000`. The room and Flat route work without API credentials. The room robot uses a local guide grounded in the shared verified content. Flat mode offers server chat with limited answers from verified portfolio facts without an OpenAI key. Contact delivery requires the service settings below.
 
 ## Environment variables
 Set these only on the server, in `.env.local` or deployment platform settings:

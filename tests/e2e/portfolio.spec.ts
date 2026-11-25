@@ -28,28 +28,40 @@ test('Room opens all four destinations and Escape returns home', async ({ page }
   test.setTimeout(120000);
   await page.goto('/');
   await page.getByRole('button', { name: 'Enter without sound' }).click();
-  for (const label of ['PROJECTS', 'JOURNEY', 'ABOUT', 'CONTACT']) {
-    await page.locator('.scene-dock button').filter({ hasText: label }).click();
-    await expect(page.getByRole('dialog', { name: label.toLowerCase() + ' window' })).toBeVisible({ timeout: 15000 });
+  for (const [label, surface] of [['Projects', 'Project desktop'], ['Experience', 'Learning, projects and credentials'], ['About', 'About Abdullah'], ['Contact', 'Contact Abdullah']]) {
+    await page.locator('.room-index').getByRole('button', { name: new RegExp(label) }).click();
+    await expect(page.locator('.room-surface[aria-label="' + surface + '"]')).toBeVisible({ timeout: 15000 });
+    if (label === 'Contact') {
+      await page.getByRole('button', { name: 'Open message form', exact: true }).click();
+      const form = page.locator('dialog .contact-form');
+      await form.locator('input[name="name"]').fill('Test Visitor');
+      await form.locator('input[name="email"]').fill('test@example.com');
+      await form.locator('textarea[name="message"]').fill('Testing the integrated room contact form.');
+      await expect(form.locator('input[name="website"]')).toBeHidden();
+      await page.route('**/api/contact', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"sent":true}' }));
+      await form.getByRole('button', { name: 'Send message' }).click();
+      await expect(form.getByRole('status')).toContainText('Message sent');
+      await page.keyboard.press('Escape');
+    }
     await page.keyboard.press('Escape');
-    await expect(page.getByRole('dialog', { name: label.toLowerCase() + ' window' })).toHaveCount(0);
+    await expect(page.locator('.room-surface')).toHaveCount(0);
   }
 });
 
-test('Room previews enlarge on hover and the desk bot opens portfolio chat', async ({ page }) => {
+test('Room project details and local guide use verified portfolio content', async ({ page }) => {
   test.setTimeout(90000);
   await page.goto('/');
   await page.getByRole('button', { name: 'Enter without sound' }).click();
-  await page.locator('.object-label.projects').hover();
-  await expect(page.getByLabel('Projects preview')).toBeVisible();
-  await expect(page.getByLabel('Projects preview').locator('img')).toBeVisible();
-  await page.getByRole('button', { name: 'Close preview' }).click();
-  await expect(page.getByLabel('Projects preview')).toHaveCount(0);
-  await page.locator('.object-label.assistant').hover();
-  await expect(page.getByLabel('Ask Abdullah’s assistant preview')).toBeVisible();
-  await page.getByLabel('Ask Abdullah’s assistant preview').getByRole('button', { name: /Open assistant/ }).click();
-  await expect(page.getByLabel('Portfolio assistant')).toBeVisible();
-  await expect(page.getByRole('textbox', { name: 'Your question' })).toBeFocused();
+  await page.locator('.room-index').getByRole('button', { name: /Projects/ }).click();
+  await page.locator('.project-tile').filter({ hasText: 'VisionGuard' }).click({ timeout: 15000 });
+  await expect(page.locator('.case-readme')).toContainText('Evaluation and deployment claims are pending evidence review');
+  await expect(page.locator('.case-links a')).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+  await page.locator('.room-index').getByRole('button', { name: /About/ }).click();
+  await page.getByRole('textbox', { name: 'Ask about Abdullah' }).fill('What university does Abdullah attend?');
+  await page.getByRole('button', { name: 'Send', exact: true }).click();
+  await expect(page.locator('.tv-message.guide').last()).toContainText('University of Management and Technology, Lahore');
 });
 
 test('WebGL failure exposes complete Flat route', async ({ page }) => {
@@ -107,16 +119,17 @@ test('Chat renders streamed response chunks', async ({ page }) => {
   await expect(page.locator('.chat-bubble.assistant')).toContainText('Python and data science projects');
 });
 
-test('Mobile room keeps all destinations usable with arrow and Escape keys', async ({ page }) => {
+test('Mobile room navigation and Escape remain usable', async ({ page }) => {
+  test.setTimeout(90000);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.getByRole('button', { name: 'Enter without sound' }).click();
-  await page.keyboard.press('ArrowLeft');
-  await expect(page.getByRole('dialog', { name: 'contact window' })).toBeVisible({ timeout: 15000 });
+  await page.locator('.room-index').getByRole('button', { name: /Contact/ }).focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByLabel('Contact Abdullah', { exact: true })).toBeVisible({ timeout: 15000 });
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('dialog', { name: 'contact window' })).toHaveCount(0);
-  await page.locator('.scene-dock button').filter({ hasText: 'PROJECTS' }).click();
-  await expect(page.getByRole('dialog', { name: 'projects window' })).toBeVisible({ timeout: 15000 });
-  const width = await page.evaluate(() => document.documentElement.scrollWidth);
-  expect(width).toBeLessThanOrEqual(390);
+  await expect(page.locator('.room-surface')).toHaveCount(0);
+  await page.locator('.room-index').getByRole('button', { name: /Projects/ }).click();
+  await expect(page.getByLabel('Project desktop')).toBeVisible({ timeout: 15000 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });

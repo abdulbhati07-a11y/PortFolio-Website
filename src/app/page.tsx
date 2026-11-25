@@ -1,5 +1,5 @@
-import ImmersiveExperience from '@/components/experience/ImmersiveExperience';
+import RoomClient from '@/components/desk/RoomClient';
 
 export default function HomePage() {
-  return <ImmersiveExperience />;
+  return <RoomClient />;
 }
