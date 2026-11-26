@@ -9,6 +9,7 @@ import { idleSpeaker } from '../../lib/spotify';
 import { ROOM_INTRO_DURATION, ROOM_NAME_START } from '../../lib/roomIntro';
 import '../../styles/desk.css';
 import '../../styles/spotify-speaker.css';
+import '../../styles/room-palette.css';
 const ContactForm=lazy(()=>import('../shared/ContactForm'));
 const SpotifySpeaker=lazy(()=>import('./SpotifySpeaker'));
 const sections=[['projects','Projects',FiMonitor],['experience','Experience',FiBriefcase],['about','About',FiMessageSquare],['contact','Contact',FiSmartphone]];

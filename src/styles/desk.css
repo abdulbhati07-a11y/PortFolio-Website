@@ -1,4 +1,4 @@
-:root{--room-ink:#0f1220;--room-pink:#ff9ebb;--room-text:#f4e7e2;--room-muted:#b9b2c4;--room-mono:var(--font-mono),monospace;--room-font:var(--font-room),sans-serif}
+:root{--room-ink:#121725;--room-pink:#edabc3;--room-text:#f2e9e7;--room-muted:#bdb7c9;--room-mono:var(--font-mono),monospace;--room-font:var(--font-room),sans-serif}
 html:has(.desk-portfolio),body:has(.desk-portfolio){margin:0;width:100%;height:100%;min-height:100%;background:var(--room-ink)!important;color:var(--room-text);overflow:hidden}
 .desk-portfolio{font-family:var(--room-font)}
 .desk-portfolio{position:relative;width:100%;height:100svh;isolation:isolate;font-family:var(--room-font);color:var(--room-text);background:#181927}

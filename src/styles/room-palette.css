@@ -1,0 +1,16 @@
+/* Tone the room surfaces together without tinting screenshots or Spotify. */
+.desk-portfolio{background:#1a1d2c}
+.desk-portfolio .room-loader{background:radial-gradient(ellipse at 50% 38%,#191d30,#0a0e18 76%)}
+.desk-portfolio .glass-control{background:linear-gradient(145deg,#2b2c40eb,#151c2bf5);border-color:#b9b5d43b;box-shadow:inset 0 1px 0 #ffffff09,0 6px 24px #0004}
+.desk-portfolio .monitor-shell{background:linear-gradient(145deg,#161b2b,#0f1422)}
+.desk-portfolio .desktop-toolbar{background:linear-gradient(110deg,#27273b,#20293a)}
+.desk-portfolio .project-tile,.desk-portfolio .case-app{background:linear-gradient(145deg,#20283a,#181d2d);border-color:#b7b5d02e}
+.desk-portfolio .project-terminal,.desk-portfolio .case-readme{background:linear-gradient(140deg,#131a29,#101521)}
+.desk-portfolio .window-bar{background:linear-gradient(100deg,#302d43,#242b3c)}
+.desk-portfolio .tv-body{background:linear-gradient(135deg,#505461,#303747)}
+.desk-portfolio .tv-screen{background:linear-gradient(145deg,#f3c0d0,#e7b0c8 56%,#dca5c0);box-shadow:inset 0 0 30px #c7759b20,0 0 12px #edabc318}
+.desk-portfolio .phone-glass{background:radial-gradient(#ffffff06 .7px,transparent .7px),radial-gradient(ellipse at 10% 0%,#29304980,transparent 65%),linear-gradient(160deg,#141a29,#0b101a);background-size:10px 10px,100% 100%,100% 100%}
+.desk-portfolio .desk-message-dialog{background:linear-gradient(145deg,#23283b,#151c2b);border-color:#edabc34d}
+.desk-portfolio .spotify-speaker{background:linear-gradient(145deg,#272c41fa,#151b2afc);border-color:#b8b4d643}
+.desk-portfolio .futurepath-laptop-shell{background:linear-gradient(145deg,#20283a,#141c2a)}
+.desk-portfolio .blueprint-case-notes{background:linear-gradient(145deg,#1d293b,#141f2e)}

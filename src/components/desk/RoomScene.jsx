@@ -7,8 +7,10 @@ import { createWallDecor } from './WallDecor';
 import { ROOM_PULLBACK_DELAY, ROOM_PULLBACK_DURATION, ROOM_REVEAL_DELAY } from '../../lib/roomIntro';
 import { batchRoomMeshes } from '../../lib/batchRoomMeshes';
 import { createInteractiveCat } from './InteractiveCat';
+import { createRobotGaze } from '../../lib/robotGaze';
+import { createRobotMechanics } from './RobotMechanics';
 
-const PINK = '#ff9ebb';
+const PINK = '#edabc3';
 const home = { position:[5.15,3.7,6.6], target:[0,1.65,-.8] };
 const views = {
   projects:{position:[-.78,2.08,-.9],target:[-.78,2.08,-.035]},
@@ -39,17 +41,17 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
     catch { callbacks.current.onReady(false);return; }
     renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
-    renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
+    renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.06;
     renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
     host.appendChild(renderer.domElement);
-    const scene=new THREE.Scene();scene.background=new THREE.Color('#181927');scene.fog=new THREE.FogExp2('#181927',.021);
+    const scene=new THREE.Scene();scene.background=new THREE.Color('#1a1d2c');scene.fog=new THREE.FogExp2('#1a1d2c',.017);
     const camera=new THREE.PerspectiveCamera(43,1,.05,90);
     const target=new THREE.Vector3(-.62,2.25,-1.16);
     camera.position.set(-.62,2.25,-.45);
     const meshes=[],resources=[],hotspots=[];
     let navigating=false,current=null,disposed=false,frame,drag=null,dragged=false,orbit=0,pitch=0,renderOrbit=0,renderPitch=0,previousTime=0;
     const material=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.65,...extra});
-    const dark=material('#222532'),metal=material('#303544',{metalness:.55,roughness:.37}),wood=material('#4c3939'),cream=material('#b8aaa3');
+    const dark=material('#242938'),metal=material('#343b4c',{metalness:.48,roughness:.43}),wood=material('#514047'),cream=material('#cbbeb3');
     const glowing=(color,intensity=1,stage='accents')=>{const result=material(color,{emissive:color,emissiveIntensity:intensity});result.userData.lightStage=stage;return result;};
     const add=(geo,mat,pos,parent=scene)=>{const mesh=new THREE.Mesh(geo,mat);mesh.position.set(...pos);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);meshes.push(mesh);return mesh;};
     const box=(size,pos,mat,parent)=>add(new THREE.BoxGeometry(...size),mat,pos,parent);
@@ -75,11 +77,11 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
     }
 
     // Indirect dusk light, a warm desk lamp and the pink glow of the robot.
-    const hemisphere=new THREE.HemisphereLight('#ddd1da','#53444a',1.65);scene.add(hemisphere);
-    const sun=new THREE.DirectionalLight('#ffd4b5',3.0);sun.position.set(-3,5,-5);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-7,right:7,top:7,bottom:-7,near:.1,far:24});sun.shadow.bias=-.001;scene.add(sun);
-    const fill=new THREE.DirectionalLight('#c1c1d6',1.05);fill.position.set(3,4,6);scene.add(fill);
-    const pinkLight=new THREE.PointLight(PINK,1.35,4,2);pinkLight.position.set(-.62,2.25,-1.03);scene.add(pinkLight);
-    const lampLight=new THREE.PointLight('#ffd6a0',8.2,4,2);lampLight.position.set(-2.1,2.3,-.3);lampLight.castShadow=true;scene.add(lampLight);
+    const hemisphere=new THREE.HemisphereLight('#d9d8e8','#60535d',1.35);scene.add(hemisphere);
+    const sun=new THREE.DirectionalLight('#ffe0c2',1.35);sun.position.set(-3,5,-5);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-7,right:7,top:7,bottom:-7,near:.1,far:24});sun.shadow.bias=-.001;scene.add(sun);
+    const fill=new THREE.DirectionalLight('#bbc8df',1.08);fill.position.set(3,4,6);scene.add(fill);
+    const pinkLight=new THREE.PointLight(PINK,1.05,4,2);pinkLight.position.set(-.62,2.25,-1.03);scene.add(pinkLight);
+    const lampLight=new THREE.PointLight('#ffe2bf',6.4,4,2);lampLight.position.set(-2.1,2.3,-.3);lampLight.castShadow=true;scene.add(lampLight);
     pinkLight.userData.lightStage=lampLight.userData.lightStage='task';
 
     // Herringbone floor and dark acoustic wall panels.
@@ -92,7 +94,7 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
       }
     });floorTex.wrapS=floorTex.wrapT=THREE.RepeatWrapping;floorTex.repeat.set(3,3);resources.push(floorTex);
     box([10,.12,9],[0,-.08,.1],material('#aaa1a3',{map:floorTex,roughness:.85}));
-    const wall=material('#49454c');box([10,5,.12],[0,2.5,-3.4],wall);box([.12,5,8],[-4.6,2.5,.6],wall);
+    const wall=material('#464653');box([10,5,.12],[0,2.5,-3.4],wall);box([.12,5,8],[-4.6,2.5,.6],wall);
     const seam=material('#171923');
     for(let x=-4.5;x<=5;x+=1.25)box([.014,5,.03],[x,2.5,-3.32],seam);
     for(let y=0;y<=5;y+=1.05)box([10,.014,.025],[0,y,-3.32],seam);
@@ -123,7 +125,7 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
     box([1.34,.035,.15],[3.95,-2.47,.08],metal,frontWall);
 
     const ceiling=new THREE.Group();ceiling.position.set(.2,5,.6);ceiling.rotation.x=Math.PI/2;scene.add(ceiling);
-    const ceilingPanel=wall.clone();ceilingPanel.emissive.set('#49454c');ceilingPanel.emissiveIntensity=.4;ceilingPanel.userData.lightStage='base';
+    const ceilingPanel=wall.clone();ceilingPanel.emissive.set('#464653');ceilingPanel.emissiveIntensity=.22;ceilingPanel.userData.lightStage='base';
     plane(9.6,8,[0,0,0],ceilingPanel,ceiling);
     for(let x=-4.5;x<=5;x+=1.25)plane(.014,8,[x-.2,0,.015],seam,ceiling);
     for(let z=-3.3;z<=4.6;z+=1.2)plane(9.6,.014,[0,z-.6,.015],seam,ceiling);
@@ -147,31 +149,31 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
     // Soft local washes keep the accent lights warm and restrained.
     const softGlow=canvasTexture(128,128,(ctx,w,h)=>{const gradient=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);gradient.addColorStop(0,'rgba(255,255,255,.55)');gradient.addColorStop(.35,'rgba(255,255,255,.22)');gradient.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=gradient;ctx.fillRect(0,0,w,h);});resources.push(softGlow);
     const glowMaterial=(color,opacity)=>{const result=new THREE.MeshBasicMaterial({map:softGlow,color,transparent:true,opacity,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});result.userData.lightStage='accents';return result;};
-    const deskGlow=plane(5.4,3.9,[-.65,.058,.1],glowMaterial('#edb690',.28));deskGlow.name='desk-floor-glow';deskGlow.rotation.x=-Math.PI/2;deskGlow.castShadow=deskGlow.receiveShadow=false;
-    const underDeskLight=new THREE.PointLight('#ffd4a1',.18,3.2,2);underDeskLight.name='desk-ambient-light';underDeskLight.position.set(-.65,.30,1.3);scene.add(underDeskLight);
-    const shelfLight=new THREE.PointLight('#ffd4a5',2.0,2.6,2);shelfLight.name='shelf-ambient-light';shelfLight.position.set(-4.01,1.94,-1.55);scene.add(shelfLight);
+    const deskGlow=plane(5.4,3.9,[-.65,.058,.1],glowMaterial('#dcc5ad',.24));deskGlow.name='desk-floor-glow';deskGlow.rotation.x=-Math.PI/2;deskGlow.castShadow=deskGlow.receiveShadow=false;
+    const underDeskLight=new THREE.PointLight('#ffd4a1',.28,3.2,2);underDeskLight.name='desk-ambient-light';underDeskLight.position.set(-.65,.30,1.3);scene.add(underDeskLight);
+    const shelfLight=new THREE.PointLight('#f2d7b8',1.65,2.6,2);shelfLight.name='shelf-ambient-light';shelfLight.position.set(-4.01,1.94,-1.55);scene.add(shelfLight);
     underDeskLight.userData.lightStage=shelfLight.userData.lightStage='accents';
-    const shelfWash=plane(2.65,1.55,[-4.505,1.7,-1.55],glowMaterial('#ffd1a0',.18));shelfWash.rotation.y=Math.PI/2;shelfWash.castShadow=shelfWash.receiveShadow=false;
-    const pinboardHalo=plane(3.6,2.3,[2.45,2.91,-3.285],glowMaterial('#bac7fa',.45));pinboardHalo.name='pinboard-halo';pinboardHalo.castShadow=pinboardHalo.receiveShadow=false;
-    const pinboardLight=new THREE.PointLight('#c3d0ff',.7,2.2,2);pinboardLight.position.set(2.45,3,-3.265);pinboardLight.userData.lightStage='accents';scene.add(pinboardLight);
+    const shelfWash=plane(2.65,1.55,[-4.505,1.7,-1.55],glowMaterial('#efd5ba',.14));shelfWash.rotation.y=Math.PI/2;shelfWash.castShadow=shelfWash.receiveShadow=false;
+    const pinboardHalo=plane(3.6,2.3,[2.45,2.91,-3.285],glowMaterial('#b8c6e8',.27));pinboardHalo.name='pinboard-halo';pinboardHalo.castShadow=pinboardHalo.receiveShadow=false;
+    const pinboardLight=new THREE.PointLight('#c0cde8',.55,2.2,2);pinboardLight.position.set(2.45,3,-3.265);pinboardLight.userData.lightStage='accents';scene.add(pinboardLight);
 
     // A city at dusk, painted into the view beyond the window.
     const city=canvasTexture(1536,1024,(ctx,w,h)=>{
-      const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#6c597e');sky.addColorStop(.43,'#cb8798');sky.addColorStop(.7,'#efa99a');sky.addColorStop(1,'#e5b69a');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+      const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#565b87');sky.addColorStop(.28,'#977c9c');sky.addColorStop(.56,'#d59aab');sky.addColorStop(.8,'#e3b29f');sky.addColorStop(1,'#d5b9aa');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
       ctx.fillStyle='#f4c5ad';ctx.beginPath();ctx.arc(310,345,65,0,Math.PI*2);ctx.fill();
       let seed=7;const random=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
-      for(let layer=0;layer<3;layer++){for(let x=-30;x<w;x+=85+random()*65){const bw=85+random()*130,bh=160+random()*(layer===0?340:490),y=h-bh+layer*30;ctx.fillStyle=layer===0?'#8a7487':layer===1?'#736274':'#625361';ctx.fillRect(x,y,bw,bh);ctx.fillStyle='#514658';ctx.fillRect(x-4,y,bw+8,7);for(let a=x+10;a<x+bw-10;a+=20)for(let b=y+16;b<h;b+=29){ctx.fillStyle=random()>.54?'#f6d89a':random()>.6?'#978e9c':'#4f4c5d';ctx.fillRect(a,b,10,16);}}}
+      for(let layer=0;layer<3;layer++){for(let x=-30;x<w;x+=85+random()*65){const bw=85+random()*130,bh=160+random()*(layer===0?340:490),y=h-bh+layer*30;ctx.fillStyle=layer===0?'#8c7e94':layer===1?'#6a657e':'#4d536c';ctx.fillRect(x,y,bw,bh);ctx.fillStyle='#514658';ctx.fillRect(x-4,y,bw+8,7);for(let a=x+10;a<x+bw-10;a+=20)for(let b=y+16;b<h;b+=29){ctx.fillStyle=random()>.54?'#e7c9a1':random()>.6?'#978e9c':'#4f4c5d';ctx.fillRect(a,b,10,16);}}}
       for(const [x,y,s]of[[290,830,1.1],[1090,740,.9],[760,990,1.35]]){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.strokeStyle='#333d3b';ctx.lineWidth=15;ctx.beginPath();ctx.moveTo(0,150);ctx.quadraticCurveTo(15,-110,0,-240);ctx.stroke();for(let i=0;i<9;i++){const angle=i/9*Math.PI*2;ctx.save();ctx.translate(0,-235);ctx.rotate(angle);ctx.fillStyle=i%2?'#425249':'#53604e';ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(80,-65,200,20);ctx.quadraticCurveTo(75,-20,0,0);ctx.fill();ctx.restore();}ctx.restore();}
     });resources.push(city);
     box([3.94,3.05,.12],[-1.45,3.0,-3.20],metal);
-    plane(3.74,2.86,[-1.45,3.0,-3.12],new THREE.MeshBasicMaterial({map:city}));
+    plane(3.74,2.86,[-1.45,3.0,-3.12],new THREE.MeshBasicMaterial({map:city,color:'#b6bfd1'}));
     box([.055,3,.07],[-1.45,3,-3.05],dark);box([3.98,.1,.24],[-1.45,1.49,-3.05],dark);
 
     // Rug, rounded desk and subtle warm perimeter strip.
-    box([4.8,.025,3.6],[-.65,.01,.1],material('#85808a'));box([4.54,.028,3.34],[-.65,.025,.1],dark);box([4.46,.03,3.26],[-.65,.03,.1],material('#87818b'));box([4.26,.032,3.06],[-.65,.035,.1],material('#6c6875'));
+    box([4.8,.025,3.6],[-.65,.01,.1],material('#777c90'));box([4.54,.028,3.34],[-.65,.025,.1],dark);box([4.46,.03,3.26],[-.65,.03,.1],material('#87818b'));box([4.26,.032,3.06],[-.65,.035,.1],material('#6c6875'));
     round(3.6,1.15,1.65,.15,[-.65,.64,.1],material('#252633'));
-    const strip=round(3.78,.07,1.8,.15,[-.65,1.235,.1],glowing('#ffdba6',2));strip.castShadow=false;
-    const underDeskStrip=glowing('#efbd8e',1.25);
+    const strip=round(3.78,.07,1.8,.15,[-.65,1.235,.1],glowing('#f5d3b2',1.25));strip.castShadow=false;
+    const underDeskStrip=glowing('#e6c5a7',.9);
     box([3.26,.022,.018],[-.65,.14,.965],underDeskStrip).castShadow=false;
     for(const x of[-2.47,1.17])box([.018,.022,1.42],[x,.14,.1],underDeskStrip).castShadow=false;
     round(3.8,.12,1.84,.18,[-.65,1.32,.1],wood);
@@ -199,22 +201,30 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
     // Robot: TV head, pale housing, articulated hands and a small antenna.
     const robot=new THREE.Group();robot.name='typing-robot';robot.position.set(-.62,-.38,-1.5);scene.add(robot);
     round(.52,.69,.41,.05,[0,1.83,0],cream,robot);box([.35,.09,.47],[0,1.48,.04],metal,robot);
+    const mechanics=createRobotMechanics({add,box,round,cylinder,material,glowing});mechanics.torso(robot);
     // Bent legs and an office chair make the seated pose physically grounded.
     for(const x of[-.16,.16]){box([.12,.12,.42],[x,1.4,.2],cream,robot);sphere(.075,[x,1.32,.4],metal,robot);rod([x,1.32,.4],[x,.68,.4],.055,cream,robot);box([.17,.09,.28],[x,.61,.49],dark,robot);}
+    for(const side of[-1,1])mechanics.joint([side*.225,1.32,.4],side,.07,robot);
     round(.68,.13,.65,.07,[0,1.30,.02],dark,robot);
     round(.68,.91,.13,.10,[0,1.82,-.31],metal,robot);
     cylinder(.06,.72,[0,.91,0],metal,robot);
     for(let i=0;i<5;i++){const a=i/5*Math.PI*2,x=Math.sin(a)*.43,z=Math.cos(a)*.43;rod([0,.53,0],[x,.49,z],.028,metal,robot);sphere(.055,[x,.45,z],dark,robot);}
-    for(let j=0;j<3;j++)box([.27,.023,.02],[0,1.99-j*.1,.22],metal,robot);
     cylinder(.105,.13,[0,2.22,0],metal,robot);
+    const robotHead=new THREE.Group();robotHead.name='robot-tracking-head';robotHead.position.set(0,2.3,0);robot.add(robotHead);
+    const headStart=robot.children.length;
     round(.91,.72,.57,.12,[0,2.63,0],dark,robot);const robotFace=round(.76,.57,.025,.085,[0,2.63,.30],glowing(PINK,.7,'screens'),robot);robotFace.name='robot-face';
     const eyes=[];for(const x of[-.18,.18]){eyes.push(box([.09,.19,.02],[x,2.65,.365],material('#202134'),robot));}
     round(.95,.07,.61,.03,[0,3.04,0],cream,robot);
     rod([-.18,3.05,0],[-.3,3.24,0],.016,metal,robot);rod([.18,3.05,0],[.3,3.27,0],.016,metal,robot);sphere(.03,[-.3,3.24,0],dark,robot);sphere(.03,[.3,3.27,0],dark,robot);
+    robot.updateWorldMatrix(true,true);robot.children.slice(headStart).forEach(part=>robotHead.attach(part));
+    robotHead.scale.setScalar(.94);
+    const robotGaze=createRobotGaze(robotHead);
     const typingArms=[],typingFingers=[];
     for(const side of[-1,1]){
       sphere(.105,[side*.36,2.03,0],metal,robot);rod([side*.37,2.03,0],[side*.47,1.91,.39],.06,cream,robot);sphere(.075,[side*.47,1.91,.39],metal,robot);
+      mechanics.joint([side*.48,2.03,0],side,.105,robot);
       const arm=new THREE.Group();arm.name=side===-1?'typing-left-arm':'typing-right-arm';arm.position.set(side*.47,1.91,.39);robot.add(arm);typingArms.push({arm,phase:side===-1?0:Math.PI});
+      mechanics.joint([side*.078,0,0],side,.073,arm);
       rod([0,0,0],[-side*.19,.05,.45],.055,cream,arm);box([.17,.06,.17],[-side*.19,.04,.49],metal,arm);
       for(let j=0;j<4;j++){const finger=box([.025,.04,.14],[-side*.19-.055+j*.037,.04,.57],cream,arm);typingFingers.push({finger,phase:j*1.3+(side===-1?0:2.1)});}
     }
@@ -228,7 +238,7 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
     for(const x of[-.07,.025])sphere(.035,[x,.19,.029],dark,phone);
     // Pinboard and genuinely relevant study/project badges.
     box([2.2,1.37,.07],[2.45,2.91,-3.19],metal);box([2.12,1.29,.08],[2.45,2.91,-3.14],material('#141824'));
-    const boardBacklight=glowing('#c4d4ff',.7);
+    const boardBacklight=glowing('#bccce9',.48);
     for(const y of[2.21,3.61])box([2.24,.014,.014],[2.45,y,-3.22],boardBacklight).castShadow=false;
     for(const x of[1.32,3.58])box([.014,1.4,.014],[x,2.91,-3.22],boardBacklight).castShadow=false;
     const pinholes=[];for(let x=1.45;x<3.45;x+=.09)for(let y=2.33;y<3.5;y+=.09)pinholes.push([x,y,-3.09]);
@@ -242,8 +252,8 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
     }
     // Cabinet, speaker, laptop and wireless router at the right of the desk.
     box([1.32,.63,.62],[2.32,.39,-2.44],dark);box([1.38,.08,.67],[2.32,.74,-2.44],metal);box([.018,.56,.03],[2.32,.4,-2.1],seam);for(const x of[2.24,2.4])box([.018,.17,.04],[x,.42,-2.07],material('#bda27d'));
-    box([1.26,.018,.02],[2.32,.72,-2.09],glowing('#c5c8eb',.6)).castShadow=false;
-    const consoleGlow=plane(2.15,1.3,[2.32,.065,-2.3],glowMaterial('#ba9cdd',.22));consoleGlow.rotation.x=-Math.PI/2;consoleGlow.castShadow=consoleGlow.receiveShadow=false;
+    box([1.26,.018,.02],[2.32,.72,-2.09],glowing('#bec8e1',.45)).castShadow=false;
+    const consoleGlow=plane(2.15,1.3,[2.32,.065,-2.3],glowMaterial('#b7a8d5',.16));consoleGlow.rotation.x=-Math.PI/2;consoleGlow.castShadow=consoleGlow.receiveShadow=false;
     const speakerBody=round(.4,.58,.31,.045,[2.05,1.07,-2.4],metal);speakerBody.userData.go='spotify';
     const speaker=cylinder(.145,.032,[2.05,1.07,-2.22],dark);speaker.rotation.x=Math.PI/2;speaker.userData.go='spotify';
     const speakerRingMaterial=material('#bc7f9c',{metalness:.6,emissive:'#8be3b1',emissiveIntensity:0});
@@ -273,7 +283,7 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
     box([.5,.08,.3],[3.62,.20,-1.97],cream);for(const x of[3.43,3.81])rod([x,.25,-2.04],[x,.52,-2.04],.013,dark);
     // Left shelf, books, warm lighting and framed pixel art.
     box([.65,.065,2.1],[-4.19,2.1,-1.55],dark);
-    box([.018,.022,1.98],[-3.85,2.075,-1.55],glowing('#ffd1a0',1.65)).castShadow=false;
+    box([.018,.022,1.98],[-3.85,2.075,-1.55],glowing('#efd2b4',1.15)).castShadow=false;
     for(let i=0;i<10;i++){const col=['#28476a','#886982','#bd9181','#62888e'][i%4];box([.35,.42+i%3*.06,.12],[-4.16,2.35+i%3*.03,-2.39+i*.17],material(col));box([.36,.018,.125],[-4.16,2.37+i%3*.03,-2.39+i*.17],cream);}
     const artTexture=canvasTexture(256,320,(ctx,w,h)=>{const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#36345f');g.addColorStop(.5,'#c8839a');g.addColorStop(1,'#ebbb93');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.fillStyle='#ecccaa';ctx.fillRect(136,62,50,50);for(let i=0;i<18;i++){ctx.fillStyle=['#423e65','#706080','#ad7f94'][i%3];ctx.fillRect(i*18-20,150+(i*31)%80,45,h);}ctx.fillStyle='#f0c7a9';ctx.font='bold 18px monospace';ctx.fillText('STAY CURIOUS',18,290);});resources.push(artTexture);
     const art=new THREE.Group();art.position.set(-4.49,3.65,-1.6);art.rotation.y=Math.PI/2;scene.add(art);box([.85,1.04,.08],[0,0,0],dark,art);box([.75,.94,.02],[0,0,.05],cream,art);plane(.62,.79,[0,0,.07],new THREE.MeshBasicMaterial({map:artTexture}),art);
@@ -330,6 +340,7 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
       if(!drag){const rect=host.getBoundingClientRect();hoverPointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);hoverDirty=true;return;}
       const dx=(e.clientX-drag.x)/host.clientWidth,dy=(e.clientY-drag.y)/host.clientHeight;
       dragged||=Math.abs(dx)+Math.abs(dy)>.008;
+      if(dragged)robotGaze.begin(camera);
       const offset=new THREE.Vector3(...roomHome()).sub(new THREE.Vector3(...home.target));
       const homePhi=Math.acos(offset.y/offset.length());
       orbit=drag.orbit-dx*Math.PI*1.1;
@@ -351,6 +362,7 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
       if(!reduced){fanRotor.rotation.y=t*.65;robot.rotation.y=Math.sin(t*.35)*.012;const blink=t%5.6>5.43?.12:1;eyes.forEach(eye=>eye.scale.y=blink);typingArms.forEach(({arm,phase})=>arm.rotation.x=Math.sin(t*9+phase)*.022);typingFingers.forEach(({finger,phase})=>finger.position.y=.04-Math.max(0,Math.sin(t*12+phase))*.012);}
       if(api.current?.entered&&!current&&!navigating&&(Math.abs(orbit-renderOrbit)+Math.abs(pitch-renderPitch)>1e-5)){const blend=reduced?1:1-Math.exp(-dt*12);renderOrbit+=(orbit-renderOrbit)*blend;renderPitch+=(pitch-renderPitch)*blend;applyOrbit();}
       camera.lookAt(target);camera.updateMatrixWorld();
+      robotGaze.update(camera,dt,!!api.current?.entered&&!current&&!navigating,reduced);
       cat.update(camera,!!api.current?.entered&&!current&&!navigating);
       if(hoverDirty&&!drag&&!current&&!navigating&&api.current?.entered){raycaster.setFromCamera(hoverPointer,camera);const hit=raycaster.intersectObjects(interactiveMeshes)[0];const isArt=hit?.object.userData.hover==='ml-art';wallDecor.setHovered(isArt);host.dataset.roomHover=isArt?'art':hit?.object.userData.go||hit?.object.userData.action?'action':'';hoverDirty=false;}
       const cameraChanged=!lastCameraMatrix.equals(camera.matrixWorld)||!lastProjectionMatrix.equals(camera.projectionMatrix);
@@ -366,7 +378,7 @@ export default function RoomScene({ entered, active, onReady, onNavigate, onDock
     }
     api.current={entered:false,setMusic:updateSpeaker,go(key,opening=false){
       if(opening)illuminateRoom();
-      leave();wallDecor.setFocused(false);
+      leave();wallDecor.setFocused(false);robotGaze.reset();
       current=key;navigating=true;cancelDrag();callbacks.current.onDocked(false);gsap.killTweensOf(camera.position);gsap.killTweensOf(target);gsap.killTweensOf(camera);
       const dest=views[key]||home,desired=key?dest.position:roomHome();const position=constrainRoomCamera(desired,dest.target);
       if(!key){orbit=0;pitch=0;renderOrbit=0;renderPitch=0;}
