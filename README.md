@@ -20,6 +20,12 @@ npm run dev
 
 Open `http://localhost:3000`. The room and Flat route work without API credentials. The room robot uses a local guide grounded in the shared verified content. Flat mode offers server chat with limited answers from verified portfolio facts without an OpenAI key. Contact delivery requires the service settings below.
 
+## Spotify speaker
+
+Click the room’s speaker or the music button, paste a full Spotify song, album, or playlist share link, and press **Load song**. Playback uses Spotify’s own embedded player; no developer API keys are needed. Use **Find a song on Spotify** to browse its catalog and copy a share link. This integration does not provide an in-page catalog search or promise unrestricted full-song playback: Spotify controls playback availability, login, browser/DRM support, and previews.
+
+The speaker display follows the selected title and real playback events. Minimize keeps the embedded controls visible and playing while exploring the room. Close stops playback. Metadata comes from Spotify’s public oEmbed endpoint through `/api/spotify`, which only accepts validated Spotify music URLs and never renders third-party HTML.
+
 ## Environment variables
 Set these only on the server, in `.env.local` or deployment platform settings:
 

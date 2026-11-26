@@ -28,6 +28,17 @@ test('Room opens all four destinations and Escape returns home', async ({ page }
   test.setTimeout(120000);
   await page.goto('/');
   await page.getByRole('button', { name: 'Enter without sound' }).click();
+  await expect(page.getByRole('status', { name: 'Welcome to Abdullah’s room' })).toBeVisible();
+  await expect(page.locator('.room-index')).toBeHidden();
+  await page.waitForTimeout(350); // Robot face is visible before the name card.
+  await expect(page.locator('.room-intro-shade')).toHaveCSS('opacity', '0');
+  await expect(page.locator('.room-intro-copy')).toHaveCSS('opacity', '0');
+  await page.waitForTimeout(1000); // Keep the pullback visible, rather than covering it.
+  await expect(page.locator('.room-intro-shade')).toHaveCSS('opacity', '0');
+  await page.waitForTimeout(1400); // The following name card holds on black.
+  await expect(page.locator('.room-intro-shade')).toHaveCSS('opacity', '1');
+  await expect(page.locator('.room-intro-name')).toBeVisible();
+  await expect(page.locator('.room-intro')).toHaveCount(0, { timeout: 12000 });
   for (const [label, surface] of [['Projects', 'Project desktop'], ['Experience', 'Learning, projects and credentials'], ['About', 'About Abdullah'], ['Contact', 'Contact Abdullah']]) {
     await page.locator('.room-index').getByRole('button', { name: new RegExp(label) }).click();
     await expect(page.locator('.room-surface[aria-label="' + surface + '"]')).toBeVisible({ timeout: 15000 });
