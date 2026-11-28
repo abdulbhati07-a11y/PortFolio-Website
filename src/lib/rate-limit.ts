@@ -6,9 +6,10 @@ const redis = configured ? Redis.fromEnv() : null;
 
 const chatLimiter = redis ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(8, '1 m'), prefix: 'abdullah:chat' }) : null;
 const contactLimiter = redis ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '10 m'), prefix: 'abdullah:contact' }) : null;
+const spotifyLimiter = redis ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(30, '1 m'), prefix: 'abdullah:spotify' }) : null;
 const localChatRequests = new Map<string, number[]>();
 
-export async function limitRequest(kind: 'chat' | 'contact', request: Request) {
+export async function limitRequest(kind: 'chat' | 'contact' | 'spotify', request: Request) {
   if (!configured) {
     if (kind === 'chat' && !process.env.OPENAI_API_KEY) {
       const key = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local';
@@ -20,9 +21,9 @@ export async function limitRequest(kind: 'chat' | 'contact', request: Request) {
       localChatRequests.set(key, recent);
       return { ok: true, status: 200, reason: '' };
     }
-    return { ok: process.env.NODE_ENV !== 'production', status: 503, reason: kind === 'chat' ? 'Chat is temporarily unavailable.' : 'Message service is temporarily unavailable.' };
+    return { ok: process.env.NODE_ENV !== 'production', status: 503, reason: kind === 'chat' ? 'Chat is temporarily unavailable.' : kind === 'spotify' ? 'Song search is temporarily unavailable.' : 'Message service is temporarily unavailable.' };
   }
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const result = await (kind === 'chat' ? chatLimiter! : contactLimiter!).limit(ip);
+  const result = await (kind === 'chat' ? chatLimiter! : kind === 'spotify' ? spotifyLimiter! : contactLimiter!).limit(ip);
   return { ok: result.success, status: 429, reason: 'Too many requests. Please try again later.' };
 }

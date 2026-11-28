@@ -22,23 +22,21 @@ window.onSpotifyIframeApiReady({createController(element, options, callback) {
 }});
 `;
 
-test('Spotify speaker loads links, reflects playback, and survives room navigation', async ({ page }) => {
+test('Spotify speaker searches songs, reflects playback, and survives room navigation', async ({ page }) => {
   test.setTimeout(90000);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.route('https://open.spotify.com/embed/iframe-api/v1', route => route.fulfill({ contentType: 'application/javascript', body: embedFixture }));
-  await page.route('**/api/spotify?*', route => route.fulfill({ json: { title: 'Test song', uri, type: 'track', id: songId, url: `https://open.spotify.com/track/${songId}` } }));
+  await page.route('**/api/spotify/search?*', route => route.fulfill({ json: { tracks: [{ title: 'Test song', artist: 'Test artist', album: 'Test album', image: null, durationMs: 180000, uri, type: 'track', id: songId, url: `https://open.spotify.com/track/${songId}` }], nextOffset: null } }));
   await page.goto('/');
   await page.getByRole('button', { name: 'Enter without sound' }).click();
   await page.locator('.desk-scene').getByRole('button', { name: 'Open Spotify speaker', exact: true }).click();
   const player = page.getByRole('complementary', { name: 'A little music?' });
-  await expect(player.getByRole('textbox', { name: 'Spotify song link' })).toBeFocused();
-  await player.getByRole('textbox').fill('https://example.com/not-a-song');
-  await player.getByRole('button', { name: 'Load song' }).click();
-  await expect(player.getByRole('alert')).toContainText('Paste a full open.spotify.com');
-  await player.getByRole('textbox').fill(`https://open.spotify.com/track/${songId}?si=tracking`);
-  await player.getByRole('button', { name: 'Load song' }).click();
+  await expect(player.getByRole('searchbox', { name: 'Search songs or artists' })).toBeFocused();
+  await player.getByRole('searchbox').fill('Test artist');
+  await player.getByRole('button', { name: 'Search', exact: true }).click();
+  await player.getByRole('button', { name: 'Select Test song by Test artist' }).click();
   await expect(player.locator('iframe')).toBeVisible();
-  await expect(page.locator('.desk-scene')).toHaveAttribute('data-speaker-title', 'Test song');
+  await expect(page.locator('.desk-scene')).toHaveAttribute('data-speaker-title', 'Test song · Test artist');
   await page.evaluate(`window.__spotifyTest.listeners.playback_update({data:{playingURI:'${uri}',isPaused:false,isBuffering:false}})`);
   await expect(page.locator('.desk-scene')).toHaveAttribute('data-speaker-playing', 'true');
   await expect(player.locator('.speaker-now-playing')).toContainText('Playing');
@@ -63,14 +61,48 @@ test('Spotify metadata endpoint rejects arbitrary hosts and invalid identifiers'
 test('Spotify panel fits mobile and reports unavailable songs', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.route('**/api/spotify?*', route => route.fulfill({ status: 404, json: { error: 'Spotify could not find this item.' } }));
+  await page.route('**/api/spotify/search?*', route => route.fulfill({ status: 503, json: { error: 'Song search isn’t connected yet. Please try again later.' } }));
   await page.goto('/');
   await page.getByRole('button', { name: 'Enter without sound' }).click();
   await page.locator('.room-music').click();
-  await page.getByRole('textbox', { name: 'Spotify song link' }).fill(uri);
-  await page.getByRole('button', { name: 'Load song' }).click();
-  await expect(page.locator('.spotify-speaker').getByRole('alert')).toContainText('Spotify could not find this item');
+  await page.getByRole('searchbox', { name: 'Search songs or artists' }).fill('Arijit Singh');
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect(page.locator('.spotify-speaker').getByRole('alert')).toContainText('Song search isn’t connected yet');
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await page.keyboard.press('Escape');
   await expect(page.locator('.spotify-speaker')).toHaveCount(0);
 });
+
+ test('Spotify search rejects invalid queries before contacting the catalog', async ({ request }) => {
+   for (const query of ['', 'a', 'a'.repeat(121)]) {
+     const response = await request.get('/api/spotify/search?q=' + encodeURIComponent(query));
+     expect(response.status()).toBe(400);
+   }
+   expect((await request.get('/api/spotify/search?q=test&offset=-1')).status()).toBe(400);
+ });
+
+ test('Spotify search handles empty results and loads additional selections', async ({ page }) => {
+   await page.emulateMedia({ reducedMotion: 'reduce' });
+   await page.route('https://open.spotify.com/embed/iframe-api/v1', route => route.fulfill({ contentType: 'application/javascript', body: embedFixture }));
+   await page.route('**/api/spotify/search?*', route => {
+     const url = new URL(route.request().url());
+     const q = url.searchParams.get('q');
+     const more = url.searchParams.get('offset') === '10';
+     return route.fulfill({ json: { tracks: q === 'nothing' ? [] : [{ title: more ? 'Another song' : 'Test song', artist: 'Test artist', album: '', image: null, durationMs: 180000, uri: more ? 'spotify:track:0VjIjW4GlUZAMYd2vXMi3b' : uri, type: 'track', id: more ? '0VjIjW4GlUZAMYd2vXMi3b' : songId, url: `https://open.spotify.com/track/${more ? '0VjIjW4GlUZAMYd2vXMi3b' : songId}` }], nextOffset: q === 'nothing' || more ? null : 10 } });
+   });
+   await page.goto('/');
+   await page.getByRole('button', { name: 'Enter without sound' }).click();
+   await page.locator('.room-music').click();
+   const player = page.getByRole('complementary', { name: 'A little music?' });
+   await player.getByRole('searchbox').fill('nothing');
+   await player.getByRole('button', { name: 'Search', exact: true }).click();
+   await expect(player.getByRole('status')).toContainText('No songs found');
+   await player.getByRole('searchbox').fill('artist');
+   await player.getByRole('button', { name: 'Search', exact: true }).click();
+   await player.getByRole('button', { name: 'Select Test song by Test artist' }).click();
+   await expect(player.locator('iframe')).toBeVisible();
+   await player.getByRole('button', { name: 'Show more songs' }).click();
+   await player.getByRole('button', { name: 'Select Another song by Test artist' }).click();
+   await expect(page.locator('.desk-scene')).toHaveAttribute('data-speaker-title', 'Another song · Test artist');
+   expect(await page.evaluate('window.__spotifyTest.loads.length')).toBe(2);
+ });

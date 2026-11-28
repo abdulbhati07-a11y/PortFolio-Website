@@ -5,6 +5,14 @@ export type SpotifyItem = {
   url: string;
 };
 
+export type SpotifySearchTrack = SpotifyItem & {
+  title: string;
+  artist: string;
+  album: string;
+  image: string | null;
+  durationMs: number;
+};
+
 /** Only canonical Spotify music links may reach our metadata endpoint. */
 export function parseSpotifyItem(value: string): SpotifyItem | null {
   if (value.length > 512) return null;

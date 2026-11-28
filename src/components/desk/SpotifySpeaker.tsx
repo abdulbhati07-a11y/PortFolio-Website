@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
-import { FiExternalLink, FiMinus, FiMusic, FiPlus, FiX } from 'react-icons/fi';
-import { idleSpeaker, parseSpotifyItem, type SpeakerPlayback, type SpotifyItem } from '@/lib/spotify';
+import Image from 'next/image';
+import { FiExternalLink, FiMinus, FiMusic, FiPlus, FiSearch, FiX } from 'react-icons/fi';
+import { idleSpeaker, parseSpotifyItem, type SpeakerPlayback, type SpotifyItem, type SpotifySearchTrack } from '@/lib/spotify';
 import { loadSpotifyEmbed, type EmbedPlaybackEvent, type SpotifyEmbedController } from '@/lib/spotify-embed';
 
 type Selection = SpotifyItem & { title: string };
@@ -15,6 +16,9 @@ type Props = {
 
 export default function SpotifySpeaker({ selection, onSelection, onPlayback, onClose }: Props) {
   const [input, setInput] = useState('');
+  const [results,setResults] = useState<SpotifySearchTrack[]>([]);
+  const [searched,setSearched] = useState(false);
+  const [nextOffset,setNextOffset] = useState<number | null>(null);
   const [error, setError] = useState('');
   const [playerError, setPlayerError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -99,31 +103,38 @@ export default function SpotifySpeaker({ selection, onSelection, onPlayback, onC
     };
   }, [hasSelection, syncPlayback, retry]);
 
-  async function loadSong(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const item = parseSpotifyItem(input);
-    if (!item) { setError('Paste a full open.spotify.com song, album, or playlist link.'); return; }
+  async function searchSongs(event?: FormEvent<HTMLFormElement>, offset = 0) {
+    event?.preventDefault();
+    const query = input.trim();
+    if (query.length < 2) { setError('Enter at least two characters to search.'); return; }
     fetchAbort.current?.abort();
     const abort = new AbortController();
     fetchAbort.current = abort;
     setBusy(true); setError('');
+    if (!offset) { setResults([]); setSearched(false); setNextOffset(null); }
     try {
-      const response = await fetch(`/api/spotify?url=${encodeURIComponent(item.url)}`, { signal: abort.signal });
+      const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(query)}&offset=${offset}`, { signal: abort.signal });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Could not load this song.');
+      if (!response.ok) throw new Error(data.error || 'Could not search Spotify.');
       if (abort.signal.aborted) return;
-      trackAbort.current?.abort();
-      trackLookup.current = '';
-      const next: Selection = { ...item, title: data.title };
-      controller.current?.pause();
-      current.current = next;
-      onSelection(next);
-      controller.current?.loadEntity(next.uri);
-      report({ ...idleSpeaker, title: next.title, uri: next.uri });
-      setInput('');
+      setResults(previous => offset ? [...previous, ...data.tracks] : data.tracks);
+      setNextOffset(data.nextOffset);
+      setSearched(true);
     } catch (cause) {
       if (!abort.signal.aborted) setError(cause instanceof Error ? cause.message : 'Could not reach Spotify. Try again.');
     } finally { if (!abort.signal.aborted) setBusy(false); }
+  }
+
+  function selectSong(track: SpotifySearchTrack) {
+    trackAbort.current?.abort();
+    trackLookup.current = '';
+    const next: Selection = { ...track, title: `${track.title}${track.artist ? ` · ${track.artist}` : ''}` };
+    controller.current?.pause();
+    current.current = next;
+    onSelection(next);
+    controller.current?.loadEntity(next.uri);
+    report({ ...idleSpeaker, title: next.title, uri: next.uri });
+    setPlayerError('');
   }
 
   const status = playback.isBuffering ? 'Buffering' : playback.isPlaying ? 'Playing' : selection ? 'Ready to play' : 'Your room. Your soundtrack.';
@@ -135,13 +146,19 @@ export default function SpotifySpeaker({ selection, onSelection, onPlayback, onC
       <button type="button" aria-label="Close Spotify player and stop playback" onClick={onClose}><FiX /></button>
     </header>
     {!compact && <div className="speaker-song-picker">
-      <p>Pick a song on Spotify, copy its share link, and bring it into the room.</p>
-      <form onSubmit={loadSong}>
-        <label htmlFor="speaker-song-link">Spotify song link</label>
-        <div><input ref={inputRef} id="speaker-song-link" type="text" inputMode="url" value={input} onChange={event => setInput(event.target.value)} maxLength={512} placeholder="https://open.spotify.com/track/…" autoComplete="off" required /><button disabled={busy} type="submit">{busy ? 'Loading…' : 'Load song'}</button></div>
+      <p>Search a song or artist, then choose your soundtrack.</p>
+      <form onSubmit={searchSongs} role="search" aria-label="Search Spotify songs">
+        <label htmlFor="speaker-song-search">Search songs or artists</label>
+        <div><input ref={inputRef} id="speaker-song-search" type="search" value={input} onChange={event => { fetchAbort.current?.abort(); setBusy(false); setInput(event.target.value); setResults([]); setSearched(false); setNextOffset(null); setError(''); }} maxLength={120} placeholder="Song title or artist…" autoComplete="off" required /><button disabled={busy} type="submit"><FiSearch aria-hidden="true" />{busy ? 'Searching…' : 'Search'}</button></div>
       </form>
       {error && <p className="speaker-error" role="alert">{error}</p>}
-      <a className="speaker-find-song" href="https://open.spotify.com/search" target="_blank" rel="noreferrer">Find a song on Spotify <FiExternalLink aria-hidden="true" /></a>
+      <div className="speaker-search-summary" role="status">{busy ? 'Searching Spotify…' : searched ? results.length ? `${results.length} songs found` : 'No songs found. Try another title or artist.' : 'Search the Spotify catalog'}</div>
+      {results.length > 0 && <ul className="speaker-search-results" aria-label="Spotify search results">{results.map(track => <li key={track.id}><button type="button" aria-label={`Select ${track.title} by ${track.artist}`} aria-pressed={selection?.uri === track.uri} onClick={() => selectSong(track)}>
+        {track.image ? <Image src={track.image} alt="" width={40} height={40} unoptimized /> : <span className="speaker-result-art"><FiMusic aria-hidden="true" /></span>}
+        <span className="speaker-result-copy"><strong>{track.title}</strong><small>{track.artist}</small></span><span className="speaker-result-duration">{Math.floor(track.durationMs / 60000)}:{String(Math.floor(track.durationMs / 1000) % 60).padStart(2, '0')}</span>
+      </button></li>)}</ul>}
+      {nextOffset !== null && <button className="speaker-more" type="button" disabled={busy} onClick={() => searchSongs(undefined, nextOffset)}>Show more songs</button>}
+      <a className="speaker-find-song" href="https://open.spotify.com" target="_blank" rel="noreferrer">Music from Spotify <FiExternalLink aria-hidden="true" /></a>
     </div>}
     <div className="speaker-now-playing" aria-live="polite"><span className={playback.isPlaying ? 'is-playing' : ''} /><div><strong>{playback.title === idleSpeaker.title && selection ? selection.title : playback.title}</strong><p>{status}</p></div></div>
     {selection && <div className="speaker-embed-shell">

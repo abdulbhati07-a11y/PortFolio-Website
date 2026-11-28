@@ -22,16 +22,20 @@ Open `http://localhost:3000`. The room and Flat route work without API credentia
 
 ## Spotify speaker
 
-Click the room’s speaker or the music button, paste a full Spotify song, album, or playlist share link, and press **Load song**. Playback uses Spotify’s own embedded player; no developer API keys are needed. Use **Find a song on Spotify** to browse its catalog and copy a share link. This integration does not provide an in-page catalog search or promise unrestricted full-song playback: Spotify controls playback availability, login, browser/DRM support, and previews.
+**Enter with sound** enables a very quiet synthesized room hum with a gradual fade. **Enter without sound** starts silently. The room sound button toggles the hum; Spotify playback temporarily fades it out, then restores it on pause if room sound is still enabled. Background tabs suspend the hum.
 
-The speaker display follows the selected title and real playback events. Minimize keeps the embedded controls visible and playing while exploring the room. Close stops playback. Metadata comes from Spotify’s public oEmbed endpoint through `/api/spotify`, which only accepts validated Spotify music URLs and never renders third-party HTML.
+Click the room’s speaker or the music button, search by song title or artist, then select a result. The result list includes artist, artwork, duration, and a **Show more songs** action. Press play in Spotify’s embedded player after selecting. The speaker display follows the selected title and actual playback events. Minimize keeps playback available during room navigation; Close stops it.
+
+Catalog search uses Spotify’s official Web API through `/api/spotify/search`. Create a Spotify developer app and set `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` in `.env.local` and the hosting environment, then restart the server. Set `SPOTIFY_MARKET` to an ISO country code (default `PK`). Production search also requires the existing Upstash rate limit configuration. No credentials or access tokens are returned to the browser. Missing credentials show an honest unavailable state; there is no simulated catalog. The existing validated `/api/spotify` oEmbed route resolves metadata when Spotify advances to another track.
+
+Spotify controls full-song/preview availability, login and browser support; catalog search credentials do not grant unrestricted playback. Development-mode app owners currently need Spotify Premium. See [Spotify search](https://developer.spotify.com/documentation/web-api/reference/search), [client credentials](https://developer.spotify.com/documentation/web-api/tutorials/client-credentials-flow), and [development-mode requirements](https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide).
 
 ## Environment variables
 Set these only on the server, in `.env.local` or deployment platform settings:
 
 - `OPENAI_API_KEY`: optional key for richer streaming assistant responses. Without it, a limited server-side portfolio guide answers common verified questions and declines unknown claims.
 - `OPENAI_MODEL`: optional model ID; default is `gpt-4o-mini`.
-- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`: production rate limiting for AI chat and contact. With no OpenAI key, the limited portfolio guide uses a local per-process limit. AI and contact requests are rejected in production if the rate limit service is missing.
+- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`: production rate limiting for AI chat, contact, and Spotify search. With no OpenAI key, the limited portfolio guide uses a local per-process limit. AI and contact requests are rejected in production if the rate limit service is missing.
 - `EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, `EMAILJS_PUBLIC_KEY`: existing contact delivery service, now called from the server. The template expects `from_name`, `from_email`, `subject`, `message`, and `to_name`.
 
 No API key is exposed through a `NEXT_PUBLIC_` variable.
